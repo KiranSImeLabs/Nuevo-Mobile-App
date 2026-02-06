@@ -1,0 +1,104 @@
+# Cursor Rules – Flutter Project Standards
+
+You are working on a Flutter multiplatform project (Mobile + Web).
+
+IMPORTANT:
+Before performing any task, ALWAYS read and align with:
+- `PROJECT_CONTEXT.md` → Contains overall project background, domain context, business goals, assumptions, and constraints.
+
+All outputs must strictly follow both:
+1. `PROJECT_CONTEXT.md`
+2. The rules defined in this `.cursorrules` file
+
+Deviations are not allowed unless explicitly stated.
+
+---
+
+## AI Orchestration Roles
+
+- Use **Claude 3.5 Sonnet** as the primary model for:
+  - Architecture planning
+  - `plan.md` generation
+  - Architectural validation
+  - HIPAA and GDPR compliance checks
+- If Claude 3.5 Sonnet quota is exhausted, fallback to **Gemini 3 Pro**.
+- Use **Gemini 1.5 Pro** for:
+  - Dart implementation
+  - Riverpod providers
+  - Business logic
+  - Unit test implementation
+- Implementation must reach **90% unit test coverage**.
+
+---
+
+## Technical Stack & Architecture
+
+- Framework: **Flutter** (Mobile + Web).
+- Minimum supported OS versions:
+  - iOS **16.0+**
+  - Android **10.0+**
+- Architecture pattern: **Clean Architecture**
+  - Presentation
+  - Domain
+  - Data
+  - Core
+- State management: **Riverpod**
+  - `SubscriptionProvider` is mandatory.
+- Navigation: **GoRouter**
+  - Must include redirect logic for active vs inactive subscriptions.
+- Dependency rules:
+  - Every class must be injectable.
+  - Every class must be unit-testable in isolation.
+- Responsive design requirements:
+  - UI must support **all screen sizes** (mobile, tablet, foldable, web).
+  - Use adaptive layouts (`LayoutBuilder`, `MediaQuery`, responsive widgets).
+  - No hard-coded widths or device-specific UI assumptions.
+
+---
+
+## Video Calling (Cross-Platform)
+
+- Video SDK: **Agora**
+  - Must be interoperable with React.js web clients.
+- iOS requirements:
+  - Must integrate **CallKit** for native background and incoming call handling.
+- Calling rules:
+  - Use standard Channel Names and UIDs compatible with Web.
+  - Handle runtime permissions gracefully using `permission_handler`.
+
+---
+
+## Strict Constraints & Compliance
+
+- Apple policy restrictions:
+  - **DO NOT** include `store_kit`.
+  - **DO NOT** include `billing_client`.
+- UI restrictions:
+  - Do NOT build payment, checkout, or “Add Card” screens.
+  - Subscription information must be displayed as **read-only text only**.
+- Security & compliance:
+  - Enforce **HIPAA** and **GDPR** standards for all health-related data.
+  - Do NOT log PII (Personally Identifiable Information).
+  - No sensitive data in logs, analytics, or crash reports.
+
+---
+
+## Quality Control (TDD)
+
+- Test-Driven Development is **mandatory**.
+- Test cases must be written **before** implementation.
+- Maintain a minimum of **90% unit test coverage**.
+- Always validate implementation against:
+  - `PROJECT_CONTEXT.md`
+  - Approved `plan.md`
+before marking any task as complete.
+
+---
+
+## Enforcement
+
+- If there is any conflict:
+  1. `PROJECT_CONTEXT.md` takes precedence
+  2. Then `.cursorrules`
+- If a request violates any rule, explain the violation and provide a compliant alternative.
+- Do not assume permissions, platforms, SDKs, or features outside what is explicitly defined.
