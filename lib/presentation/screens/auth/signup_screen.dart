@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/auth_state.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/constants/app_strings.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -40,7 +41,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       if (!_agreedToTerms) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Please agree to the Terms of Service'),
+            content: Text(AppStrings.agreeTermsError),
             backgroundColor: AppColors.error,
           ),
         );
@@ -84,7 +85,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   
                   // Header
                   Text(
-                    'Create your account',
+                    AppStrings.createAccount, // AppStrings.createAccount
                     style: AppTextStyles.h2.copyWith(
                       fontSize: 28,
                       fontWeight: FontWeight.w500,
@@ -93,7 +94,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Start your personalised care journey',
+                    AppStrings.startJourney,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -105,7 +106,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   TextFormField(
                     controller: _nameController,
                     decoration: _inputDecoration(
-                      hintText: 'Full Name',
+                      hintText: AppStrings.fullName,
                       prefixIcon: Icons.person_outline,
                     ),
                     validator: Validators.validateName,
@@ -118,7 +119,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: _inputDecoration(
-                      hintText: 'Email Address',
+                      hintText: AppStrings.emailAddress,
                       prefixIcon: Icons.mail_outline,
                     ),
                     keyboardType: TextInputType.emailAddress,
@@ -132,7 +133,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   TextFormField(
                     controller: _passwordController,
                     decoration: _inputDecoration(
-                      hintText: 'Password',
+                      hintText: AppStrings.password,
                       // No prefix icon for password based on design (usually just toggle)
                       // Design shows NO prefix icon for password inputs, just suffix eye
                     ).copyWith(
@@ -156,7 +157,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   TextFormField(
                     controller: _confirmPasswordController,
                     decoration: _inputDecoration(
-                      hintText: 'Confirm password',
+                      hintText: AppStrings.confirmPassword,
                     ).copyWith(
                       suffixIcon: IconButton(
                         icon: Icon(
@@ -206,9 +207,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               height: 1.4
                             ),
                             children: [
-                              const TextSpan(text: 'By creating an account, you agree to our '),
+                              const TextSpan(text: AppStrings.agreeTo),
                               TextSpan(
-                                text: 'Terms of Service',
+                                text: AppStrings.termsOfService,
                                 style: const TextStyle(
                                   color: Color(0xFF8B3A3A),
                                   fontWeight: FontWeight.w500,
@@ -217,9 +218,9 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                   // TODO: Open Terms
                                 },
                               ),
-                              const TextSpan(text: ' and '),
+                              const TextSpan(text: AppStrings.and),
                               TextSpan(
-                                text: 'Privacy Policy',
+                                text: AppStrings.privacyPolicy,
                                 style: const TextStyle(
                                   color: Color(0xFF8B3A3A),
                                   fontWeight: FontWeight.w500,
@@ -261,7 +262,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
                                 Text(
-                                  'Create Account',
+                                  AppStrings.createAccountBtn,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -283,7 +284,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'Or',
+                          AppStrings.or,
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                         ),
                       ),
@@ -295,14 +296,14 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
                   // Social Logins
                   _SocialButton(
-                    text: 'Google',
+                    text: AppStrings.google,
                     icon: Icons.g_mobiledata, 
                     onTap: () {},
                   ),
                   const SizedBox(height: 16),
                   
                   _SocialButton(
-                    text: 'Apple',
+                    text: AppStrings.apple,
                     icon: Icons.apple,
                     color: Colors.black,
                     onTap: () {},
@@ -315,13 +316,13 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Already Have an Account? ",
+                        AppStrings.alreadyHaveAccount,
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
                       GestureDetector(
                         onTap: () => context.pop(), // Go back to login
                         child: Text(
-                          'Login',
+                          AppStrings.loginLink,
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: const Color(0xFF8B3A3A),
                             fontWeight: FontWeight.w600,

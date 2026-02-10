@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 
+import '../../core/constants/app_strings.dart';
+
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
@@ -20,7 +22,7 @@ class SplashScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             Text(
-              'Nuevo Medical',
+              AppStrings.appName,
               style: AppTextStyles.h1.copyWith(color: Colors.white),
             ),
             const SizedBox(height: 48),

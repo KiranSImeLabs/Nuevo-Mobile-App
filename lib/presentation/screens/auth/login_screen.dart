@@ -5,6 +5,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/auth_state.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
+import '../../../core/constants/app_strings.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -68,7 +69,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   
                   // Header
                   Text(
-                    'Welcome back',
+                    AppStrings.welcomeBack,
                     style: AppTextStyles.h2.copyWith(
                       fontSize: 28,
                       fontWeight: FontWeight.w500,
@@ -77,7 +78,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Access your personalised care program',
+                    AppStrings.accessProgram,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -89,7 +90,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _emailController,
                     decoration: InputDecoration(
-                      hintText: 'Email Address', 
+                      hintText: AppStrings.emailAddress, 
                       prefixIcon: const Icon(Icons.mail_outline, color: AppColors.textSecondary),
                       filled: true,
                       fillColor: const Color(0xFFFAFAFA), // Very light grey
@@ -118,7 +119,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   TextFormField(
                     controller: _passwordController,
                     decoration: InputDecoration(
-                      hintText: 'Password',
+                      hintText: AppStrings.password,
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -171,7 +172,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
-                      child: const Text('Forgot password?', style: TextStyle(decoration: TextDecoration.underline)),
+                      child: const Text(AppStrings.forgotPassword, style: TextStyle(decoration: TextDecoration.underline)),
                     ),
                   ),
                   const SizedBox(height: 24),
@@ -199,7 +200,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: const [
                                 Text(
-                                  'Log in',
+                                  AppStrings.login,
                                   style: TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600,
@@ -221,7 +222,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
-                          'Or',
+                          AppStrings.or,
                           style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                         ),
                       ),
@@ -234,7 +235,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   // Social Logins
                   // Google
                   _SocialButton(
-                    text: 'Google',
+                    text: AppStrings.google,
                     icon: Icons.g_mobiledata, // Placeholder
                     // real google icon would be better if we had assets
                     onTap: () {},
@@ -243,7 +244,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   
                   // Apple
                   _SocialButton(
-                    text: 'Apple',
+                    text: AppStrings.apple,
                     icon: Icons.apple,
                     color: Colors.black,
                     onTap: () {},
@@ -256,13 +257,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        "Don't have an account? ",
+                        AppStrings.doNotHaveAccount,
                         style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
                       ),
                       GestureDetector(
                         onTap: () => context.push('/signup'),
                         child: Text(
-                          'Sign up',
+                          AppStrings.signupLink,
                           style: AppTextStyles.bodyMedium.copyWith(
                             color: const Color(0xFF8B3A3A), // Match primary
                             fontWeight: FontWeight.w600,

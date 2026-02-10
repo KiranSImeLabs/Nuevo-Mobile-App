@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_strings.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -18,7 +19,7 @@ class HomeScreen extends ConsumerWidget {
       body: userState.when(
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('No user data'));
+            return const Center(child: Text(AppStrings.noUserData));
           }
 
           return SafeArea(
@@ -47,13 +48,13 @@ class HomeScreen extends ConsumerWidget {
                             const SizedBox(height: AppSpacing.xl),
 
                             // 3. Upcoming Appointment Card (Hero Section)
-                            Text('Upcoming Consultation', style: AppTextStyles.h4),
+                            Text(AppStrings.upcomingConsultation, style: AppTextStyles.h4),
                             const SizedBox(height: AppSpacing.md),
                             _buildAppointmentCard(),
                             const SizedBox(height: AppSpacing.xl),
 
                             // 4. Quick Actions Grid
-                            Text('Services', style: AppTextStyles.h4),
+                            Text(AppStrings.services, style: AppTextStyles.h4),
                             const SizedBox(height: AppSpacing.md),
                             _buildQuickActionsGrid(context),
                             const SizedBox(height: AppSpacing.xl),
@@ -62,8 +63,8 @@ class HomeScreen extends ConsumerWidget {
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Text('Your Vitals', style: AppTextStyles.h4),
-                                TextButton(onPressed: () {}, child: const Text('See All')),
+                                Text(AppStrings.yourVitals, style: AppTextStyles.h4),
+                                TextButton(onPressed: () {}, child: const Text(AppStrings.seeAll)),
                               ],
                             ),
                             const SizedBox(height: AppSpacing.sm),
@@ -89,7 +90,7 @@ class HomeScreen extends ConsumerWidget {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.read(userProvider.notifier).fetchProfile(),
-                child: const Text('Retry'),
+                child: const Text(AppStrings.retry),
               ),
             ],
           ),
@@ -106,7 +107,7 @@ class HomeScreen extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Good Morning,',
+              AppStrings.goodMorning,
               style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
             ),
             Text(
@@ -146,7 +147,7 @@ class HomeScreen extends ConsumerWidget {
       ),
       child: TextField(
         decoration: InputDecoration(
-          hintText: 'Search doctors, specialties...',
+          hintText: AppStrings.searchHint,
           prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
@@ -255,13 +256,13 @@ class HomeScreen extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: _ActionCard(icon: Icons.person_add_alt_1, label: 'Find Doctor', color: Colors.blueAccent, onTap: () {})),
+        Expanded(child: _ActionCard(icon: Icons.person_add_alt_1, label: AppStrings.findDoctor, color: Colors.blueAccent, onTap: () {})),
         const SizedBox(width: AppSpacing.md),
-        Expanded(child: _ActionCard(icon: Icons.calendar_month, label: 'Schedule', color: Colors.orangeAccent, onTap: () {})),
+        Expanded(child: _ActionCard(icon: Icons.calendar_month, label: AppStrings.schedule, color: Colors.orangeAccent, onTap: () {})),
         const SizedBox(width: AppSpacing.md),
-        Expanded(child: _ActionCard(icon: Icons.medication, label: 'Pharmacy', color: Colors.green, onTap: () {})),
+        Expanded(child: _ActionCard(icon: Icons.medication, label: AppStrings.pharmacy, color: Colors.green, onTap: () {})),
         const SizedBox(width: AppSpacing.md),
-        Expanded(child: _ActionCard(icon: Icons.medical_services, label: 'Hospitals', color: Colors.purpleAccent, onTap: () {})),
+        Expanded(child: _ActionCard(icon: Icons.medical_services, label: AppStrings.hospitals, color: Colors.purpleAccent, onTap: () {})),
       ],
     );
   }
@@ -272,7 +273,7 @@ class HomeScreen extends ConsumerWidget {
       child: Row(
         children: [
           _VitalCard(
-            label: 'Heart Rate',
+            label: AppStrings.heartRate,
             value: '98 bpm',
             icon: Icons.favorite,
             color: Colors.redAccent,
@@ -280,7 +281,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           SizedBox(width: AppSpacing.md),
           _VitalCard(
-            label: 'Blood Pressure',
+            label: AppStrings.bloodPressure,
             value: '102/72',
             icon: Icons.water_drop,
             color: Colors.blueAccent,
@@ -288,7 +289,7 @@ class HomeScreen extends ConsumerWidget {
           ),
           SizedBox(width: AppSpacing.md),
           _VitalCard(
-            label: 'Weight',
+            label: AppStrings.weight,
             value: '72 kg',
             icon: Icons.monitor_weight,
             color: Colors.orangeAccent,

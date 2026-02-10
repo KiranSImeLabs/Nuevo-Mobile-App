@@ -102,3 +102,11 @@ before marking any task as complete.
   2. Then `.cursorrules`
 - If a request violates any rule, explain the violation and provide a compliant alternative.
 - Do not assume permissions, platforms, SDKs, or features outside what is explicitly defined.
+
+---
+
+## Strings & Localization
+
+- **NO Hardcoded Strings**: All user-facing text must be extracted to `lib/core/constants/app_strings.dart`.
+- **Future-Proofing**: Use the `AppStrings` class for all UI text to facilitate future localization switching.
+
