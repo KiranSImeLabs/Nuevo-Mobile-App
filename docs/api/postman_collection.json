@@ -1,0 +1,2772 @@
+{
+  "info": {
+    "_postman_id": "fbcd5e4f-a627-48bb-8abd-97f7f04b9246",
+    "name": "Nuevo",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "30710580",
+    "_collection_link": "https://go.postman.co/collection/30710580-fbcd5e4f-a627-48bb-8abd-97f7f04b9246?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\":\"Himanshu\",\n  \"lastName\":\"Yadav\",\n  \"email\":\"{{email}}\",\n  \"password\":\"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/register",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => { pm.expect.fail(\"Invalid JSON response\"); });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Login success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const user = json.data.user;",
+                  "    const token = json.data.token;",
+                  "",
+                  "    pm.environment.set(\"authToken\", token);",
+                  "",
+                  "    pm.test(\"Environment variables stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"authToken\")).to.exist;",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\":\"{{email}}\",\n  \"password\":\"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/login",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Forget Pass",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\":\"{{email}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/forgot-password",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "forgot-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resend Reset Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\":\"{{email}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/resend-reset-code",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "resend-reset-code"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Verify Code",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\":\"{{email}}\",\n  \"code\":\"479019\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/verify-reset-code",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "verify-reset-code"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Password",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\":\"{{email}}\",\n   \"code\":\"479019\",\n  \"newPassword\":\"{{password}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/reset-password",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "reset-password"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get User Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => {",
+                  "            pm.expect.fail(\"Invalid JSON response\");",
+                  "        });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const firstProgramId = json.data && json.data.length > 0 ? json.data[0].id : null;",
+                  "",
+                  "    pm.test(\"First program ID exists\", () => {",
+                  "        pm.expect(firstProgramId).to.exist;",
+                  "    });",
+                  "",
+                  "    pm.environment.set(\"programID\", firstProgramId);",
+                  "",
+                  "    pm.test(\"Program ID stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"programID\")).to.equal(firstProgramId);",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/profile",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "profile"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Mail Check",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => {",
+                  "            pm.expect.fail(\"Invalid JSON response\");",
+                  "        });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const firstProgramId = json.data && json.data.length > 0 ? json.data[0].id : null;",
+                  "",
+                  "    pm.test(\"First program ID exists\", () => {",
+                  "        pm.expect(firstProgramId).to.exist;",
+                  "    });",
+                  "",
+                  "    pm.environment.set(\"programID\", firstProgramId);",
+                  "",
+                  "    pm.test(\"Program ID stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"programID\")).to.equal(firstProgramId);",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true,
+            "disabledSystemHeaders": {
+              "user-agent": true,
+              "accept": true,
+              "accept-encoding": true,
+              "connection": true
+            }
+          },
+          "request": {
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/auth/check-email?email=ihimrao@gmail.com",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "auth",
+                "check-email"
+              ],
+              "query": [
+                {
+                  "key": "email",
+                  "value": "{{email}}",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "email",
+                  "value": "ihimrao@gmail.com"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Programs",
+      "item": [
+        {
+          "name": "Get Programs",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => {",
+                  "            pm.expect.fail(\"Invalid JSON response\");",
+                  "        });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const firstProgramId = json.data && json.data.length > 0 ? json.data[0].id : null;",
+                  "",
+                  "    pm.test(\"First program ID exists\", () => {",
+                  "        pm.expect(firstProgramId).to.exist;",
+                  "    });",
+                  "",
+                  "    pm.environment.set(\"programID\", firstProgramId);",
+                  "",
+                  "    pm.test(\"Program ID stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"programID\")).to.equal(firstProgramId);",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/programs",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "programs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Program By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/programs/{{programID}}",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "programs",
+                "{{programID}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Bookings",
+      "item": [
+        {
+          "name": "Payment Flow",
+          "item": [
+            {
+              "name": "Check User Existing Credentials",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/payments/customer",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "customer"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Token",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "(function () {",
+                      "",
+                      "    let json;",
+                      "    try { json = pm.response.json(); }",
+                      "    catch (e) {",
+                      "        pm.test(\"Response is valid JSON\", () => { pm.expect.fail(\"Invalid JSON response\"); });",
+                      "        return;",
+                      "    }",
+                      "",
+                      "    pm.test(\"Response success is true\", () => {",
+                      "        pm.expect(json.success).to.be.true;",
+                      "    });",
+                      "",
+                      "    const singleUseTokenId = json.data.singleUseTokenId;",
+                      "",
+                      "    pm.environment.set(\"singleUseTokenId\", singleUseTokenId);",
+                      "",
+                      "    pm.test(\"Environment variables stored\", () => {",
+                      "        pm.expect(pm.environment.get(\"singleUseTokenId\")).to.exist;",
+                      "    });",
+                      "",
+                      "})();",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/x-www-form-urlencoded"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "urlencoded",
+                  "urlencoded": [
+                    {
+                      "type": "text",
+                      "key": "paymentMethod",
+                      "value": "creditCard"
+                    },
+                    {
+                      "type": "text",
+                      "key": "cvn",
+                      "value": "847"
+                    },
+                    {
+                      "type": "text",
+                      "key": "cardholderName",
+                      "value": "John Doe"
+                    },
+                    {
+                      "type": "text",
+                      "key": "cardNumber",
+                      "value": "4564710000000004"
+                    },
+                    {
+                      "type": "text",
+                      "key": "expiryDateMonth",
+                      "value": "02"
+                    },
+                    {
+                      "type": "text",
+                      "key": "expiryDateYear",
+                      "value": "29"
+                    },
+                    {
+                      "key": "cardNumber",
+                      "value": "4242424242424242",
+                      "type": "text",
+                      "uuid": "eaeb5445-3632-48fe-a359-956dd84c8f02",
+                      "disabled": true
+                    },
+                    {
+                      "key": "expiryDateMonth",
+                      "value": "08",
+                      "type": "text",
+                      "uuid": "766eedb8-d80b-4482-8f54-c708258b57f4",
+                      "disabled": true
+                    },
+                    {
+                      "key": "expiryDateYear",
+                      "value": "28",
+                      "type": "text",
+                      "uuid": "119c4737-5ea2-42f3-a8da-37bd30b19455",
+                      "disabled": true
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "{{baseURl}}/payments/token",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "token"
+                  ]
+                },
+                "description": "Generated from cURL: curl --location 'https://api.payway.com.au/rest/v1/single-use-tokens' \\\n--header 'Content-Type: application/x-www-form-urlencoded' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Basic VDE1OTI3X1BVQl95b3VyX3B1Ymxpc2hhYmxlX2tleV9oZXJlOg==' \\\n--data-urlencode 'paymentMethod=creditCard' \\\n--data-urlencode 'cardNumber=4564710000000004' \\\n--data-urlencode 'cvn=847' \\\n--data-urlencode 'cardholderName=John Doe' \\\n--data-urlencode 'expiryDateMonth=02' \\\n--data-urlencode 'expiryDateYear=29'"
+              },
+              "response": []
+            },
+            {
+              "name": "Make payment - Update a booking",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"singleUseTokenId\": \"{{singleUseTokenId}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/payments/{{bookingID}}",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "payments",
+                    "{{bookingID}}"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Get User Bookings",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/bookings",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "bookings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Booking By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/bookings/{{bookingID}}",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "bookings",
+                "{{bookingID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Draft a booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => { pm.expect.fail(\"Invalid JSON response\"); });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Create booking success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const bookingId = json.data.bookingId;",
+                  "",
+                  "    pm.environment.set(\"bookingID\", bookingId);",
+                  "",
+                  "    pm.test(\"Environment variables stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"bookingID\")).to.exist;",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURl}}/bookings",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "bookings"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Select a program - Update a booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => { pm.expect.fail(\"Invalid JSON response\"); });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Create booking success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const bookingId = json.data.bookingId;",
+                  "",
+                  "    pm.environment.set(\"bookingID\", bookingId);",
+                  "",
+                  "    pm.test(\"Environment variables stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"bookingID\")).to.exist;",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programId\": \"{{programID}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/bookings/{{bookingID}}",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "bookings",
+                "{{bookingID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Patient Details - Update a booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => { pm.expect.fail(\"Invalid JSON response\"); });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Create booking success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const bookingId = json.data.bookingId;",
+                  "",
+                  "    pm.environment.set(\"bookingID\", bookingId);",
+                  "",
+                  "    pm.test(\"Environment variables stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"bookingID\")).to.exist;",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"programId\": \"{{programID}}\",\n  \"patientDetails\": {\n    \"firstName\": \"Alice\",\n    \"lastName\": \"Smith\",\n    \"email\": \"ihimrao@gmail.com\",\n    \"mobilePhone\": \"0412345678\",\n    \"dateOfBirth\": \"1985-06-15\",\n    \"address\": \"42 Wallaby Way, Sydney NSW 2000\",\n    \"consentGiven\": true,\n    \"mainGoal\": \"Improve energy levels and sleep quality\",\n    \"referralSource\": \"Friend\",\n    \"healthContext\": \"History of mild asthma\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/bookings/{{bookingID}}",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "bookings",
+                "{{bookingID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Select slot - Update a booking",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "(function () {",
+                  "",
+                  "    let json;",
+                  "    try { json = pm.response.json(); }",
+                  "    catch (e) {",
+                  "        pm.test(\"Response is valid JSON\", () => { pm.expect.fail(\"Invalid JSON response\"); });",
+                  "        return;",
+                  "    }",
+                  "",
+                  "    pm.test(\"Create booking success is true\", () => {",
+                  "        pm.expect(json.success).to.be.true;",
+                  "    });",
+                  "",
+                  "    const bookingId = json.data.bookingId;",
+                  "",
+                  "    pm.environment.set(\"bookingID\", bookingId);",
+                  "",
+                  "    pm.test(\"Environment variables stored\", () => {",
+                  "        pm.expect(pm.environment.get(\"bookingID\")).to.exist;",
+                  "    });",
+                  "",
+                  "})();",
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"consultationDateTime\": \"2026-01-07T05:30:00.000Z\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/bookings/{{bookingID}}",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "bookings",
+                "{{bookingID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Fetch Available Time Slots",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseURl}}/timeslots/day?date=2026-01-07",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "timeslots",
+                "day"
+              ],
+              "query": [
+                {
+                  "key": "date",
+                  "value": "2026-01-07"
+                }
+              ]
+            },
+            "description": "Generated from cURL: curl -X GET \"http://localhost:3000/api/v1/timeslots/day?date=2026-01-06\" -H \"Content-Type: application/json\" | jq ."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Payway",
+      "item": [
+        {
+          "name": "Create Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Basic VDE1OTI3X1NFQ18yM3lhYjNzZmY4bnRxOXRhdG56cjM0enV3Znh1dWNwOWF4YXhoaW5yaW00YXYyd3I4YW15NTN5cnpzcWQ6"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "type": "text",
+                  "key": "singleUseTokenId",
+                  "value": "b2fb640f-a537-44a6-a9a3-518017ee0f24"
+                },
+                {
+                  "type": "text",
+                  "key": "merchantId",
+                  "value": "TEST"
+                },
+                {
+                  "type": "text",
+                  "key": "customerName",
+                  "value": "John Doe"
+                },
+                {
+                  "type": "text",
+                  "key": "emailAddress",
+                  "value": "john@example.com"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://api.payway.com.au/rest/v1/customers",
+              "protocol": "https",
+              "host": [
+                "api",
+                "payway",
+                "com",
+                "au"
+              ],
+              "path": [
+                "rest",
+                "v1",
+                "customers"
+              ]
+            },
+            "description": "Generated from cURL: curl --location 'https://api.payway.com.au/rest/v1/customers' \\\n--header 'Content-Type: application/x-www-form-urlencoded' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Basic VDE1OTI3X1NFQ18yM3lhYjNzZmY4bnRxOXRhdG56cjM0enV3Znh1dWNwOWF4YXhoaW5yaW00YXYyd3I4YW15NTN5cnpzcWQ6' \\\n--data-urlencode 'singleUseTokenId=PUT_TOKEN_ID_FROM_STEP_1_HERE' \\\n--data-urlencode 'merchantId=TEST' \\\n--data-urlencode 'customerName=John Doe' \\\n--data-urlencode 'emailAddress=john@example.com'"
+          },
+          "response": []
+        },
+        {
+          "name": "get Customer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Basic VDE1OTI3X1NFQ18yM3lhYjNzZmY4bnRxOXRhdG56cjM0enV3Znh1dWNwOWF4YXhoaW5yaW00YXYyd3I4YW15NTN5cnpzcWQ6"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "type": "text",
+                  "key": "singleUseTokenId",
+                  "value": "b2fb640f-a537-44a6-a9a3-518017ee0f24"
+                },
+                {
+                  "type": "text",
+                  "key": "merchantId",
+                  "value": "TEST"
+                },
+                {
+                  "type": "text",
+                  "key": "customerName",
+                  "value": "John Doe"
+                },
+                {
+                  "type": "text",
+                  "key": "emailAddress",
+                  "value": "john@example.com"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://api.payway.com.au/rest/v1/customers",
+              "protocol": "https",
+              "host": [
+                "api",
+                "payway",
+                "com",
+                "au"
+              ],
+              "path": [
+                "rest",
+                "v1",
+                "customers"
+              ]
+            },
+            "description": "Generated from cURL: curl --location 'https://api.payway.com.au/rest/v1/customers' \\\n--header 'Content-Type: application/x-www-form-urlencoded' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Basic VDE1OTI3X1NFQ18yM3lhYjNzZmY4bnRxOXRhdG56cjM0enV3Znh1dWNwOWF4YXhoaW5yaW00YXYyd3I4YW15NTN5cnpzcWQ6' \\\n--data-urlencode 'singleUseTokenId=PUT_TOKEN_ID_FROM_STEP_1_HERE' \\\n--data-urlencode 'merchantId=TEST' \\\n--data-urlencode 'customerName=John Doe' \\\n--data-urlencode 'emailAddress=john@example.com'"
+          },
+          "response": []
+        },
+        {
+          "name": "Transaction detail",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Basic VDE1OTI3X1NFQ18yM3lhYjNzZmY4bnRxOXRhdG56cjM0enV3Znh1dWNwOWF4YXhoaW5yaW00YXYyd3I4YW15NTN5cnpzcWQ6"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "type": "text",
+                  "key": "transactionType",
+                  "value": "payment"
+                },
+                {
+                  "type": "text",
+                  "key": "customerNumber",
+                  "value": "28"
+                },
+                {
+                  "type": "text",
+                  "key": "principalAmount",
+                  "value": "200"
+                },
+                {
+                  "type": "text",
+                  "key": "currency",
+                  "value": "aud"
+                },
+                {
+                  "type": "text",
+                  "key": "orderNumber",
+                  "value": "ORDER-1234564"
+                },
+                {
+                  "type": "text",
+                  "key": "merchantId",
+                  "value": "TEST"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://api.payway.com.au/rest/v1/transactions",
+              "protocol": "https",
+              "host": [
+                "api",
+                "payway",
+                "com",
+                "au"
+              ],
+              "path": [
+                "rest",
+                "v1",
+                "transactions"
+              ]
+            },
+            "description": "Generated from cURL: curl --location 'https://api.payway.com.au/rest/v1/transactions' \\\n--header 'Content-Type: application/x-www-form-urlencoded' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Basic VDE1OTI3X1NFQ18yM3lhYjNzZmY4bnRxOXRhdG56cjM0enV3Znh1dWNwOWF4YXhoaW5yaW00YXYyd3I4YW15NTN5cnpzcWQ6' \\\n--data-urlencode 'transactionType=payment' \\\n--data-urlencode 'customerNumber=PUT_CUSTOMER_NUMBER_FROM_STEP_2_HERE' \\\n--data-urlencode 'principalAmount=10000' \\\n--data-urlencode 'currency=aud' \\\n--data-urlencode 'orderNumber=ORDER-123456' \\\n--data-urlencode 'merchantId=TEST'"
+          },
+          "response": []
+        },
+        {
+          "name": "Get token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Basic VDE1OTI3X1BVQl84N3Rzbmlrc3hxZzZybTlteWhiNzZiNWE1ZXNydXdnd2pwcGhpdmYzNzk0YTdxdTNmdTlpM3RuOXc0aTQ="
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "type": "text",
+                  "key": "paymentMethod",
+                  "value": "creditCard"
+                },
+                {
+                  "type": "text",
+                  "key": "cardNumber",
+                  "value": "4564710000000004"
+                },
+                {
+                  "type": "text",
+                  "key": "cvn",
+                  "value": "847"
+                },
+                {
+                  "type": "text",
+                  "key": "cardholderName",
+                  "value": "John Doe"
+                },
+                {
+                  "type": "text",
+                  "key": "expiryDateMonth",
+                  "value": "02"
+                },
+                {
+                  "type": "text",
+                  "key": "expiryDateYear",
+                  "value": "29"
+                }
+              ]
+            },
+            "url": {
+              "raw": "https://api.payway.com.au/rest/v1/single-use-tokens",
+              "protocol": "https",
+              "host": [
+                "api",
+                "payway",
+                "com",
+                "au"
+              ],
+              "path": [
+                "rest",
+                "v1",
+                "single-use-tokens"
+              ]
+            },
+            "description": "Generated from cURL: curl --location 'https://api.payway.com.au/rest/v1/single-use-tokens' \\\n--header 'Content-Type: application/x-www-form-urlencoded' \\\n--header 'Accept: application/json' \\\n--header 'Authorization: Basic VDE1OTI3X1BVQl95b3VyX3B1Ymxpc2hhYmxlX2tleV9oZXJlOg==' \\\n--data-urlencode 'paymentMethod=creditCard' \\\n--data-urlencode 'cardNumber=4564710000000004' \\\n--data-urlencode 'cvn=847' \\\n--data-urlencode 'cardholderName=John Doe' \\\n--data-urlencode 'expiryDateMonth=02' \\\n--data-urlencode 'expiryDateYear=29'"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Patients",
+          "item": [
+            {
+              "name": "Get Patient By ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/patients/{{patientID}}",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "patients",
+                    "{{patientID}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Patients",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/patients?page=1&programType=FOUNDATION,TAILORED&sortBy=lastName&limit=5",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "patients"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "bookingStatus",
+                      "value": "SCHEDULED",
+                      "disabled": true
+                    },
+                    {
+                      "key": "programType",
+                      "value": "FOUNDATION,TAILORED"
+                    },
+                    {
+                      "key": "sortBy",
+                      "value": "lastName"
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "ASC",
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": "Himanshu",
+                      "disabled": true
+                    },
+                    {
+                      "key": "limit",
+                      "value": "5"
+                    },
+                    {
+                      "key": "hasBookings",
+                      "value": "true",
+                      "type": "text",
+                      "disabled": true
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Recent Registred Users",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/dashboard/users/recent",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "users",
+                    "recent"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Booking",
+          "item": [
+            {
+              "name": "Todays appointment",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/dashboard/appointments/today",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "dashboard",
+                    "appointments",
+                    "today"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Scheduled appointments",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text",
+                    "disabled": true
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/timeslots/booked?startDate=2026-01-07&endDate=2026-01-14",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "timeslots",
+                    "booked"
+                  ],
+                  "query": [
+                    {
+                      "key": "startDate",
+                      "value": "2026-01-07"
+                    },
+                    {
+                      "key": "endDate",
+                      "value": "2026-01-14"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get All Booking",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/bookings/admin/all?limit=20&page=1",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "admin",
+                    "all"
+                  ],
+                  "query": [
+                    {
+                      "key": "limit",
+                      "value": "20"
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Booking By ID",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/bookings/admin/{{bookingID}}",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "admin",
+                    "{{bookingID}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Booking of a user",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/bookings/user/{{patientID}}",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "user",
+                    "{{patientID}}"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Update Notes",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"doctorNotes\":\"Hey there\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/bookings/admin/{{bookingID}}/notes",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "bookings",
+                    "admin",
+                    "{{bookingID}}",
+                    "notes"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Auth",
+          "item": [
+            {
+              "name": "Admin Login",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "(function () {",
+                      "",
+                      "    let json;",
+                      "    try { json = pm.response.json(); }",
+                      "    catch (e) {",
+                      "        pm.test(\"Response is valid JSON\", () => { pm.expect.fail(\"Invalid JSON response\"); });",
+                      "        return;",
+                      "    }",
+                      "",
+                      "    pm.test(\"Login success is true\", () => {",
+                      "        pm.expect(json.success).to.be.true;",
+                      "    });",
+                      "",
+                      "    const user = json.data.user;",
+                      "    const token = json.data.token;",
+                      "",
+                      "    pm.environment.set(\"superAdminToken\", token);",
+                      "",
+                      "    pm.test(\"Environment variables stored\", () => {",
+                      "        pm.expect(pm.environment.get(\"superAdminToken\")).to.exist;",
+                      "    });",
+                      "",
+                      "})();",
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cache-Control",
+                    "value": "no-cache",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"username\":\"{{superAdminUsername}}\",\n  \"password\":\"{{superAdminPass}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/admin/auth/login",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "auth",
+                    "login"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Admin Change Pass",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Cache-Control",
+                    "value": "no-cache",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\":\"{{superAdminPass}}\",\n  \"newPassword\":\"{{superAdminPass}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/admin/auth/change-password",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "auth",
+                    "change-password"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Get Profile",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Cache-Control",
+                    "value": "no-cache",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"currentPassword\":\"{{superAdminPass}}\",\n  \"newPassword\":\"{{superAdminPass}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/admin/auth/profile",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "Admin Profile Update",
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      ""
+                    ],
+                    "type": "text/javascript",
+                    "packages": {},
+                    "requests": {}
+                  }
+                }
+              ],
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Cache-Control",
+                    "value": "no-cache",
+                    "type": "text"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}",
+                    "type": "text"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"fullName\":\"Himanshu Yadav\",\n  \"email\":\"himrao@gmail.com\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/admin/auth/profile",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admin",
+                    "auth",
+                    "profile"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Admin Managment",
+          "item": [
+            {
+              "name": "Admin List",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseURl}}/admins?page=1&limit=10",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admins"
+                  ],
+                  "query": [
+                    {
+                      "key": "sortBy",
+                      "value": "username",
+                      "disabled": true
+                    },
+                    {
+                      "key": "sortOrder",
+                      "value": "ASC",
+                      "disabled": true
+                    },
+                    {
+                      "key": "role",
+                      "value": null,
+                      "disabled": true
+                    },
+                    {
+                      "key": "search",
+                      "value": null,
+                      "disabled": true
+                    },
+                    {
+                      "key": "page",
+                      "value": "1"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                },
+                "description": "Generated from cURL: \ncurl -X GET \"http://localhost:3000/api/v1/admins?sortBy=username&sortOrder=ASC\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\" \\\n  -H \"Content-Type: application/json\""
+              },
+              "response": []
+            },
+            {
+              "name": "Create Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"username\": \"ihimrao1\",\n    \"email\": \"ihimrao.auli@gmail.com\",\n    \"fullName\": \"Himanshu Yadav\",\n    \"role\": \"ADMIN\"\n  }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/admins",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admins"
+                  ]
+                },
+                "description": "Generated from cURL: curl -X POST http://localhost:3000/api/v1/admins \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"username\": \"newadmin\",\n    \"email\": \"newadmin@nuevomedical.com.au\",\n    \"fullName\": \"John Doe\",\n    \"role\": \"ADMIN\"\n  }'"
+              },
+              "response": []
+            },
+            {
+              "name": "Get Admin Details",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseURl}}/admins/e93c639b-993a-414e-b9f4-c694be2aaf88",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admins",
+                    "e93c639b-993a-414e-b9f4-c694be2aaf88"
+                  ]
+                },
+                "description": "Generated from cURL: curl -X GET \"http://localhost:3000/api/v1/admins/e93c639b-993a-414e-b9f4-c694be2aaf88\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\" \\\n  -H \"Content-Type: application/json\""
+              },
+              "response": []
+            },
+            {
+              "name": "Update Admin",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n\n    \"role\": \"SUPER_ADMIN\"\n  }",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseURl}}/admins/719dce2e-633c-4b57-9a8b-da663a708e75",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admins",
+                    "719dce2e-633c-4b57-9a8b-da663a708e75"
+                  ]
+                },
+                "description": "Generated from cURL: curl -X PATCH \"http://localhost:3000/api/v1/admins/e93c639b-993a-414e-b9f4-c694be2aaf88\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\" \\\n  -H \"Content-Type: application/json\" \\\n  -d '{\n    \"fullName\": \"John Smith\",\n    \"email\": \"johnsmith@nuevomedical.com.au\",\n    \"role\": \"SUPER_ADMIN\"\n  }'"
+              },
+              "response": []
+            },
+            {
+              "name": "Delete Admin",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{superAdminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseURl}}/admins/e93c639b-993a-414e-b9f4-c694be2aaf88",
+                  "host": [
+                    "{{baseURl}}"
+                  ],
+                  "path": [
+                    "admins",
+                    "e93c639b-993a-414e-b9f4-c694be2aaf88"
+                  ]
+                },
+                "description": "Generated from cURL: curl -X DELETE \"http://localhost:3000/api/v1/admins/e93c639b-993a-414e-b9f4-c694be2aaf88\" \\\n  -H \"Authorization: Bearer YOUR_TOKEN_HERE\" \\\n  -H \"Content-Type: application/json\"\n"
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "Create a program",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}",
+                "type": "text",
+                "disabled": true
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"INSIGHT\",\n  \"name\": \"Insight Health Program\",\n  \"description\": \"Deep dive analysis into specific health markers and personalized insights.\",\n  \"price\": 499.00,\n  \"priceLabel\": \"$499 / session\",\n  \"isActive\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/programs",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "programs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Program By ID",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n\"type\": \"TAILORED\",\n      \"name\": \"Tailored Program\",\n      \"description\": \"A fully personalised program built around your individual health needs and goals.\",\n      \"price\": \"150.00\",\n      \"priceLabel\": \"Price On Application\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/programs/091b6bfa-76b4-4933-9a2d-dc1e3c2c7815",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "programs",
+                "091b6bfa-76b4-4933-9a2d-dc1e3c2c7815"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dashboard Details",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          },
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/dashboard/stats",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "dashboard",
+                "stats"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Caution",
+      "item": [
+        {
+          "name": "Clear DB",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/caution/clear-db",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "caution",
+                "clear-db"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Program",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              },
+              {
+                "key": "caution",
+                "value": "true",
+                "type": "text",
+                "disabled": true
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"priceLabel\": \"$99.00 / week\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/caution/programs/{{programID}}",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "caution",
+                "programs",
+                "{{programID}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Super Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  ""
+                ],
+                "type": "text/javascript",
+                "packages": {},
+                "requests": {}
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{superAdminToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseURl}}/caution/super-admin",
+              "host": [
+                "{{baseURl}}"
+              ],
+              "path": [
+                "caution",
+                "super-admin"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

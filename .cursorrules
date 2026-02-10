@@ -110,3 +110,15 @@ before marking any task as complete.
 - **NO Hardcoded Strings**: All user-facing text must be extracted to `lib/core/constants/app_strings.dart`.
 - **Future-Proofing**: Use the `AppStrings` class for all UI text to facilitate future localization switching.
 
+---
+
+## API Contract Source of Truth
+
+- All backend API definitions are provided via:
+  - `docs/api/postman_collection.json`
+- This Postman collection is the **single source of truth** for:
+  - Endpoints
+  - Request/response schemas
+  - Headers and authentication
+- AI must NEVER invent, assume, or modify API contracts.
+- Any mismatch must be reported instead of auto-corrected.
