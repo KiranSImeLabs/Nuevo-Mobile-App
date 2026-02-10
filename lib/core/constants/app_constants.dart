@@ -2,29 +2,43 @@
 /// IMPORTANT: Update these with actual backend URLs before deployment
 class ApiConstants {
   // Base URLs
-  static const String baseUrl = 'https://api.yourmedicalapp.com/v1';
-  static const String webSocketUrl = 'wss://api.yourmedicalapp.com/ws';
+  static const String baseUrl = 'https://nuevo-medical-be.simelabs.in/api/v1';
   
   // Endpoints
+  // Auth
   static const String login = '/auth/login';
-  static const String signup = '/auth/signup';
-  static const String logout = '/auth/logout';
-  static const String refreshToken = '/auth/refresh';
+  static const String register = '/auth/register';
+  static const String forgotPassword = '/auth/forgot-password';
+  static const String resendResetCode = '/auth/resend-reset-code';
+  static const String verifyResetCode = '/auth/verify-reset-code';
+  static const String resetPassword = '/auth/reset-password';
+  static const String userProfile = '/auth/profile';
+  static const String checkEmail = '/auth/check-email';
+  static const String updateProfile = '/auth/profile'; // Typically PUT or PATCH on profile endpoint
   
-  // User
-  static const String userProfile = '/user/profile';
-  static const String updateProfile = '/user/update';
+  // Programs
+  static const String programs = '/programs';
+  // Note: For dynamic IDs, we'll use string interpolation in the client
   
-  // Subscription (READ-ONLY - No payment endpoints)
-  static const String subscriptionStatus = '/subscription/status';
-  static const String subscriptionDetails = '/subscription/details';
+  // Bookings
+  static const String bookings = '/bookings';
+  static const String timeSlots = '/timeslots/day';
+  
+  // Payments
+  static const String paymentCustomer = '/payments/customer';
+  static const String paymentToken = '/payments/token';
+  
+  // Subscriptions (Using existing constants if they map to Programs/Bookings, 
+  // but keeping placeholders if not explicitly in the Postman subset provided)
+  static const String subscriptionStatus = '/subscription/status'; // To be verified
+  static const String subscriptionDetails = '/subscription/details'; // To be verified
   
   // Video Consultations
-  static const String appointments = '/appointments';
-  static const String scheduleAppointment = '/appointments/schedule';
-  static const String agoraToken = '/video/token';
+  static const String appointments = '/bookings'; // Mapping appointments to bookings
+  static const String scheduleAppointment = '/bookings';
+  static const String agoraToken = '/video/token'; // To be verified with backend
   
-  // Health Data
+  // Health
   static const String healthMetrics = '/health/metrics';
   static const String labResults = '/health/lab-results';
   static const String wellnessData = '/health/wellness';

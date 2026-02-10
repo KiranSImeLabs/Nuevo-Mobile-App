@@ -33,7 +33,8 @@ class DioClient {
         onRequest: (options, handler) async {
           final token = await getAccessToken();
           if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token';
+            options.headers['Authorization'] = 'Bearer $token'; // The Postman collection doesn't always use Bearer but most do.
+            // Postman collection uses {{authToken}} in Bearer.
           }
           
           // HIPAA/GDPR Compliance: Do NOT log request data containing PII
@@ -57,86 +58,12 @@ class DioClient {
     );
   }
   
-  /// GET Request
-  Future<Response> get(
-    String path, {
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
-    try {
-      final response = await _dio.get(
-        path,
-        queryParameters: queryParameters,
-        options: options,
-      );
-      return response;
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    }
-  }
-  
-  /// POST Request
-  Future<Response> post(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
-    try {
-      final response = await _dio.post(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-      return response;
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    }
-  }
-  
-  /// PUT Request
-  Future<Response> put(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
-    try {
-      final response = await _dio.put(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-      return response;
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    }
-  }
-  
-  /// DELETE Request
-  Future<Response> delete(
-    String path, {
-    dynamic data,
-    Map<String, dynamic>? queryParameters,
-    Options? options,
-  }) async {
-    try {
-      final response = await _dio.delete(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: options,
-      );
-      return response;
-    } on DioException catch (e) {
-      throw _handleDioError(e);
-    }
-  }
-  
+  /// Expose Dio instance for Retrofit
+  Dio get dio => _dio;
+
   /// Handle Dio Errors and convert to custom exceptions
-  Exception _handleDioError(DioException error) {
+  /// Static so it can be used without instance if needed, or by Repositories
+  static Exception handleDioError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
@@ -170,7 +97,7 @@ class DioClient {
                          error.response?.data?['error'] ?? 
                          ErrorMessages.somethingWentWrong;
           return ServerException(
-            message: message,
+            message: message.toString(),
             code: statusCode,
           );
         }
@@ -188,6 +115,84 @@ class DioClient {
           message: ErrorMessages.noInternet,
           code: null,
         );
+    }
+  }
+  
+  /// GET Request
+  Future<Response> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final response = await _dio.get(
+        path,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw handleDioError(e);
+    }
+  }
+  
+  /// POST Request
+  Future<Response> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final response = await _dio.post(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw handleDioError(e);
+    }
+  }
+  
+  /// PUT Request
+  Future<Response> put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final response = await _dio.put(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw handleDioError(e);
+    }
+  }
+  
+  /// DELETE Request
+  Future<Response> delete(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final response = await _dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw handleDioError(e);
     }
   }
 }

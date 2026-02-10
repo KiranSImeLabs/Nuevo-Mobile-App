@@ -1,9 +1,11 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
+import '../../core/network/dio_client.dart';
+import '../../data/datasources/remote/api_client.dart';
 import '../../domain/entities/subscription.dart';
 import '../../domain/repositories/subscription_repository.dart';
-import '../datasources/remote/api_client.dart';
 
 /// Subscription Repository Implementation (Data Layer)
 /// Implements the SubscriptionRepository interface
@@ -18,14 +20,39 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   @override
   Future<Either<Failure, Subscription>> getSubscriptionStatus() async {
     try {
-      final model = await _apiClient.getSubscriptionStatus();
-      return Right(model.toEntity());
-    } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, code: e.code));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      // Since there is no direct subscription endpoint in Postman subset,
+      // we fetch user profile which contains subscription info.
+      final response = await _apiClient.getUserProfile();
+      
+      if (response.success && response.data != null) {
+        final user = response.data!;
+        if (user.subscription != null) {
+          return Right(user.subscription!.toEntity());
+        } else {
+          // Return default/inactive subscription if null
+          return const Right(Subscription(
+            id: 'inactive',
+             planName: 'Free',
+             status: SubscriptionStatus.inactive,
+             startDate: null,
+             expiryDate: null,
+             features: [],
+          ));
+        }
+      } else {
+        return Left(ServerFailure(message: response.message ?? 'Failed to get subscription status'));
+      }
+    } on DioException catch (e) {
+      final exception = DioClient.handleDioError(e);
+      if (exception is AuthException) {
+        return Left(AuthFailure(message: exception.message, code: exception.code));
+      } else if (exception is NetworkException) {
+        return Left(NetworkFailure(message: exception.message, code: exception.code));
+      } else if (exception is ServerException) {
+        return Left(ServerFailure(message: exception.message, code: exception.code));
+      } else {
+        return Left(UnknownFailure(message: exception.toString()));
+      }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -33,51 +60,25 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
   
   @override
   Future<Either<Failure, Subscription>> getSubscriptionDetails() async {
-    try {
-      final model = await _apiClient.getSubscriptionDetails();
-      return Right(model.toEntity());
-    } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, code: e.code));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+    // Reusing getSubscriptionStatus since details are likely same place
+    return getSubscriptionStatus();
   }
   
   @override
   Future<Either<Failure, bool>> isFeatureUnlocked(String featureName) async {
-    try {
-      final model = await _apiClient.getSubscriptionStatus();
-      final subscription = model.toEntity();
-      return Right(subscription.hasFeature(featureName));
-    } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, code: e.code));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+    final result = await getSubscriptionStatus();
+    return result.fold(
+      (failure) => Left(failure),
+      (subscription) => Right(subscription.hasFeature(featureName)),
+    );
   }
   
   @override
   Future<Either<Failure, bool>> isSubscriptionActive() async {
-    try {
-      final model = await _apiClient.getSubscriptionStatus();
-      final subscription = model.toEntity();
-      return Right(subscription.isActive);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, code: e.code));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+    final result = await getSubscriptionStatus();
+    return result.fold(
+      (failure) => Left(failure),
+      (subscription) => Right(subscription.isActive),
+    );
   }
 }

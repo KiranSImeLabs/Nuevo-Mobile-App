@@ -183,7 +183,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     child: ElevatedButton(
                       onPressed: authState.isLoading ? null : _login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B3A3A), // Deep Maroon/Primary
+                        backgroundColor: AppColors.primaryButtonColor, // Deep Maroon/Primary
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -265,9 +265,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         child: Text(
                           AppStrings.signupLink,
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: const Color(0xFF8B3A3A), // Match primary
+                            color: AppColors.primaryButtonColor,//const Color(0xFF8B3A3A), // Match primary
                             fontWeight: FontWeight.w600,
                             decoration: TextDecoration.underline,
+                            decorationColor: AppColors.primaryButtonColor,
                           ),
                         ),
                       ),

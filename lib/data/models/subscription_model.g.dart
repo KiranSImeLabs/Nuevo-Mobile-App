@@ -13,9 +13,8 @@ SubscriptionModel _$SubscriptionModelFromJson(Map<String, dynamic> json) =>
       status: json['status'] as String,
       startDate: json['start_date'] as String?,
       expiryDate: json['expiry_date'] as String?,
-      features: (json['features'] as List<dynamic>)
-          .map((e) => e as String)
-          .toList(),
+      features:
+          (json['features'] as List<dynamic>).map((e) => e as String).toList(),
       description: json['description'] as String?,
     );
 

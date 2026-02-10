@@ -1,11 +1,14 @@
 import 'package:dartz/dartz.dart';
+import 'package:dio/dio.dart';
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
+import '../../core/network/dio_client.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/local_data_source.dart';
 import '../datasources/remote/api_client.dart';
 import '../models/auth_response_model.dart';
+import '../models/user_model.dart';
 
 /// Authentication Repository Implementation (Data Layer)
 /// Implements the AuthRepository interface
@@ -18,6 +21,8 @@ class AuthRepositoryImpl implements AuthRepository {
     required LocalDataSource localDataSource,
   })  : _apiClient = apiClient,
         _localDataSource = localDataSource;
+
+  // I will update the constructor in core_providers.dart in the next step.
   
   @override
   Future<Either<Failure, User>> login({
@@ -26,7 +31,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }) async {
     try {
       // Create login request
-      final request = LoginRequestModel(
+      final request = LoginRequest(
         email: email,
         password: password,
       );
@@ -34,19 +39,34 @@ class AuthRepositoryImpl implements AuthRepository {
       // Call API
       final response = await _apiClient.login(request);
       
-      // Save tokens securely
-      await _localDataSource.saveAccessToken(response.accessToken);
-      await _localDataSource.saveRefreshToken(response.refreshToken);
-      await _localDataSource.saveUserId(response.user.id);
-      
-      // Convert to domain entity and return
-      return Right(response.user.toEntity());
-    } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, code: e.code));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      if (response.success && response.data != null) {
+        final data = response.data!;
+        
+        // Save tokens securely
+        await _localDataSource.saveAccessToken(data.token);
+        // Postman only returns one token. Assuming it's access token.
+        // If refresh token logic is needed, it might be the same or handled by cookie (unlikely for mobile).
+        // I'll skip refresh token saving if not present.
+        
+        await _localDataSource.saveUserId(data.user.id);
+        
+        // Convert to domain entity and return
+        return Right(data.user.toEntity());
+      } else {
+        return Left(ServerFailure(message: response.message ?? 'Login failed'));
+      }
+    } on DioException catch (e) {
+      // Map DioException to domain Failure
+      final exception = DioClient.handleDioError(e);
+       if (exception is AuthException) {
+        return Left(AuthFailure(message: exception.message, code: exception.code));
+      } else if (exception is NetworkException) {
+        return Left(NetworkFailure(message: exception.message, code: exception.code));
+      } else if (exception is ServerException) {
+        return Left(ServerFailure(message: exception.message, code: exception.code));
+      } else {
+        return Left(UnknownFailure(message: exception.toString()));
+      }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -60,30 +80,45 @@ class AuthRepositoryImpl implements AuthRepository {
     String? phoneNumber,
   }) async {
     try {
-      // Create signup request
-      final request = SignupRequestModel(
+      // Split name into first and last name as API requires
+      final nameParts = name.split(' ');
+      final firstName = nameParts.isNotEmpty ? nameParts.first : name;
+      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      
+      // Create register request
+      final request = RegisterRequest(
         email: email,
         password: password,
-        name: name,
-        phoneNumber: phoneNumber,
+        firstName: firstName,
+        lastName: lastName,
       );
       
       // Call API
-      final response = await _apiClient.signup(request);
+      final response = await _apiClient.register(request);
       
-      // Save tokens securely
-      await _localDataSource.saveAccessToken(response.accessToken);
-      await _localDataSource.saveRefreshToken(response.refreshToken);
-      await _localDataSource.saveUserId(response.user.id);
-      
-      // Convert to domain entity and return
-      return Right(response.user.toEntity());
-    } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, code: e.code));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
+      if (response.success && response.data != null) {
+        final data = response.data!;
+        
+        // Save tokens securely
+        await _localDataSource.saveAccessToken(data.token);
+        await _localDataSource.saveUserId(data.user.id);
+        
+        // Convert to domain entity and return
+        return Right(data.user.toEntity());
+      } else {
+        return Left(ServerFailure(message: response.message ?? 'Signup failed'));
+      }
+    } on DioException catch (e) {
+       final exception = DioClient.handleDioError(e);
+       if (exception is AuthException) {
+        return Left(AuthFailure(message: exception.message, code: exception.code));
+      } else if (exception is NetworkException) {
+        return Left(NetworkFailure(message: exception.message, code: exception.code));
+      } else if (exception is ServerException) {
+        return Left(ServerFailure(message: exception.message, code: exception.code));
+      } else {
+        return Left(UnknownFailure(message: exception.toString()));
+      }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -92,21 +127,18 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      // Call API to logout (invalidate token on server)
-      await _apiClient.logout();
+      // API doesn't have explicit logout in the provided Postman subset for token invalidation unless it's blacklist.
+      // But typically we just clear local storage.
+      // If there IS a logout endpoint, I'd call it.
+      // Postman subset didn't show logout. ApiConstants had placeholder.
+      // I'll just clear local data for now as per "Client-side logout".
+      
+      // If server logout exists: await _restClient.logout();
       
       // Clear local data
       await _localDataSource.clearSecureData();
       
       return const Right(null);
-    } on NetworkException catch (e) {
-      // Even if API call fails, clear local data
-      await _localDataSource.clearSecureData();
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      // Even if API call fails, clear local data
-      await _localDataSource.clearSecureData();
-      return Left(ServerFailure(message: e.message, code: e.code));
     } catch (e) {
       // Even if API call fails, clear local data
       await _localDataSource.clearSecureData();
@@ -116,33 +148,10 @@ class AuthRepositoryImpl implements AuthRepository {
   
   @override
   Future<Either<Failure, void>> refreshToken() async {
-    try {
-      // Get current refresh token
-      final refreshToken = await _localDataSource.getRefreshToken();
-      
-      if (refreshToken == null) {
-        return const Left(AuthFailure(message: 'No refresh token available'));
-      }
-      
-      // Call API to refresh token
-      final response = await _apiClient.refreshToken({
-        'refresh_token': refreshToken,
-      });
-      
-      // Save new tokens
-      await _localDataSource.saveAccessToken(response.accessToken);
-      await _localDataSource.saveRefreshToken(response.refreshToken);
-      
-      return const Right(null);
-    } on AuthException catch (e) {
-      return Left(AuthFailure(message: e.message, code: e.code));
-    } on NetworkException catch (e) {
-      return Left(NetworkFailure(message: e.message, code: e.code));
-    } on ServerException catch (e) {
-      return Left(ServerFailure(message: e.message, code: e.code));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+     // Postman subset didn't show refresh token endpoint.
+     // If using RefreshTokenUseCase, we might need it.
+     // For now, returning unimplemented or just null.
+     return const Left(AuthFailure(message: 'Refresh token not supported in this API version'));
   }
   
   @override

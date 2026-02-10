@@ -47,7 +47,7 @@ dependencies:
   
   # Network
   dio: ^5.4.0
-  retrofit: ^4.0.0
+  # retrofit removed - using manual implementation
   
   # Storage
   flutter_secure_storage: ^9.0.0
@@ -61,7 +61,7 @@ dev_dependencies:
   # Code Generation
   riverpod_generator: ^2.3.0
   build_runner: ^2.4.0
-  retrofit_generator: ^8.0.0
+  # retrofit_generator removed
   
   # Testing
   mockito: ^5.4.0
@@ -91,7 +91,7 @@ dev_dependencies:
 - Dio client setup
 - Interceptors (auth, logging)
 - Error handling
-- Retrofit API definitions
+- Manual ApiClient implementation (Dio)
 
 ## Phase 3: Domain Layer
 

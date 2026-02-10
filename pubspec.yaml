@@ -68,6 +68,7 @@ dependencies:
   equatable: ^2.0.7
   logger: ^2.4.0
   dartz: ^0.10.1
+  # retrofit removed due to build incompatibility
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +90,7 @@ dev_dependencies:
   mockito: ^5.4.4
   mocktail: ^1.0.4
   faker: ^2.2.0
+  # retrofit_generator removed due to build incompatibility
   
   # CRITICAL: Apple Policy Compliance
   # STRICTLY PROHIBITED - DO NOT ADD:

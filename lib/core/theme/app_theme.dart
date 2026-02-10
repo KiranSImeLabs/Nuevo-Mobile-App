@@ -5,8 +5,9 @@ class AppColors {
   // Primary Colors - Deep Maroon/Burgundy
   static const Color primaryColor = Color(0xFF4A0E0E);
   static const Color primaryDark = Color(0xFF3A0808);
-  static const Color primaryLight = Color(0xFF6A1E1E);
-  
+  static const Color primaryLight = Color(0xFF6A1E1E); //964a38
+  static const Color primaryButtonColor = Color(0xFF964a38);
+
   // Background Colors - Light Beige/Cream
   static const Color backgroundColor = Color(0xFFF9F5F2);
   static const Color cardBackground = Color(0xFFFFFFFF);

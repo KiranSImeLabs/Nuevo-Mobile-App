@@ -193,7 +193,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
                           ),
-                          activeColor: const Color(0xFF8B3A3A),
+                          activeColor: AppColors.primaryButtonColor,//const Color(0xFF8B3A3A),
                           side: const BorderSide(color: Color(0xFFBDBDBD), width: 1.5),
                         ),
                       ),
@@ -211,7 +211,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               TextSpan(
                                 text: AppStrings.termsOfService,
                                 style: const TextStyle(
-                                  color: Color(0xFF8B3A3A),
+                                  color: AppColors.primaryButtonColor,//Color(0xFF8B3A3A),
                                   fontWeight: FontWeight.w500,
                                 ),
                                 recognizer: TapGestureRecognizer()..onTap = () {
@@ -222,7 +222,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                               TextSpan(
                                 text: AppStrings.privacyPolicy,
                                 style: const TextStyle(
-                                  color: Color(0xFF8B3A3A),
+                                  color: AppColors.primaryButtonColor,//Color(0xFF8B3A3A),
                                   fontWeight: FontWeight.w500,
                                 ),
                                 recognizer: TapGestureRecognizer()..onTap = () {
@@ -245,7 +245,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     child: ElevatedButton(
                       onPressed: authState.isLoading ? null : _signup,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B3A3A), // Deep Maroon
+                        backgroundColor: AppColors.primaryButtonColor,//const Color(0xFF8B3A3A), // Deep Maroon
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
@@ -324,9 +324,10 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                         child: Text(
                           AppStrings.loginLink,
                           style: AppTextStyles.bodyMedium.copyWith(
-                            color: const Color(0xFF8B3A3A),
+                            color: AppColors.primaryButtonColor,//const Color(0xFF8B3A3A),
                             fontWeight: FontWeight.w600,
                             decoration: TextDecoration.underline,
+                            decorationColor: AppColors.primaryButtonColor,
                           ),
                         ),
                       ),
