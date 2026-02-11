@@ -18,6 +18,7 @@ class AppStrings {
   static const String doNotHaveAccount = "Don't have an account? ";
   static const String signupLink = 'Sign up';
   static const String google = 'Google';
+  static const String continueWithGoogle = 'Continue with Google';
   static const String apple = 'Apple';
   
   // Auth - Signup

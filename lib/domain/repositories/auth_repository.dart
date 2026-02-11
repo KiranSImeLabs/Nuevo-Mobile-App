@@ -33,6 +33,12 @@ abstract class AuthRepository {
   /// Returns true if logged in, false otherwise
   Future<bool> isLoggedIn();
   
+  /// Sign in with Google
+  Future<Either<Failure, User>> signInWithGoogle();
+  
+  /// Sign in with Apple
+  Future<Either<Failure, User>> signInWithApple();
+
   /// Get current access token
   /// Returns token string or null if not logged in
   Future<String?> getAccessToken();

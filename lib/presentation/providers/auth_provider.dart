@@ -52,7 +52,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         state = AuthState.unauthenticated();
       }
     } catch (e) {
-      state = AuthState.error(e.toString());
+      // If we can't check login status, default to unauthenticated so user can login
+      state = AuthState.unauthenticated();
     }
   }
 
@@ -93,6 +94,27 @@ class AuthNotifier extends StateNotifier<AuthState> {
     result.fold(
       (failure) => state = AuthState.error(failure.message),
       (_) => state = AuthState.unauthenticated(),
+    );
+  }
+
+  /// Sign in with Google
+  Future<void> signInWithGoogle() async {
+    state = AuthState.loading();
+    // Ideally use a UseCase here, but using repository directly for speed/simplicity in this step
+    final result = await _authRepository.signInWithGoogle();
+    result.fold(
+      (failure) => state = AuthState.error(failure.message),
+      (user) => state = AuthState.authenticated(user),
+    );
+  }
+
+  /// Sign in with Apple
+  Future<void> signInWithApple() async {
+    state = AuthState.loading();
+    final result = await _authRepository.signInWithApple();
+    result.fold(
+      (failure) => state = AuthState.error(failure.message),
+      (user) => state = AuthState.authenticated(user),
     );
   }
 }

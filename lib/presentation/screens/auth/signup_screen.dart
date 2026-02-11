@@ -2,6 +2,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart' as apple;
+import 'package:sign_in_button/sign_in_button.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/auth_state.dart';
 import '../../../core/theme/app_theme.dart';
@@ -295,18 +297,30 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   const SizedBox(height: 24),
 
                   // Social Logins
-                  _SocialButton(
-                    text: AppStrings.google,
-                    icon: Icons.g_mobiledata, 
-                    onTap: () {},
+                  // Google
+                  SizedBox(
+                    height: 50,
+                    child: SignInButton(
+                      Buttons.google,
+                      text: "Sign up with Google",
+                      onPressed: () {
+                        ref.read(authProvider.notifier).signInWithGoogle();
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   
-                  _SocialButton(
-                    text: AppStrings.apple,
-                    icon: Icons.apple,
-                    color: Colors.black,
-                    onTap: () {},
+                  apple.SignInWithAppleButton(
+                    onPressed: () {
+                      ref.read(authProvider.notifier).signInWithApple();
+                    },
+                    height: 50,
+                    style: apple.SignInWithAppleButtonStyle.black,
+                    borderRadius: BorderRadius.circular(24),
+                    iconAlignment: apple.IconAlignment.left,
                   ),
 
                   const SizedBox(height: 32),
@@ -372,46 +386,4 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 }
 
 // Duplicated from LoginScreen for speed, ideally should be in shared widgets
-class _SocialButton extends StatelessWidget {
-  final String text;
-  final IconData icon;
-  final VoidCallback onTap;
-  final Color? color;
 
-  const _SocialButton({
-    required this.text,
-    required this.icon,
-    required this.onTap,
-    this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 56,
-      child: TextButton(
-        onPressed: onTap,
-        style: TextButton.styleFrom(
-          backgroundColor: const Color(0xFFF5F0EB), // Light beige
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, color: color ?? AppColors.textPrimary, size: 24),
-            const SizedBox(width: 12),
-            Text(
-              text,
-              style: AppTextStyles.bodyMedium.copyWith(
-                color: AppColors.textPrimary,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

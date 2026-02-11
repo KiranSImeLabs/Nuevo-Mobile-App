@@ -14,32 +14,69 @@ final shellNavigatorKey = GlobalKey<NavigatorState>();
 
 /// Router Provider
 final routerProvider = Provider<GoRouter>((ref) {
-  final authState = ref.watch(authProvider);
+  final currentAuth = ref.read(authProvider);
+  final notifier = ValueNotifier<AuthState>(currentAuth);
+  
+  ref.onDispose(notifier.dispose);
+
+  ref.listen<AuthState>(authProvider, (_, next) {
+    notifier.value = next;
+  });
 
   return GoRouter(
+    refreshListenable: notifier,
     navigatorKey: rootNavigatorKey,
     initialLocation: '/',
     debugLogDiagnostics: true,
     redirect: (context, state) {
-      final isLoggedIn = authState.status == AuthStatus.authenticated;
-      final isLoggingIn = state.uri.toString() == '/login';
-      final isSigningUp = state.uri.toString() == '/signup';
-      final isSplash = state.uri.toString() == '/';
+      final authState = ref.read(authProvider);
+      final status = authState.status;
+      final path = state.uri.path;
+      final isLoggedIn = status == AuthStatus.authenticated;
+      
+      final isLogin = path == '/login';
+      final isSignup = path == '/signup';
+      final isSplash = path == '/';
+      final isPublicRoute = isLogin || isSignup || isSplash;
 
-      // 1. Loading State -> Splash
-      if (authState.status == AuthStatus.initial || authState.status == AuthStatus.loading) {
+      print('Redirect Check: status=$status, path=$path');
+     
+      // 1. Initial State -> Always go to Splash
+      if (status == AuthStatus.initial) {
         return '/';
       }
 
-      // 2. Unauthenticated -> Login
-      if (!isLoggedIn && !isLoggingIn && !isSigningUp) {
+      // 2. Verified Error or Loading State -> Stay on current screen
+      // This ensures we don't navigate away while showing an error snackbar or loading spinner
+      if (status == AuthStatus.error || status == AuthStatus.loading) {
+        return null;
+      }
+
+      // 3. Unauthenticated User
+      if (!isLoggedIn) {
+        // If strictly on Splash, go to Login
+        if (isSplash) {
+          return '/login';
+        }
+        // If on other public routes (Login/Signup), stay there
+        if (isLogin || isSignup) {
+          return null;
+        }
+        // If on a protected route, redirect to login
         return '/login';
       }
 
-      // 3. Authenticated -> Home (if explicitly on login/signup/splash)
-      if (isLoggedIn && (isLoggingIn || isSigningUp || isSplash)) {
-        return '/home';
+      // 4. Authenticated User
+      if (isLoggedIn) {
+        // If on a public route (Splash/Login/Signup), redirect to Home
+        if (isPublicRoute) {
+          return '/home';
+        }
+        // Otherwise, allow access to the protected route they are on
+        return null;
       }
+
+      return null;
 
       return null;
     },

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "997951366579",
+    "project_id": "neuvo-app-83aec",
+    "storage_bucket": "neuvo-app-83aec.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:997951366579:android:21247f96fe852b6a4cd7c6",
+        "android_client_info": {
+          "package_name": "com.example.nuevo_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARv4Rkx-_GjApfUlCsEqDEQIHL5hIMHgY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

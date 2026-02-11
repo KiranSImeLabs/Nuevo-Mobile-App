@@ -1,5 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import '../../core/errors/exceptions.dart';
 import '../../core/errors/failures.dart';
 import '../../core/network/dio_client.dart';
@@ -162,5 +164,93 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<String?> getAccessToken() async {
     return await _localDataSource.getAccessToken();
+  }
+
+  @override
+  Future<Either<Failure, User>> signInWithGoogle() async {
+    try {
+      final GoogleSignIn googleSignIn = GoogleSignIn();
+      final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
+      
+      if (googleUser == null) {
+        // User canceled the sign-in
+        return const Left(AuthFailure(message: 'Google Sign-In canceled'));
+      }
+      
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+      final String? idToken = googleAuth.idToken;
+      final String? accessToken = googleAuth.accessToken;
+      
+      if (idToken == null) {
+         return const Left(AuthFailure(message: 'Failed to retrieve Google ID Token'));
+      }
+
+      // TODO: Send idToken (and optionally accessToken) to your backend
+      // final response = await _apiClient.googleLogin(idToken);
+      
+      // MOCK IMPLEMENTATION FOR NOW (until backend endpoint is ready)
+      // We'll simulate a successful login
+      
+      // Simulate API delay
+      await Future.delayed(const Duration(seconds: 1));
+      
+      // Create a mock user based on Google profile
+      final user = User(
+        id: 'google_${googleUser.id}',
+        email: googleUser.email,
+        name: googleUser.displayName ?? 'Google User',
+        // Add other fields as necessary
+      );
+      
+      // Save dummy token
+      await _localDataSource.saveAccessToken('mock_google_token_$idToken');
+      await _localDataSource.saveUserId(user.id);
+      
+      return Right(user);
+
+    } catch (e) {
+      return Left(AuthFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> signInWithApple() async {
+    try {
+      final credential = await SignInWithApple.getAppleIDCredential(
+        scopes: [
+          AppleIDAuthorizationScopes.email,
+          AppleIDAuthorizationScopes.fullName,
+        ],
+        // Implement webAuthenticationOptions if native flow handles Android too, 
+        // but typically this package handles iOS natively and Android via web fallback.
+        // For Android, you need redirect URI.
+      );
+
+      // credential.identityToken is the JWT to send to backend
+      if (credential.identityToken == null) {
+         return const Left(AuthFailure(message: 'Failed to retrieve Apple Identity Token'));
+      }
+
+      // TODO: Send identityToken to backend
+      // final response = await _apiClient.appleLogin(credential.identityToken!);
+
+      // MOCK IMPLEMENTATION
+      
+      final user = User(
+        id: 'apple_${credential.userIdentifier}',
+         // Email/Name are only available on FIRST sign in with Apple. 
+         // Subsequent sign-ins might not return them, so you rely on the backend decoding the ID token.
+        email: credential.email ?? 'apple_hidden@email.com', 
+        name: [credential.givenName, credential.familyName].where((e) => e != null).join(' '),
+      );
+      
+      await _localDataSource.saveAccessToken('mock_apple_token_${credential.identityToken}');
+      await _localDataSource.saveUserId(user.id);
+      
+      return Right(user);
+
+    } catch (e) {
+      return Left(AuthFailure(message: e.toString()));
+    }
   }
 }
