@@ -50,7 +50,7 @@ Deviations are not allowed unless explicitly stated.
   - Every class must be injectable.
   - Every class must be unit-testable in isolation.
 - Responsive design requirements:
-  - UI must support **all screen sizes** (mobile, tablet, foldable, web).
+  - UI must support **all screen sizes** (mobile, tablet, foldable).
   - Use adaptive layouts (`LayoutBuilder`, `MediaQuery`, responsive widgets).
   - No hard-coded widths or device-specific UI assumptions.
 
@@ -122,3 +122,11 @@ before marking any task as complete.
   - Headers and authentication
 - AI must NEVER invent, assume, or modify API contracts.
 - Any mismatch must be reported instead of auto-corrected.
+
+## UI Component Standards & DRY (Don't Repeat Yourself)
+
+- **Atomic Widgets**: Every repeated UI element (Cards, TextFields, Buttons) MUST be a standalone widget in `lib/presentation/widgets/` or `lib/core/widgets/`.
+- **Card Patterns**: Create a `BaseCard` widget that handles elevation, shadow, and border radius. Use composition for specific card types (e.g., `AppointmentCard`, `RecordCard`).
+- **Input Consistency**: All TextFields must use a shared `AppTextField` widget to ensure uniform focus colors, error styling, and content padding.
+- **Theme-Only Styling**: NEVER use hardcoded `Colors` or `FontSize`. Use `Theme.of(context)` exclusively.
+- **Refactoring Requirement**: If the AI detects similar logic or UI being written for a second time, it MUST suggest refactoring into a reusable component before proceeding.
