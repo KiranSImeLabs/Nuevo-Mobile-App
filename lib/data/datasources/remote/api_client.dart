@@ -24,6 +24,7 @@ class ApiClient {
       ApiConstants.login,
       data: request.toJson(),
     );
+    
     return ApiResponse.fromJson(
       response.data, 
       (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
