@@ -5,6 +5,7 @@ You are working on a Flutter multiplatform project (Mobile + Web).
 IMPORTANT:
 Before performing any task, ALWAYS read and align with:
 - `PROJECT_CONTEXT.md` → Contains overall project background, domain context, business goals, assumptions, and constraints.
+- Check whether any duplicate coding is there including UI widgets.
 
 All outputs must strictly follow both:
 1. `PROJECT_CONTEXT.md`

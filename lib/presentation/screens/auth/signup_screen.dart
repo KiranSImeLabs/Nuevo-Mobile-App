@@ -4,6 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart' as apple;
 import 'package:sign_in_button/sign_in_button.dart';
+import '../../widgets/common/app_text_field.dart';
+import '../../widgets/common/app_primary_button.dart';
+import '../../widgets/common/or_divider.dart';
+import '../../widgets/common/social_login_buttons.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/auth_state.dart';
 import '../../../core/theme/app_theme.dart';
@@ -105,75 +109,57 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   const SizedBox(height: 32),
 
                   // Full Name
-                  TextFormField(
+                  AppTextField(
                     controller: _nameController,
-                    decoration: _inputDecoration(
-                      hintText: AppStrings.fullName,
-                      prefixIcon: Icons.person_outline,
-                    ),
+                    hintText: AppStrings.fullName,
+                    prefixIcon: Icons.person_outline,
                     validator: Validators.validateName,
                     enabled: !authState.isLoading,
-                    style: AppTextStyles.bodyMedium,
                   ),
                   const SizedBox(height: 16),
 
                   // Email
-                  TextFormField(
+                  AppTextField(
                     controller: _emailController,
-                    decoration: _inputDecoration(
-                      hintText: AppStrings.emailAddress,
-                      prefixIcon: Icons.mail_outline,
-                    ),
+                    hintText: AppStrings.emailAddress,
+                    prefixIcon: Icons.mail_outline,
                     keyboardType: TextInputType.emailAddress,
                     validator: Validators.validateEmail,
                     enabled: !authState.isLoading,
-                    style: AppTextStyles.bodyMedium,
                   ),
                   const SizedBox(height: 16),
 
                   // Password
-                  TextFormField(
+                  AppTextField(
                     controller: _passwordController,
-                    decoration: _inputDecoration(
-                      hintText: AppStrings.password,
-                      // No prefix icon for password based on design (usually just toggle)
-                      // Design shows NO prefix icon for password inputs, just suffix eye
-                    ).copyWith(
-                      suffixIcon: IconButton(
+                    hintText: AppStrings.password,
+                    obscureText: _obscurePassword,
+                     suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                           color: AppColors.textSecondary,
                         ),
                         onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    ),
-                    obscureText: _obscurePassword,
-                    validator: Validators.validatePassword,
+                    validator: Validators.validateSignupPassword,
                     enabled: !authState.isLoading,
-                    style: AppTextStyles.bodyMedium,
                   ),
                   const SizedBox(height: 16),
                   
                   // Confirm Password
-                  TextFormField(
+                  AppTextField(
                     controller: _confirmPasswordController,
-                    decoration: _inputDecoration(
-                      hintText: AppStrings.confirmPassword,
-                    ).copyWith(
-                      suffixIcon: IconButton(
+                    hintText: AppStrings.confirmPassword,
+                    obscureText: _obscureConfirmPassword,
+                    suffixIcon: IconButton(
                         icon: Icon(
                           _obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
                           color: AppColors.textSecondary,
                         ),
                         onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                    ),
-                    obscureText: _obscureConfirmPassword,
                     validator: (value) => Validators.validateConfirmPassword(value, _passwordController.text),
                     enabled: !authState.isLoading,
-                    style: AppTextStyles.bodyMedium,
                   ),
                   
                   const SizedBox(height: 24),
@@ -242,85 +228,28 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   const SizedBox(height: 32),
 
                   // Create Account Button
-                  SizedBox(
-                    height: 56,
-                    child: ElevatedButton(
-                      onPressed: authState.isLoading ? null : _signup,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primaryButtonColor,//const Color(0xFF8B3A3A), // Deep Maroon
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: authState.isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: const [
-                                Text(
-                                  AppStrings.createAccountBtn,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Icon(Icons.arrow_forward_rounded, size: 20),
-                              ],
-                            ),
-                    ),
+                  AppPrimaryButton(
+                    onPressed: _signup,
+                    text: AppStrings.createAccountBtn,
+                    isLoading: authState.isLoading,
                   ),
                   
                   const SizedBox(height: 24),
 
                   // Divider
-                  Row(
-                    children: [
-                      const Expanded(child: Divider(color: Color(0xFFEEEEEE), thickness: 1)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        child: Text(
-                          AppStrings.or,
-                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                        ),
-                      ),
-                      const Expanded(child: Divider(color: Color(0xFFEEEEEE), thickness: 1)),
-                    ],
-                  ),
+                  const OrDivider(),
                   
                   const SizedBox(height: 24),
 
                   // Social Logins
-                  // Google
-                  SizedBox(
-                    height: 50,
-                    child: SignInButton(
-                      Buttons.google,
-                      text: "Sign up with Google",
-                      onPressed: () {
-                        ref.read(authProvider.notifier).signInWithGoogle();
-                      },
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(24),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  
-                  apple.SignInWithAppleButton(
-                    onPressed: () {
+                  SocialLoginButtons(
+                    onGooglePressed: () {
+                      ref.read(authProvider.notifier).signInWithGoogle();
+                    },
+                    onApplePressed: () {
                       ref.read(authProvider.notifier).signInWithApple();
                     },
-                    height: 50,
-                    style: apple.SignInWithAppleButtonStyle.black,
-                    borderRadius: BorderRadius.circular(24),
-                    iconAlignment: apple.IconAlignment.left,
+                    googleButtonText: "Sign up with Google",
                   ),
 
                   const SizedBox(height: 32),
@@ -356,34 +285,6 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       ),
     );
   }
-
-  InputDecoration _inputDecoration({
-    required String hintText,
-    IconData? prefixIcon,
-  }) {
-    return InputDecoration(
-      hintText: hintText,
-      prefixIcon: prefixIcon != null 
-          ? Icon(prefixIcon, color: AppColors.textSecondary) 
-          : null,
-      filled: true,
-      fillColor: const Color(0xFFFAFAFA),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-      ),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primaryColor),
-      ),
-      contentPadding: const EdgeInsets.symmetric(vertical: 16),
-    );
-  }
 }
 
 // Duplicated from LoginScreen for speed, ideally should be in shared widgets
-

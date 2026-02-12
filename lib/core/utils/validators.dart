@@ -15,8 +15,16 @@ class Validators {
     return null;
   }
   
-  /// Validate Password
-  static String? validatePassword(String? value) {
+  /// Validate Login Password (Simple check)
+  static String? validateLoginPassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Password is required';
+    }
+    return null;
+  }
+
+  /// Validate Signup Password (Strict check)
+  static String? validateSignupPassword(String? value) {
     if (value == null || value.isEmpty) {
       return 'Password is required';
     }
@@ -29,8 +37,19 @@ class Validators {
       return 'Password must not exceed ${ValidationConstants.maxPasswordLength} characters';
     }
     
-    if (!ValidationConstants.passwordRegex.hasMatch(value)) {
-      return 'Password must contain uppercase, lowercase, number, and special character';
+    // Check for Uppercase
+    if (!value.contains(RegExp(r'[A-Z]'))) {
+      return 'Password must contain at least one uppercase letter';
+    }
+
+    // Check for Number
+    if (!value.contains(RegExp(r'[0-9]'))) {
+      return 'Password must contain at least one number';
+    }
+
+    // Check for Special Character
+    if (!value.contains(RegExp(r'[!@#$%^&*(),.?":{}|<>]'))) {
+      return 'Password must contain at least one special character';
     }
     
     return null;
