@@ -78,15 +78,11 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<Either<Failure, User>> signup({
     required String email,
     required String password,
-    required String name,
+    required String firstName,
+    required String lastName,
     String? phoneNumber,
   }) async {
     try {
-      // Split name into first and last name as API requires
-      final nameParts = name.split(' ');
-      final firstName = nameParts.isNotEmpty ? nameParts.first : name;
-      final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-      
       // Create register request
       final request = RegisterRequest(
         email: email,
@@ -97,6 +93,14 @@ class AuthRepositoryImpl implements AuthRepository {
       
       // Call API
       final response = await _apiClient.register(request);
+      
+      // Check for validation errors first
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        final errorMessage = response.errors!
+            .map((e) => e.msg ?? 'Invalid value')
+            .join(', ');
+        return Left(ValidationFailure(message: errorMessage));
+      }
       
       if (response.success && response.data != null) {
         final data = response.data!;
@@ -118,6 +122,11 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
         return Left(ServerFailure(message: exception.message, code: exception.code));
+      } else if (exception is ValidationException) {
+        final msg = exception.errors != null && exception.errors!.isNotEmpty
+            ? exception.errors!.join(', ')
+            : exception.message;
+        return Left(ValidationFailure(message: msg, code: exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }

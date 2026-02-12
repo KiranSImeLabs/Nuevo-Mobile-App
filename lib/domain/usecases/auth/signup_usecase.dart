@@ -17,7 +17,8 @@ class SignupUseCase implements UseCase<User, SignupParams> {
     return await repository.signup(
       email: params.email,
       password: params.password,
-      name: params.name,
+      firstName: params.firstName,
+      lastName: params.lastName,
       phoneNumber: params.phoneNumber,
     );
   }
@@ -27,16 +28,18 @@ class SignupUseCase implements UseCase<User, SignupParams> {
 class SignupParams extends Equatable {
   final String email;
   final String password;
-  final String name;
+  final String firstName;
+  final String lastName;
   final String? phoneNumber;
   
   const SignupParams({
     required this.email,
     required this.password,
-    required this.name,
+    required this.firstName,
+    required this.lastName,
     this.phoneNumber,
   });
   
   @override
-  List<Object?> get props => [email, password, name, phoneNumber];
+  List<Object?> get props => [email, password, firstName, lastName, phoneNumber];
 }

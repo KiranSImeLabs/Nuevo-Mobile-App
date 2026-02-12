@@ -80,11 +80,14 @@ class CacheException extends AppException {
 
 /// Validation exceptions
 class ValidationException extends AppException {
+  final List<String>? errors;
+
   ValidationException({
     required super.message,
     super.code,
+    this.errors,
   });
   
   @override
-  String toString() => 'ValidationException: $message (code: $code)';
+  String toString() => 'ValidationException: $message (code: $code, errors: $errors)';
 }

@@ -6,13 +6,13 @@ part of 'auth_response_model.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-LoginResponseData _$LoginResponseDataFromJson(Map<String, dynamic> json) =>
-    LoginResponseData(
+AuthResponseData _$AuthResponseDataFromJson(Map<String, dynamic> json) =>
+    AuthResponseData(
       token: json['token'] as String,
       user: UserModel.fromJson(json['user'] as Map<String, dynamic>),
     );
 
-Map<String, dynamic> _$LoginResponseDataToJson(LoginResponseData instance) =>
+Map<String, dynamic> _$AuthResponseDataToJson(AuthResponseData instance) =>
     <String, dynamic>{
       'token': instance.token,
       'user': instance.user,

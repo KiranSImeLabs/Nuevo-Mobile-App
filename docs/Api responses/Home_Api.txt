@@ -1,0 +1,69 @@
+{
+    "success": true,
+    "message": "Home dashboard loaded successfully",
+    "data": {
+        "welcome": {
+            "firstName": "Alice",
+            "lastName": "Smith",
+            "greeting": "Welcome Back!"
+        },
+        "wellnessProgress": {
+            "phaseName": "Wellness Reset",
+            "subtitle": "2 Building Habits",
+            "progressPercent": 58,
+            "currentStep": "BUILDING_HABITS"
+        },
+        "quickStats": {
+            "nuevoAge": 40,
+            "nextSession": null
+        },
+        "actionRequired": [],
+        "tasksCompleted": [
+            {
+                "id": "task-1",
+                "title": "Pre-session questionnaire",
+                "duration": "5 minutes",
+                "status": "pending",
+                "thumbnail": null
+            },
+            {
+                "id": "task-2",
+                "title": "Health assessment form",
+                "duration": "10 minutes",
+                "status": "completed",
+                "thumbnail": null
+            }
+        ],
+        "yourProgram": {
+            "id": "000971b0-ed59-4ee6-9b3a-14706d752275",
+            "name": "Foundation Program",
+            "type": "FOUNDATION",
+            "description": "Our foundational health program designed to establish healthy habits and sustainable lifestyle changes.",
+            "price": "99.00",
+            "priceLabel": "$99.00 / week",
+            "isActive": true
+        },
+        "quickAccess": [
+            {
+                "id": "daily-exercise",
+                "title": "Daily Exercise",
+                "icon": "dumbbell"
+            },
+            {
+                "id": "daily-nutrition",
+                "title": "Daily Nutrition",
+                "icon": "nutrition"
+            },
+            {
+                "id": "appointments",
+                "title": "Appointments",
+                "icon": "calendar"
+            },
+            {
+                "id": "health-insight",
+                "title": "Health Insight",
+                "icon": "heart"
+            }
+        ]
+    }
+}

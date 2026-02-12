@@ -1,0 +1,40 @@
+Sig-in API 
+
+Result1 
+{
+    "success": false,
+    "message": "Email already registered"
+}
+
+====================================
+Reuslt:2
+{
+    "success": false,
+    "message": "Validation failed",
+    "errors": [
+        {
+            "type": "field",
+            "value": "{kk@jdjf.co}",
+            "msg": "Valid email is required",
+            "path": "email",
+            "location": "body"
+        }
+    ]
+}
+
+====================================
+Result 3:
+{
+    "success": true,
+    "message": "User registered successfully",
+    "data": {
+        "user": {
+            "id": "866e9f45-5627-4211-b53f-e943032e0a0f",
+            "email": "kk@jdjf.co",
+            "firstName": "Kiran11",
+            "lastName": "Nair1",
+            "createdAt": "2026-02-12T06:13:03.854Z"
+        },
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg2NmU5ZjQ1LTU2MjctNDIxMS1iNTNmLWU5NDMwMzJlMGEwZiIsImVtYWlsIjoia2tAamRqZi5jbyIsImlhdCI6MTc3MDg3Njc4MywiZXhwIjoxNzcxNDgxNTgzfQ.Ozp3ZM0p0NzQfojJAwOW6vJzhVQ_WFkvMzpjrCJGJO4"
+    }
+}

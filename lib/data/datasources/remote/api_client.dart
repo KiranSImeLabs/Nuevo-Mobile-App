@@ -19,26 +19,26 @@ class ApiClient {
   // ============================================
   
   /// Login with email and password
-  Future<ApiResponse<LoginResponseData>> login(LoginRequest request) async {
+  Future<ApiResponse<AuthResponseData>> login(LoginRequest request) async {
     final response = await _dioClient.post(
       ApiConstants.login,
       data: request.toJson(),
     );
     return ApiResponse.fromJson(
       response.data, 
-      (json) => LoginResponseData.fromJson(json as Map<String, dynamic>),
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
     );
   }
   
   /// Sign up new user
-  Future<ApiResponse<LoginResponseData>> register(RegisterRequest request) async {
+  Future<ApiResponse<AuthResponseData>> register(RegisterRequest request) async {
     final response = await _dioClient.post(
       ApiConstants.register,
       data: request.toJson(),
     );
     return ApiResponse.fromJson(
       response.data,
-      (json) => LoginResponseData.fromJson(json as Map<String, dynamic>),
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
     );
   }
   

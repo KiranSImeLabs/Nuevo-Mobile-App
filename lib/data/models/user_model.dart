@@ -10,7 +10,8 @@ part 'user_model.g.dart';
 class UserModel {
   final String id;
   final String email;
-  final String name;
+  final String? firstName;
+  final String? lastName;
   @JsonKey(name: 'phone_number')
   final String? phoneNumber;
   @JsonKey(name: 'profile_image_url')
@@ -24,7 +25,8 @@ class UserModel {
   const UserModel({
     required this.id,
     required this.email,
-    required this.name,
+    this.firstName,
+    this.lastName,
     this.phoneNumber,
     this.profileImageUrl,
     this.subscription,
@@ -44,7 +46,7 @@ class UserModel {
     return User(
       id: id,
       email: email,
-      name: name,
+      name: '${firstName ?? ''} ${lastName ?? ''}'.trim(),
       phoneNumber: phoneNumber,
       profileImageUrl: profileImageUrl,
       subscription: subscription?.toEntity(),
@@ -55,10 +57,15 @@ class UserModel {
   
   /// Factory constructor for creating a UserModel from Domain Entity
   factory UserModel.fromEntity(User user) {
+    final nameParts = user.name.split(' ');
+    final firstName = nameParts.length > 0 ? nameParts.first : '';
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+    
     return UserModel(
       id: user.id,
       email: user.email,
-      name: user.name,
+      firstName: firstName,
+      lastName: lastName,
       phoneNumber: user.phoneNumber,
       profileImageUrl: user.profileImageUrl,
       subscription: user.subscription != null
