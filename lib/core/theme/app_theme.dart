@@ -13,6 +13,7 @@ class AppColors {
   static const Color backgroundColor = Color(0xFFF9F5F2);
   static const Color cardBackground = Color(0xFFFFFFFF);
   static const Color surfaceColor = Color(0xFFFFFBF8);
+  static const Color roseSurface = Color(0xFFFAF1ED); // Light beige/rose for backgrounds
   
   // Health Status Indicators
   static const Color optimalGreen = Color(0xFF4CAF50);
@@ -36,6 +37,23 @@ class AppColors {
   static const Color overlay = Color(0x80000000); // 50% black
   static const Color shimmer = Color(0xFFE0E0E0);
 }
+
+/*
+🟤 Primary & Brand Tones
+#735B4D — primary text / icons
+#6B3528 — deep brown accent
+#964A38 — secondary accent
+#17110D — very dark brown/near black
+⚫ Neutral / Text
+#212121 — dark neutral text
+🤍 Backgrounds & Surfaces
+#FCF9F8 — main background
+#F6ECE9 — soft surface tint
+#F5EDEB — light warm surface
+#F5EAE8 — subtle background layer
+#DEC7C1 — muted card/border tone
+#DFDFDF — divider / border
+*/
 
 /// App Text Styles (Based on Figma Typography)
 class AppTextStyles {

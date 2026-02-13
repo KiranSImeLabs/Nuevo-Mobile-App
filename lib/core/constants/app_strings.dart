@@ -59,4 +59,29 @@ class AppStrings {
   static const String heartRate = 'Heart Rate';
   static const String bloodPressure = 'Blood Pressure';
   static const String weight = 'Weight';
+  
+  // My Plan
+  static const String myPlan = 'My Plan';
+  static const String insightProgram = 'Insight Program';
+  static const String resetPhase = 'Reset Phase';
+  static const String overview = 'Overview';
+  static const String phaseTimeline = 'Phase Timeline';
+  static const String assess = 'Assess';
+  static const String reset = 'Reset';
+  static const String elevate = 'Elevate';
+  static const String sustain = 'Sustain';
+  static const String yourCareTeam = 'Your Care Team';
+  static const String goals = 'Goals';
+  static const String improveEnergy = 'Improve daily energy levels';
+  static const String reduceFat = 'Reduce visceral fat metrics';
+  static const String buildSleepRoutine = 'Build consistent sleep routine';
+  static const String planPillars = 'Plan Pillars';
+  static const String exercisePlan = 'Exercise Plan';
+  static const String strengthFoundations = 'Strength foundations';
+  static const String nutritionPlan = 'Nutrition Plan';
+  static const String wholeFoodFocus = 'Whole food focus';
+  static const String drMike = 'DR. Mike';
+  static const String dietitian = 'Dietitian';
+  static const String drSmith = 'Dr. A. Smith';
+  static const String generalPractitioner = 'General Practitioner';
 }
