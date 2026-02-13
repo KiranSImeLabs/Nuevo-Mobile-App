@@ -255,7 +255,17 @@ class MyPlanScreen extends StatelessWidget {
                 AppStrings.goals, 
                  style: AppTextStyles.h4.copyWith(fontSize: 16, color: const Color(0xFF4A4A4A))
                ),
-               const Icon(Icons.edit_outlined, size: 20, color: Color(0xFF8D6E63)),
+               IconButton(
+                 onPressed: () {
+                   // TODO: Implement edit functionality
+                 },
+                 icon: const Icon(Icons.edit_outlined, size: 20, color: Color(0xFF8D6E63)),
+                 padding: EdgeInsets.zero,
+                 constraints: const BoxConstraints(),
+                 style: IconButton.styleFrom(
+                   tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                 ),
+               ),
             ],
           ),
           const SizedBox(height: 16),
