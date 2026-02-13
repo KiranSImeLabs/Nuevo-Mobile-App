@@ -22,6 +22,13 @@ import '../screens/appointments/select_time_screen.dart';
 import '../screens/appointments/confirm_booking_screen.dart';
 import '../screens/appointments/appointment_details_screen.dart';
 import '../screens/appointments/connecting_session_screen.dart';
+import '../screens/appointments/connecting_session_screen.dart';
+import '../screens/profile/account_settings_screen.dart';
+import '../screens/profile/privacy_consent_screen.dart';
+import '../screens/profile/payments_screen.dart';
+import '../screens/profile/notification_settings_screen.dart';
+import '../screens/profile/doctor_list_screen.dart';
+import '../screens/profile/support_screen.dart';
 import '../../domain/entities/session.dart';
 import 'main_shell.dart';
 
@@ -201,6 +208,30 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/connecting-session',
             builder: (context, state) => const ConnectingSessionScreen(),
+          ),
+          GoRoute(
+            path: '/account-settings',
+            builder: (context, state) => const AccountSettingsScreen(),
+          ),
+          GoRoute(
+            path: '/privacy-consent',
+            builder: (context, state) => const PrivacyConsentScreen(),
+          ),
+          GoRoute(
+            path: '/payments',
+            builder: (context, state) => const PaymentsScreen(),
+          ),
+          GoRoute(
+            path: '/notifications',
+            builder: (context, state) => const NotificationSettingsScreen(),
+          ),
+          GoRoute(
+            path: '/doctor-list',
+            builder: (context, state) => const DoctorListScreen(),
+          ),
+          GoRoute(
+            path: '/support',
+            builder: (context, state) => const SupportScreen(),
           ),
         ],
       ),
