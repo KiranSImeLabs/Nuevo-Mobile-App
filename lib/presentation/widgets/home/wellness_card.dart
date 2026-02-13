@@ -16,8 +16,6 @@ class WellnessCard extends StatelessWidget {
   Widget build(BuildContext context) {
     // Calculate percentage integer (0-100)
     final int percentage = wellnessProgress.progressPercent;
-    print('🔍 DEBUG: WellnessCard percentage: $percentage');
-    print('🔍 DEBUG: WellnessCard subtitle: ${wellnessProgress.subtitle}');
     
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -25,7 +23,7 @@ class WellnessCard extends StatelessWidget {
           height: 126, // Fixed height from spec
           padding: const EdgeInsets.all(12), // Fixed padding from spec
           decoration: BoxDecoration(
-            color: AppColors.primaryLight, // Visual Debug: Blue background
+            color: const Color(0xFF6B3528), // Solid background from spec
             borderRadius: BorderRadius.circular(12), // Fixed radius from spec
           ),
           child: Column(
