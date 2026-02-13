@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../domain/entities/home/wellness_progress.dart';
 import '../../utils/responsive_utils.dart';
-
+import '../../../core/theme/app_theme.dart';
 /// Wellness progress card widget matching updated UI specs
 /// Specs: width: 335, height: 126, bg: #6B3528, radius: 12, padding: 12
 class WellnessCard extends StatelessWidget {
@@ -25,7 +25,7 @@ class WellnessCard extends StatelessWidget {
           height: 126, // Fixed height from spec
           padding: const EdgeInsets.all(12), // Fixed padding from spec
           decoration: BoxDecoration(
-            color: Colors.blue, // Visual Debug: Blue background
+            color: AppColors.primaryLight, // Visual Debug: Blue background
             borderRadius: BorderRadius.circular(12), // Fixed radius from spec
           ),
           child: Column(
@@ -147,7 +147,7 @@ class WellnessCard extends StatelessWidget {
             decoration: BoxDecoration(
               color: isActive
                   ? const Color(0xFF9E5C4B) // Lighter brown/terracotta for active (matched from image)
-                  : const Color(0xFF53281E), // Darker brown for inactive (matched from image background shade)
+                  : AppColors.primaryColor,//Color(0xFF53281E), // Darker brown for inactive (matched from image background shade)
               borderRadius: BorderRadius.circular(4),
             ),
           );
