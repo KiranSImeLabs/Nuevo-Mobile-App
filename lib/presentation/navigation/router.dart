@@ -5,6 +5,7 @@ import '../providers/auth_provider.dart';
 import '../providers/auth_state.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
+import '../screens/auth/forgot_password_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/my_plan/my_plan_screen.dart';
 import '../screens/health/health_screen.dart';
@@ -44,8 +45,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       
       final isLogin = path == '/login';
       final isSignup = path == '/signup';
+      final isForgotPassword = path == '/forgot-password';
       final isSplash = path == '/';
-      final isPublicRoute = isLogin || isSignup || isSplash;
+      final isPublicRoute = isLogin || isSignup || isSplash || isForgotPassword;
 
       print('Redirect Check: status=$status, path=$path');
      
@@ -60,21 +62,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         return null;
       }
 
-      // 3. Unauthenticated User
-      if (!isLoggedIn) {
-        // If strictly on Splash, go to Login
-        if (isSplash) {
-          return '/login';
-        }
-        // If on other public routes (Login/Signup), stay there
-        if (isLogin || isSignup) {
-          return null;
-        }
-        // If on a protected route, redirect to login
-        return '/login';
-      }
-
-      // 4. Authenticated User
+      // 3. Authenticated User
       if (isLoggedIn) {
         // If on a public route (Splash/Login/Signup), redirect to Home
         if (isPublicRoute) {
@@ -83,6 +71,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         // Otherwise, allow access to the protected route they are on
         return null;
       }
+      
+      // 4. Unauthenticated User
+      if (!isLoggedIn) {
+        // If strictly on Splash, go to Login
+        if (isSplash) {
+          return '/login';
+        }
+        // If on other public routes (Login/Signup/Forgot), stay there
+        if (isPublicRoute) {
+          return null;
+        }
+        // If on a protected route, redirect to login
+        return '/login';
+      }
+
 
       return null;
 
@@ -100,6 +103,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: '/signup',
         builder: (context, state) => const SignupScreen(),
+      ),
+      GoRoute(
+        path: '/forgot-password',
+        builder: (context, state) => const ForgotPasswordScreen(),
       ),
       // Shell route for main app with bottom navigation
       ShellRoute(

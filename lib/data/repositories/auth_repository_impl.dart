@@ -283,4 +283,36 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> checkFirstLaunch() async {
     await _localDataSource.handleFirstLaunch();
   }
+
+  @override
+  Future<Either<Failure, void>> forgotPassword(String email) async {
+    try {
+      final request = ForgotPasswordRequest(email: email);
+      final response = await _apiClient.forgotPassword(request);
+      
+      if (response.errors != null && response.errors!.isNotEmpty) {
+        final errorMessage = response.errors!
+            .map((e) => e.msg ?? 'Invalid value')
+            .join(', ');
+        return Left(ValidationFailure(message: errorMessage));
+      }
+
+      if (response.success) {
+        return const Right(null);
+      } else {
+        return Left(ServerFailure(message: response.message ?? 'Failed to send reset email'));
+      }
+    } on DioException catch (e) {
+      final exception = DioClient.handleDioError(e);
+      if (exception is ValidationException) {
+         final msg = exception.errors != null && exception.errors!.isNotEmpty
+            ? exception.errors!.join(', ')
+            : exception.message;
+        return Left(ValidationFailure(message: msg, code: exception.code));
+      }
+      return Left(ServerFailure(message: exception.message));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
 }

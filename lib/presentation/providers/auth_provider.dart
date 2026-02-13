@@ -3,6 +3,7 @@ import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/logout_usecase.dart';
 import '../../domain/usecases/auth/signup_usecase.dart';
 import '../../domain/usecases/user/get_user_profile_usecase.dart';
+import '../../domain/usecases/auth/forgot_password_usecase.dart';
 import '../../domain/usecases/usecase.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
@@ -15,6 +16,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   final SignupUseCase _signupUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetUserProfileUseCase _getUserProfileUseCase;
+  final ForgotPasswordUseCase _forgotPasswordUseCase;
   final AuthRepository _authRepository; // Needed for checking initial login status
   final Ref _ref;
 
@@ -23,12 +25,14 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required SignupUseCase signupUseCase,
     required LogoutUseCase logoutUseCase,
     required GetUserProfileUseCase getUserProfileUseCase,
+    required ForgotPasswordUseCase forgotPasswordUseCase,
     required AuthRepository authRepository,
     required Ref ref,
   })  : _loginUseCase = loginUseCase,
         _signupUseCase = signupUseCase,
         _logoutUseCase = logoutUseCase,
         _getUserProfileUseCase = getUserProfileUseCase,
+        _forgotPasswordUseCase = forgotPasswordUseCase,
         _authRepository = authRepository,
         _ref = ref,
         super(AuthState.initial()) {
@@ -139,6 +143,32 @@ class AuthNotifier extends StateNotifier<AuthState> {
       (user) => state = AuthState.authenticated(user),
     );
   }
+
+  /// Forgot Password
+  Future<void> forgotPassword(String email) async {
+    // We don't necessarily want to change the whole app state to loading 
+    // because this screen might be on top of others, but for simplicity let's stick to the pattern.
+    // However, if we change state to loading, it might trigger redirects in router if not careful.
+    // Start with loading.
+    state = AuthState.loading();
+    
+    final result = await _forgotPasswordUseCase(ForgotPasswordParams(email: email));
+    
+    result.fold(
+      (failure) => state = AuthState.error(failure.message),
+      (_) {
+        // Success - we might want to keep the user on the screen or show a success message.
+        // Returning to unauthenticated state with a "message" would be ideal, 
+        // but AuthState doesn't hold success messages well without authenticated.
+        // Let's reset to unauthenticated (since they are not logged in) 
+        // but the UI will handle the success feedback.
+        // OR better: The UI should watch for state changes.
+        // If we go back to unauthenticated, the UI might flicker.
+        // Let's just restore previous state (unauthenticated) but maybe with a clear error if any.
+        state = AuthState.unauthenticated();
+      },
+    );
+  }
 }
 
 /// Global Auth Provider
@@ -149,6 +179,7 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
     signupUseCase: ref.watch(signupUseCaseProvider),
     logoutUseCase: ref.watch(logoutUseCaseProvider),
     getUserProfileUseCase: ref.watch(getUserProfileUseCaseProvider),
+    forgotPasswordUseCase: ref.watch(forgotPasswordUseCaseProvider),
     authRepository: ref.watch(authRepositoryProvider),
   );
 });

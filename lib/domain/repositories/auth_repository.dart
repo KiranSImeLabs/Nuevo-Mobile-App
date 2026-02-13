@@ -46,4 +46,8 @@ abstract class AuthRepository {
 
   /// Check and handle first launch logic (clearing secure storage if needed)
   Future<void> checkFirstLaunch();
+
+  /// Send password reset link to email
+  /// Returns void on success, Failure on error
+  Future<Either<Failure, void>> forgotPassword(String email);
 }

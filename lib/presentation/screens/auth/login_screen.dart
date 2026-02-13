@@ -166,7 +166,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // TODO: Navigate to Forgot Password
+                        context.push('/forgot-password');
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: AppColors.textSecondary,

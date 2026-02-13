@@ -72,7 +72,7 @@ class DioClient {
 
   /// Handle Dio Errors and convert to custom exceptions
   /// Static so it can be used without instance if needed, or by Repositories
-  static Exception handleDioError(DioException error) {
+  static AppException handleDioError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
@@ -106,9 +106,12 @@ class DioClient {
              return ValidationException(
               message: 'Validation failed',
               code: statusCode,
-              errors: (error.response?.data['errors'] as List)
-                  .map((e) => e.toString())
-                  .toList(), // Added toList() to fix type error
+              errors: (error.response?.data['errors'] as List).map((e) {
+                if (e is Map && e.containsKey('msg')) {
+                  return e['msg'].toString();
+                }
+                return e.toString();
+              }).toList(),
              );
           }
           return ServerException(

@@ -13,7 +13,11 @@ class AppStrings {
   static const String accessProgram = 'Access your personalised care program';
   static const String emailAddress = 'Email Address';
   static const String password = 'Password';
-  static const String forgotPassword = 'Forgot password?';
+  static const String forgotPassword = 'Forgot Password';
+  static const String forgotPasswordTitle = 'Forgot Password';
+  static const String forgotPasswordSubtitle = 'Enter your registered email address to receive password reset instructions.';
+  static const String sendResetLink = 'Send Reset Link';
+  static const String backToLogin = 'Back to Login';
   static const String login = 'Log in';
   static const String doNotHaveAccount = "Don't have an account? ";
   static const String signupLink = 'Sign up';

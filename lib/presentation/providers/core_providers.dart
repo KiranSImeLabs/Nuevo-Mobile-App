@@ -17,6 +17,7 @@ import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/logout_usecase.dart';
 import '../../domain/usecases/auth/refresh_token_usecase.dart';
 import '../../domain/usecases/auth/signup_usecase.dart';
+import '../../domain/usecases/auth/forgot_password_usecase.dart';
 import '../../domain/usecases/subscription/check_feature_access_usecase.dart';
 import '../../domain/usecases/subscription/get_subscription_status_usecase.dart';
 import '../../domain/usecases/subscription/is_subscription_active_usecase.dart';
@@ -130,6 +131,11 @@ final logoutUseCaseProvider = Provider<LogoutUseCase>((ref) {
 final refreshTokenUseCaseProvider = Provider<RefreshTokenUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return RefreshTokenUseCase(repository: repository);
+});
+
+final forgotPasswordUseCaseProvider = Provider<ForgotPasswordUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return ForgotPasswordUseCase(repository);
 });
 
 // ============================================
