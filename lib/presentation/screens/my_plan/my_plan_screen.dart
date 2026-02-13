@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/common/care_team_member_card.dart';
+import 'package:go_router/go_router.dart';
 
 class MyPlanScreen extends StatelessWidget {
   const MyPlanScreen({super.key});
@@ -34,12 +35,12 @@ class MyPlanScreen extends StatelessWidget {
                   
                   _buildSectionTitle(AppStrings.yourCareTeam),
                   const SizedBox(height: 12),
-                  _buildCareTeam(),
+                  _buildCareTeam(context),
                   const SizedBox(height: 24),
                   
                   _buildSectionTitle(AppStrings.goals),
                   const SizedBox(height: 12),
-                  _buildGoalsSection(),
+                  _buildGoalsSection(context),
                   const SizedBox(height: 24),
                   
                   _buildSectionTitle(AppStrings.planPillars),
@@ -220,25 +221,40 @@ class MyPlanScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCareTeam() {
+  Widget _buildCareTeam(BuildContext context) {
     return Column(
       children: [
         CareTeamMemberCard(
           name: AppStrings.drMike,
           role: AppStrings.dietitian,
           placeholderColor: Colors.blue.shade100, 
+          onTap: () => context.push(
+            '/clinician-profile',
+            extra: {
+              'name': AppStrings.drMike,
+              'role': AppStrings.dietitian,
+               // 'imageUrl': ..., // Pass real image URL when available
+            },
+          ),
         ),
         const SizedBox(height: 12),
         CareTeamMemberCard(
           name: AppStrings.drSmith,
           role: AppStrings.generalPractitioner,
           placeholderColor: Colors.teal.shade100,
+          onTap: () => context.push(
+            '/clinician-profile',
+            extra: {
+              'name': AppStrings.drSmith,
+              'role': AppStrings.generalPractitioner,
+            },
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildGoalsSection() {
+  Widget _buildGoalsSection(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -257,7 +273,7 @@ class MyPlanScreen extends StatelessWidget {
                ),
                IconButton(
                  onPressed: () {
-                   // TODO: Implement edit functionality
+                   context.push('/edit-goals');
                  },
                  icon: const Icon(Icons.edit_outlined, size: 20, color: Color(0xFF8D6E63)),
                  padding: EdgeInsets.zero,

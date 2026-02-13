@@ -11,6 +11,8 @@ import '../screens/my_plan/my_plan_screen.dart';
 import '../screens/health/health_screen.dart';
 import '../screens/appointments/appointments_screen.dart';
 import '../screens/profile/profile_screen.dart';
+import '../screens/my_plan/edit_goals_screen.dart';
+import '../screens/my_plan/clinician_profile_screen.dart';
 import '../screens/splash_screen.dart';
 import '../screens/home/daily_exercise_screen.dart';
 import '../screens/home/daily_nutrition_screen.dart';
@@ -125,6 +127,7 @@ final routerProvider = Provider<GoRouter>((ref) {
             path: '/my-plan',
             builder: (context, state) => const MyPlanScreen(),
           ),
+
           GoRoute(
             path: '/health',
             builder: (context, state) => const HealthScreen(),
@@ -153,6 +156,24 @@ final routerProvider = Provider<GoRouter>((ref) {
             },
           ),
         ],
+      ),
+      GoRoute(
+        path: '/edit-goals',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const EditGoalsScreen(),
+      ),
+      GoRoute(
+        path: '/clinician-profile',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          return ClinicianProfileScreen(
+            name: extras?['name'] ?? 'Doctor',
+            role: extras?['role'] ?? 'Specialist',
+            imageUrl: extras?['imageUrl'],
+            bio: extras?['bio'],
+          );
+        },
       ),
     ],
   );

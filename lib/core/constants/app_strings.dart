@@ -84,4 +84,35 @@ class AppStrings {
   static const String dietitian = 'Dietitian';
   static const String drSmith = 'Dr. A. Smith';
   static const String generalPractitioner = 'General Practitioner';
+
+  // Edit Goals
+  static const String editGoals = 'Edit Goals';
+  static const String refineFocus = 'Refine your focus';
+  static const String refineFocusDesc = 'Update your goals for the Reset phase to match your current needs.';
+  static const String suggestedForReset = 'Suggested for Reset';
+  static const String prioritizeSleep = 'Prioritize sleep quality';
+  static const String increaseHydration = 'Increase hydration';
+  static const String practiceMindfulness = 'Practice daily mindfulness';
+  static const String addNewGoal = 'Add a new goal...';
+  static const String deleteGoal = 'Delete Goal';
+  static const String deleteGoalConfirmation = 'Are you sure you want to delete this goal?';
+  static const String enterNewGoal = 'Enter new goal';
+  static const String add = 'Add';
+
+  // Clinician Profile
+  static const String clinicianProfile = 'Clinician Profile';
+  static const String call = 'Call';
+  static const String video = 'Video';
+  static const String about = 'About';
+  static const String yourCareTeamRole = 'Your care team role';
+  static const String roleDescription = 'Supports you during the Insight Program with nutrition guidance, reviews, and ongoing check-ins.';
+  static const String sessions = 'Sessions';
+  static const String scheduledConsultations = 'Scheduled consultations';
+  static const String programReviews = 'Program reviews';
+  static const String ongoingGuidance = 'Ongoing guidance';
+  static const String nextAvailable = 'Next Available';
+  static const String viewAppointments = 'View Appointments';
+  static const String cardiologist = 'Cardiologist'; // Example role
+  static const String drSarah = 'Dr. Sarah Bennett'; // Example name
+  static const String aboutDrSarah = 'Dr. Sarah specialises in personalised nutrition strategies that support long-term health and sustainable lifestyle changes.'; // Example bio
 }
