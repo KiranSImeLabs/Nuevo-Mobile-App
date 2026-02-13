@@ -58,18 +58,31 @@ class HomeScreen extends ConsumerWidget {
                           SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
 
                           // 4. Action Required
-                          if (dashboard.actionRequired.isNotEmpty) ...[
-                            _buildSectionHeader(
-                              context,
-                              'Action required',
-                              onActionTap: () => context.go('/my-plan'),
-                              actionLabel: 'Complete Now',
-                              showArrow: true,
-                            ),
-                            SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-                            _buildTasksList(context, dashboard.actionRequired),
-                            SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-                          ],
+                          // Force show section per request
+                          Builder(
+                            builder: (context) {
+                              final List<entities.Task> actions = dashboard.actionRequired;
+
+                              // Only show header if empty, show list only if not empty
+                              return Column(
+                                children: [
+                                  _buildSectionHeader(
+                                    context,
+                                    'Action required',
+                                    onActionTap: () => context.go('/my-plan'),
+                                    actionLabel: 'Complete Now',
+                                    showArrow: true,
+                                  ),
+                                  // Widget below removed per user request "remove the pression quesioner widget completly"
+                                  // if (actions.isNotEmpty) ...[
+                                  //   SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                                  //   _buildTasksList(context, actions),
+                                  // ],
+                                  SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
+                                ],
+                              );
+                            }
+                          ),
 
                           // 5. Task Completed
                           if (dashboard.tasksCompleted.isNotEmpty) ...[
@@ -86,12 +99,13 @@ class HomeScreen extends ConsumerWidget {
                           ],
 
                           // 6. Program Card
-                          _buildSectionHeader(
-                            context,
-                            'Your Program',
-                            showArrow: false,
-                          ),
-                          SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                          // "Your Program" header removed per request
+                          // _buildSectionHeader(
+                          //   context,
+                          //   'Your Program',
+                          //   showArrow: false,
+                          // ),
+                          // SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
                           _buildProgramSection(context, dashboard.yourProgram),
                           SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
 
@@ -188,16 +202,15 @@ class HomeScreen extends ConsumerWidget {
       children: [
         Expanded(
           child: InfoCard(
-            value: stats.nuevoAge ?? 'Missing',
+            value: stats.nuevoAge ?? '--',
             label: 'Nuevo Age',
           ),
         ),
         SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
         Expanded(
           child: InfoCard(
-            value: stats.nextSession ?? 'Missing', // API might return "10:30 AM" or similar
-            label: 'Dietitian Session', // Static label or infer? API just gives nextSession string.
-            // If nextSession is null, "Missing".
+            value: stats.nextSession ?? '--', 
+            label: 'Dietitian Session', 
             backgroundColor: const Color(0xFFF9F3F1),
           ),
         ),

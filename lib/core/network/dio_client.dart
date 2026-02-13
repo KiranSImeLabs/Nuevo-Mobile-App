@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
 import '../constants/app_constants.dart';
 import '../errors/exceptions.dart';
 
@@ -7,7 +6,7 @@ import '../errors/exceptions.dart';
 /// Handles all API communication with proper error handling and logging
 class DioClient {
   late final Dio _dio;
-  final Logger _logger = Logger();
+  // final Logger _logger = Logger();
   
   final void Function()? onUnauthorized;
 
@@ -41,23 +40,23 @@ class DioClient {
           }
           
           // HIPAA/GDPR Compliance: Do NOT log request data containing PII
-          _logger.d('REQUEST[${options.method}] => PATH: ${options.path}');
+          // _logger.d('REQUEST[${options.method}] => PATH: ${options.path}');
           
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          _logger.d(
-            'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
-          );
+          // _logger.d(
+          //   'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
+          // );
           return handler.next(response);
         },
         onError: (error, handler) {
-          _logger.e(
-            'ERROR[${error.response?.statusCode}] => PATH: ${error.requestOptions.path}',
-          );
+          // _logger.e(
+          //   'ERROR[${error.response?.statusCode}] => PATH: ${error.requestOptions.path}',
+          // );
           
           if (error.response?.statusCode == 401) {
-            _logger.w('401 Unauthorized detected - triggering onUnauthorized callback');
+            // _logger.w('401 Unauthorized detected - triggering onUnauthorized callback');
             onUnauthorized?.call();
           }
           

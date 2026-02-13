@@ -46,17 +46,7 @@ class ProgramCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // "Your Program"
-              Text(
-                'Your Program',
-                style: TextStyle(
-                  fontSize: ResponsiveUtils.fontSize(context, base: 14),
-                  fontWeight: FontWeight.w400,
-                  color: Colors.white,
-                  letterSpacing: 0.5,
-                ),
-              ),
-              const SizedBox(height: 10), // Gap 10px per spec (though spec says gap: 10, check visual spacing)
+
 
               // "Insight Program"
               Text(

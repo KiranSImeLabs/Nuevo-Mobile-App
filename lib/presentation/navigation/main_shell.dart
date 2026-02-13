@@ -17,6 +17,7 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('MainShell build: currentPath=$currentPath');
     return Scaffold(
       body: child,
       bottomNavigationBar: _buildBottomNavigationBar(context),
@@ -134,17 +135,21 @@ class MainShell extends StatelessWidget {
   }
 
   void _onTabTapped(BuildContext context, int index) {
+    print('Tab tapped: $index');
     switch (index) {
       case 0:
+        print('Navigating to /home');
         context.go('/home');
         break;
       case 1:
+        /// ...
         context.go('/my-plan');
         break;
       case 2:
         context.go('/health');
         break;
       case 3:
+        print('Navigating to /appointments');
         context.go('/appointments');
         break;
       case 4:
