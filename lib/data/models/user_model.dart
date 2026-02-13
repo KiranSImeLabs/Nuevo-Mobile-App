@@ -52,7 +52,7 @@ class UserModel {
     return User(
       id: id,
       email: email,
-      name: name.isNotEmpty ? name : email, // Fallback to email if no name
+      name: '${firstName ?? ''} ${lastName ?? ''}'.trim(),
       phoneNumber: phoneNumber,
       profileImageUrl: profileImageUrl,
       subscription: subscription?.toEntity(),
@@ -63,10 +63,9 @@ class UserModel {
   
   /// Factory constructor for creating a UserModel from Domain Entity
   factory UserModel.fromEntity(User user) {
-    // Split name into firstName and lastName
     final nameParts = user.name.split(' ');
-    final firstName = nameParts.isNotEmpty ? nameParts.first : user.name;
-    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : null;
+    final firstName = nameParts.length > 0 ? nameParts.first : '';
+    final lastName = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
     
     return UserModel(
       id: user.id,

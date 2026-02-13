@@ -18,14 +18,16 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
     this._ref, {
     required GetUserProfileUseCase getUserProfile,
     required UpdateUserProfileUseCase updateUserProfile,
+    User? initialUser,
   })  : _getUserProfileUseCase = getUserProfile,
         _updateUserProfileUseCase = updateUserProfile,
-        super(const AsyncValue.loading());
+        super(initialUser != null ? AsyncValue.data(initialUser) : const AsyncValue.loading());
 
   /// Fetch User Profile
   Future<void> fetchProfile() async {
     state = const AsyncValue.loading();
     final result = await _getUserProfileUseCase(const NoParams());
+    print('fetchProfile result: $result');
     result.fold(
       (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
       (user) => state = AsyncValue.data(user),
@@ -66,13 +68,17 @@ final userProvider = StateNotifierProvider<UserNotifier, AsyncValue<User?>>((ref
     ref,
     getUserProfile: ref.watch(getUserProfileUseCaseProvider),
     updateUserProfile: ref.watch(updateUserProfileUseCaseProvider),
+    initialUser: authState.user,
   );
   
-  // Auto-fetch profile when authenticated
-  if (authState.status == AuthStatus.authenticated && authState.user == null) {
-    // Only fetch if we don't have user data yet (or handled inside notifier)
-    // Delaying slightly to avoid build interruptions or just rely on manual fetch
-    Future.microtask(() => notifier.fetchProfile());
+  // Auto-fetch profile if we are authenticated but have no user, OR just to refresh
+  if (authState.status == AuthStatus.authenticated) {
+     if (authState.user == null) {
+        Future.microtask(() => notifier.fetchProfile());
+     } 
+     // Optional: You could allow background refresh even if user exists
+  } else if (authState.status == AuthStatus.unauthenticated) {
+    // Determine if we should clear state? UserNotifier is recreated anyway if authProvider changes
   }
   
   return notifier;

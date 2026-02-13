@@ -23,7 +23,8 @@ class SignupScreen extends ConsumerStatefulWidget {
 
 class _SignupScreenState extends ConsumerState<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameController = TextEditingController();
+  final _firstNameController = TextEditingController();
+  final _lastNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -35,7 +36,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
 
   @override
   void dispose() {
-    _nameController.dispose();
+    _firstNameController.dispose();
+    _lastNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
@@ -57,7 +59,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
       ref.read(authProvider.notifier).signup(
             email: _emailController.text.trim(),
             password: _passwordController.text,
-            name: _nameController.text.trim(),
+            firstName: _firstNameController.text.trim(),
+            lastName: _lastNameController.text.trim(),
             // Phone number is optional and currently handled inside signup method or removed from UI based on design
             phoneNumber: null, 
           );
@@ -108,10 +111,20 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                   ),
                   const SizedBox(height: 32),
 
-                  // Full Name
+                  // First Name
                   AppTextField(
-                    controller: _nameController,
-                    hintText: AppStrings.fullName,
+                    controller: _firstNameController,
+                    hintText: AppStrings.firstName,
+                    prefixIcon: Icons.person_outline,
+                    validator: Validators.validateName, // Using same validator for now, simpler
+                    enabled: !authState.isLoading,
+                  ),
+                  const SizedBox(height: 16),
+
+                  // Last Name
+                  AppTextField(
+                    controller: _lastNameController,
+                    hintText: AppStrings.lastName,
                     prefixIcon: Icons.person_outline,
                     validator: Validators.validateName,
                     enabled: !authState.isLoading,

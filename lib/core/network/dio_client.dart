@@ -100,6 +100,21 @@ class DioClient {
             message: ErrorMessages.serverError,
             code: statusCode,
           );
+        } else if (statusCode == 400) {
+          // Check for validation errors
+          if (error.response?.data is Map && error.response?.data['errors'] != null) {
+             return ValidationException(
+              message: 'Validation failed',
+              code: statusCode,
+              errors: (error.response?.data['errors'] as List)
+                  .map((e) => e.toString())
+                  .toList(), // Added toList() to fix type error
+             );
+          }
+          return ServerException(
+            message: error.response?.data?['message'] ?? ErrorMessages.somethingWentWrong,
+            code: statusCode,
+          );
         } else {
           // Try to extract error message from response
           final message = error.response?.data?['message'] ?? 

@@ -3,23 +3,23 @@ import 'user_model.dart';
 
 part 'auth_response_model.g.dart';
 
-/// Login Response Data
-/// Wrapped inside ApiResponse<LoginResponseData>
+/// Auth Response Data (Login/Signup)
+/// Wrapped inside ApiResponse<AuthResponseData>
 @JsonSerializable()
-class LoginResponseData {
+class AuthResponseData {
   @JsonKey(name: 'token')
   final String token;
   final UserModel user;
   
-  const LoginResponseData({
+  const AuthResponseData({
     required this.token,
     required this.user,
   });
   
-  factory LoginResponseData.fromJson(Map<String, dynamic> json) =>
-      _$LoginResponseDataFromJson(json);
+  factory AuthResponseData.fromJson(Map<String, dynamic> json) =>
+      _$AuthResponseDataFromJson(json);
   
-  Map<String, dynamic> toJson() => _$LoginResponseDataToJson(this);
+  Map<String, dynamic> toJson() => _$AuthResponseDataToJson(this);
 }
 
 /// Login Request Model

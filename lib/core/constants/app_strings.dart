@@ -24,7 +24,8 @@ class AppStrings {
   // Auth - Signup
   static const String createAccount = 'Create your account';
   static const String startJourney = 'Start your personalised care journey';
-  static const String fullName = 'Full Name';
+  static const String firstName = 'First Name';
+  static const String lastName = 'Last Name';
   static const String confirmPassword = 'Confirm password';
   static const String agreeTo = 'By creating an account, you agree to our ';
   static const String termsOfService = 'Terms of Service';

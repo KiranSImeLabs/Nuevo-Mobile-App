@@ -87,17 +87,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
   }
 
   /// Signup
+  /// Signup
   Future<void> signup({
     required String email,
     required String password,
-    required String name,
+    required String firstName,
+    required String lastName,
     String? phoneNumber,
   }) async {
     state = AuthState.loading();
     final result = await _signupUseCase(SignupParams(
       email: email,
       password: password,
-      name: name,
+      firstName: firstName,
+      lastName: lastName,
       phoneNumber: phoneNumber,
     ));
     result.fold(
