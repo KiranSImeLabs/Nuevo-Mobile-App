@@ -6,7 +6,15 @@ import '../providers/auth_state.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/auth/signup_screen.dart';
 import '../screens/home/home_screen.dart';
+import '../screens/my_plan/my_plan_screen.dart';
+import '../screens/health/health_screen.dart';
+import '../screens/appointments/appointments_screen.dart';
+import '../screens/profile/profile_screen.dart';
 import '../screens/splash_screen.dart';
+import '../screens/home/daily_exercise_screen.dart';
+import '../screens/home/daily_nutrition_screen.dart';
+import '../screens/home/task_detail_screen.dart';
+import 'main_shell.dart';
 
 // Keys for navigation
 final rootNavigatorKey = GlobalKey<NavigatorState>();
@@ -93,9 +101,51 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/signup',
         builder: (context, state) => const SignupScreen(),
       ),
-      GoRoute(
-        path: '/home',
-        builder: (context, state) => const HomeScreen(),
+      // Shell route for main app with bottom navigation
+      ShellRoute(
+        builder: (context, state, child) {
+          return MainShell(
+            currentPath: state.uri.path,
+            child: child,
+          );
+        },
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (context, state) => const HomeScreen(),
+          ),
+          GoRoute(
+            path: '/my-plan',
+            builder: (context, state) => const MyPlanScreen(),
+          ),
+          GoRoute(
+            path: '/health',
+            builder: (context, state) => const HealthScreen(),
+          ),
+          GoRoute(
+            path: '/appointments',
+            builder: (context, state) => const AppointmentsScreen(),
+          ),
+          GoRoute(
+            path: '/profile',
+            builder: (context, state) => const ProfileScreen(),
+          ),
+          GoRoute(
+            path: '/daily-exercise',
+            builder: (context, state) => const DailyExerciseScreen(),
+          ),
+          GoRoute(
+            path: '/daily-nutrition',
+            builder: (context, state) => const DailyNutritionScreen(),
+          ),
+          GoRoute(
+            path: '/task/:id',
+            builder: (context, state) {
+              final taskId = state.pathParameters['id'] ?? '';
+              return TaskDetailScreen(taskId: taskId);
+            },
+          ),
+        ],
       ),
     ],
   );

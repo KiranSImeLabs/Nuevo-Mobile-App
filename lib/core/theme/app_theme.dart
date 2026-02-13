@@ -6,7 +6,8 @@ class AppColors {
   static const Color primaryColor = Color(0xFF4A0E0E);
   static const Color primaryDark = Color(0xFF3A0808);
   static const Color primaryLight = Color(0xFF6A1E1E); //964a38
-  static const Color primaryButtonColor = Color(0xFF964a38);
+  //static const Color primaryButtonColor = Color(0xFF964a38);//
+  static const Color primaryButtonColor = Color(0xFF964A38);
 
   // Background Colors - Light Beige/Cream
   static const Color backgroundColor = Color(0xFFF9F5F2);
@@ -19,8 +20,9 @@ class AppColors {
   static const Color criticalRed = Color(0xFFE53935);
   
   // Neutral Grays
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
+  static const Color textPrimary = Colors.black; //Color(0xFF212121);
+  //static const Color textSecondary = Color(0xFF757575);//
+  static const Color textSecondary = Color(0xFF735B4D);
   static const Color textHint = Color(0xFFBDBDBD);
   static const Color divider = Color(0xFFE0E0E0);
   
@@ -51,7 +53,7 @@ class AppTextStyles {
   
   static const TextStyle h2 = TextStyle(
     fontSize: 24,
-    fontWeight: FontWeight.bold,
+    fontWeight: FontWeight.w300,
     color: AppColors.textPrimary,
     fontFamily: fontFamily,
     height: 1.3,

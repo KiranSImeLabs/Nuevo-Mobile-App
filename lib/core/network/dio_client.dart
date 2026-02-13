@@ -9,9 +9,12 @@ class DioClient {
   late final Dio _dio;
   final Logger _logger = Logger();
   
+  final void Function()? onUnauthorized;
+
   DioClient({
     Dio? dio,
     required Future<String?> Function() getAccessToken,
+    this.onUnauthorized,
   }) {
     _dio = dio ?? Dio();
     
@@ -52,6 +55,12 @@ class DioClient {
           _logger.e(
             'ERROR[${error.response?.statusCode}] => PATH: ${error.requestOptions.path}',
           );
+          
+          if (error.response?.statusCode == 401) {
+            _logger.w('401 Unauthorized detected - triggering onUnauthorized callback');
+            onUnauthorized?.call();
+          }
+          
           return handler.next(error);
         },
       ),

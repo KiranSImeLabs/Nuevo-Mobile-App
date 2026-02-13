@@ -42,4 +42,7 @@ abstract class AuthRepository {
   /// Get current access token
   /// Returns token string or null if not logged in
   Future<String?> getAccessToken();
+
+  /// Check and handle first launch logic (clearing secure storage if needed)
+  Future<void> checkFirstLaunch();
 }

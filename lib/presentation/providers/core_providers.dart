@@ -22,10 +22,15 @@ import '../../domain/usecases/subscription/get_subscription_status_usecase.dart'
 import '../../domain/usecases/subscription/is_subscription_active_usecase.dart';
 import '../../domain/usecases/user/get_user_profile_usecase.dart';
 import '../../domain/usecases/user/update_user_profile_usecase.dart';
+// import 'auth_provider.dart'; // Removing to break circularity
 
 // ============================================
 // Core Dependencies
 // ============================================
+
+/// A simple provider to signal that a logout should occur (e.g. on 401 unauthorized access)
+/// This helps break circular dependencies between DioClient and AuthProvider
+final logoutEventProvider = StateProvider<int>((ref) => 0);
 
 /// Shared Preferences Provider
 /// Must be overridden in main.dart:
@@ -41,12 +46,14 @@ final secureStorageProvider = Provider<FlutterSecureStorage>((ref) {
 
 /// Dio Client Provider
 final dioClientProvider = Provider<DioClient>((ref) {
-  // We need to delay the dependency lookup for token to avoid circular dependency
-  // or use the lower level secureStorage directly
   final secureStorage = ref.watch(secureStorageProvider);
   return DioClient(
     getAccessToken: () async {
       return await secureStorage.read(key: StorageKeys.accessToken);
+    },
+    onUnauthorized: () {
+      // Trigger logout event without directly depending on authProvider
+      ref.read(logoutEventProvider.notifier).state++;
     },
   );
 });

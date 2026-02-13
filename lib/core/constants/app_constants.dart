@@ -45,6 +45,9 @@ class ApiConstants {
   
   // Support
   static const String contactSupport = '/support/contact';
+
+  // Home
+  static const String home = '/mobile/home';
   
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);

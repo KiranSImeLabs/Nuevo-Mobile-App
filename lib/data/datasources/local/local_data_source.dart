@@ -201,6 +201,18 @@ class LocalDataSource {
     }
   }
   
+  /// Handle first launch logic
+  /// Check if it's the first time the app is running (or after reinstall)
+  /// If so, clear secure storage to prevent stale tokens from persisting (iOS Keychain issue)
+  Future<void> handleFirstLaunch() async {
+    if (isFirstLaunch()) {
+      print('🚀 First launch detected (or fresh install). Clearing secure storage...');
+      await clearSecureData();
+      await setFirstLaunchComplete();
+      print('✅ Secure storage cleared and first launch flag set.');
+    }
+  }
+
   /// Check if user is logged in (has access token)
   Future<bool> isLoggedIn() async {
     final token = await getAccessToken();

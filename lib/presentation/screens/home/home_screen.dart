@@ -1,424 +1,349 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../providers/auth_provider.dart';
-import '../../providers/user_provider.dart';
+import 'package:intl/intl.dart';
+import '../../providers/home_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../../domain/entities/task.dart' as entities;
+import '../../../domain/entities/wellness_program.dart';
+import '../../../domain/entities/home/home_dashboard.dart';
+import '../../utils/responsive_utils.dart';
+import '../../widgets/home/wellness_card.dart';
+import '../../widgets/home/info_card.dart';
+import '../../widgets/home/task_card.dart';
+import '../../widgets/home/program_card.dart';
+import '../../widgets/home/quick_access_grid.dart';
+import '../../widgets/home/quick_access_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final userState = ref.watch(userProvider);
-    final size = MediaQuery.of(context).size;
+    final dashboardState = ref.watch(homeDashboardProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F6F9), // Light grey-blue background for premium feel
-      body: userState.when(
-        data: (user) {
-          if (user == null) {
-            return const Center(child: Text(AppStrings.noUserData));
-          }
-
+      backgroundColor: const Color(0xFFFDF9F8),
+      body: dashboardState.when(
+        data: (dashboard) {
           return SafeArea(
-            child: SizedBox(
-              height: size.height,
-              child: RefreshIndicator(
-                onRefresh: () async {
-                  return ref.read(userProvider.notifier).fetchProfile();
-                },
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Center(
-                    child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 800), // Adaptive constraint
-                      child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // 1. Header Section
-                            _buildHeader(context, ref, user.name),
-                            const SizedBox(height: AppSpacing.xl),
+            bottom: false,
+            child: RefreshIndicator(
+              onRefresh: () async {
+                return ref.refresh(homeDashboardProvider.future);
+              },
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: ResponsiveUtils.getHorizontalPadding(context),
+                        vertical: ResponsiveUtils.spacing(context, base: 20),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // 1. Header with profile and notification
+                          _buildHeader(context, dashboard.welcome),
+                          SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
 
-                            // 2. Main Search Bar (Visual only for now)
-                            _buildSearchBar(),
-                            const SizedBox(height: AppSpacing.xl),
+                          // 2. Wellness Reset Card (Using WellnessProgress)
+                          _buildWellnessSection(context, dashboard.wellnessProgress),
+                          SizedBox(height: ResponsiveUtils.spacing(context, base: 20)),
 
-                            // 3. Upcoming Appointment Card (Hero Section)
-                            Text(AppStrings.upcomingConsultation, style: AppTextStyles.h4),
-                            const SizedBox(height: AppSpacing.md),
-                            _buildAppointmentCard(),
-                            const SizedBox(height: AppSpacing.xl),
+                          // 3. Info Cards (Age & Session)
+                          _buildInfoSection(context, dashboard.quickStats),
+                          SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
 
-                            // 4. Quick Actions Grid
-                            Text(AppStrings.services, style: AppTextStyles.h4),
-                            const SizedBox(height: AppSpacing.md),
-                            _buildQuickActionsGrid(context),
-                            const SizedBox(height: AppSpacing.xl),
-
-                            // 5. Health Vitals Horizontal Scroll
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(AppStrings.yourVitals, style: AppTextStyles.h4),
-                                TextButton(onPressed: () {}, child: const Text(AppStrings.seeAll)),
-                              ],
+                          // 4. Action Required
+                          if (dashboard.actionRequired.isNotEmpty) ...[
+                            _buildSectionHeader(
+                              context,
+                              'Action required',
+                              onActionTap: () => context.go('/my-plan'),
+                              actionLabel: 'Complete Now',
+                              showArrow: true,
                             ),
-                            const SizedBox(height: AppSpacing.sm),
-                            _buildVitalsRow(),
-                            
-                            const SizedBox(height: 100), // Bottom spacer
+                            SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                            _buildTasksList(context, dashboard.actionRequired),
+                            SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
                           ],
-                        ),
+
+                          // 5. Task Completed
+                          if (dashboard.tasksCompleted.isNotEmpty) ...[
+                            _buildSectionHeader(
+                              context,
+                              'Task Completed',
+                              onActionTap: () => context.go('/my-plan'),
+                              actionLabel: 'See All',
+                              showArrow: false,
+                            ),
+                            SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                            _buildTasksList(context, dashboard.tasksCompleted),
+                            SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
+                          ],
+
+                          // 6. Program Card
+                          _buildSectionHeader(
+                            context,
+                            'Your Program',
+                            showArrow: false,
+                          ),
+                          SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                          _buildProgramSection(context, dashboard.yourProgram),
+                          SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
+
+                          // 7. Quick Access Grid
+                          _buildSectionHeader(
+                            context,
+                            'Quick Access',
+                            showArrow: false,
+                          ),
+                          SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                          _buildQuickAccessSection(context, dashboard.quickAccess),
+                          
+                          // Bottom padding for scroll
+                          SizedBox(height: ResponsiveUtils.spacing(context, base: 40)),
+                        ],
                       ),
                     ),
-                  ),
-                ),
+                  );
+                },
               ),
             ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator.adaptive()),
-        error: (error, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: $error'),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => ref.read(userProvider.notifier).fetchProfile(),
-                child: const Text(AppStrings.retry),
-              ),
-            ],
-          ),
-        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Error: $err'),
+            ElevatedButton(
+              onPressed: () => ref.refresh(homeDashboardProvider),
+              child: const Text('Retry'),
+            ),
+          ],
+        )),
       ),
     );
   }
 
-  Widget _buildHeader(BuildContext context, WidgetRef ref, String userName) {
+  Widget _buildHeader(BuildContext context, WelcomeData welcome) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        Row(
           children: [
-            Text(
-              AppStrings.goodMorning,
-              style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+            CircleAvatar(
+              radius: ResponsiveUtils.iconSize(context, base: 24),
+              backgroundImage: const NetworkImage('https://i.pravatar.cc/150?u=a042581f4e29026704d'), // Placeholder
             ),
-            Text(
-              userName,
-              style: AppTextStyles.h2,
+            SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  welcome.greeting,
+                  style: TextStyle(
+                    fontSize: ResponsiveUtils.fontSize(context, base: 12),
+                    color: const Color(0xFF3E160D).withOpacity(0.6),
+                  ),
+                ),
+                Text(
+                  '${welcome.firstName} ${welcome.lastName}'.trim(),
+                  style: TextStyle(
+                    fontSize: ResponsiveUtils.fontSize(context, base: 20),
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF3E160D),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
         Container(
+          padding: EdgeInsets.all(ResponsiveUtils.spacing(context, base: 8)),
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            border: Border.all(color: AppColors.divider, width: 2),
+            border: Border.all(color: Colors.grey.shade200),
           ),
-          child: IconButton(
-            icon: const Icon(Icons.logout, color: AppColors.primaryColor),
-            onPressed: () {
-              ref.read(authProvider.notifier).logout();
-            },
+          child: Icon(
+            Icons.notifications_outlined,
+            color: const Color(0xFF3E160D),
+            size: ResponsiveUtils.iconSize(context, base: 24),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildSearchBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
+  Widget _buildWellnessSection(BuildContext context, WellnessProgress progress) {
+    return WellnessCard(wellnessProgress: progress);
+  }
+
+  Widget _buildInfoSection(BuildContext context, QuickStats stats) {
+    return Row(
+      children: [
+        Expanded(
+          child: InfoCard(
+            value: stats.nuevoAge ?? 'Missing',
+            label: 'Nuevo Age',
           ),
-        ],
-      ),
-      child: TextField(
-        decoration: InputDecoration(
-          hintText: AppStrings.searchHint,
-          prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
-          border: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textHint),
         ),
-      ),
+        SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
+        Expanded(
+          child: InfoCard(
+            value: stats.nextSession ?? 'Missing', // API might return "10:30 AM" or similar
+            label: 'Dietitian Session', // Static label or infer? API just gives nextSession string.
+            // If nextSession is null, "Missing".
+            backgroundColor: const Color(0xFFF9F3F1),
+          ),
+        ),
+      ],
     );
   }
 
-  Widget _buildAppointmentCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primaryColor, AppColors.primaryLight],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primaryColor.withOpacity(0.3),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              const CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.white24,
-                child: Icon(Icons.person, color: Colors.white),
-              ),
-              const SizedBox(width: 16),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Dr. Sarah Johnson',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 18,
-                    ),
-                  ),
-                  Text(
-                    'General Practitioner',
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
-                      fontSize: 14,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.video_call, color: Colors.white),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(AppRadius.md),
-            ),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.calendar_today, color: Colors.white, size: 16),
-                    SizedBox(width: 8),
-                    Text('Today, July 24', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-                Row(
-                  children: [
-                    Icon(Icons.access_time, color: Colors.white, size: 16),
-                    SizedBox(width: 8),
-                    Text('10:30 AM', style: TextStyle(color: Colors.white)),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildQuickActionsGrid(BuildContext context) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title, {
+    VoidCallback? onActionTap,
+    String? actionLabel,
+    bool showArrow = false,
+  }) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Expanded(child: _ActionCard(icon: Icons.person_add_alt_1, label: AppStrings.findDoctor, color: Colors.blueAccent, onTap: () {})),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(child: _ActionCard(icon: Icons.calendar_month, label: AppStrings.schedule, color: Colors.orangeAccent, onTap: () {})),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(child: _ActionCard(icon: Icons.medication, label: AppStrings.pharmacy, color: Colors.green, onTap: () {})),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(child: _ActionCard(icon: Icons.medical_services, label: AppStrings.hospitals, color: Colors.purpleAccent, onTap: () {})),
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: ResponsiveUtils.fontSize(context, base: 16),
+            fontWeight: FontWeight.w300,
+            color: const Color(0xFF17110D),
+            height: 1.5,
+            letterSpacing: 0,
+            fontFamily: 'Inter',
+          ),
+        ),
+        if (actionLabel != null && onActionTap != null)
+          TextButton(
+            onPressed: onActionTap,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              minimumSize: const Size(0, 0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Row(
+              children: [
+                Text(
+                  actionLabel,
+                  style: TextStyle(
+                    color: const Color(0xFF964A38),
+                    fontSize: ResponsiveUtils.fontSize(context, base: 12),
+                    fontWeight: FontWeight.w300,
+                    height: 16 / 12,
+                    letterSpacing: 0,
+                    fontFamily: 'Inter',
+                  ),
+                ),
+                if (showArrow) ...[
+                  SizedBox(width: ResponsiveUtils.spacing(context, base: 6)),
+                  Icon(
+                    Icons.arrow_forward,
+                    size: ResponsiveUtils.iconSize(context, base: 14),
+                    color: const Color(0xFF964A38),
+                  ),
+                ],
+              ],
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildVitalsRow() {
-    return const SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(
-        children: [
-          _VitalCard(
-            label: AppStrings.heartRate,
-            value: '98 bpm',
-            icon: Icons.favorite,
-            color: Colors.redAccent,
-            trend: '+2%',
-          ),
-          SizedBox(width: AppSpacing.md),
-          _VitalCard(
-            label: AppStrings.bloodPressure,
-            value: '102/72',
-            icon: Icons.water_drop,
-            color: Colors.blueAccent,
-            trend: '-1%',
-          ),
-          SizedBox(width: AppSpacing.md),
-          _VitalCard(
-            label: AppStrings.weight,
-            value: '72 kg',
-            icon: Icons.monitor_weight,
-            color: Colors.orangeAccent,
-            trend: 'Stable',
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ActionCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionCard({
-    required this.icon,
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(AppRadius.lg),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 10,
-              offset: const Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: color.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, color: color, size: 24),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              label,
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: AppTextStyles.caption.copyWith(
-                fontWeight: FontWeight.w600,
-                fontSize: 11,
-              ),
-            ),
-          ],
+  Widget _buildTasksList(BuildContext context, List<entities.Task> tasks) {
+    return SizedBox(
+      height: ResponsiveUtils.spacing(context, base: 110),
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: tasks.length,
+        separatorBuilder: (_, __) => SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
+        itemBuilder: (context, index) => TaskCard(
+          task: tasks[index],
+          onTap: () => context.go('/task/${tasks[index].id}'),
         ),
       ),
     );
   }
-}
 
-class _VitalCard extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-  final Color color;
-  final String trend;
-
-  const _VitalCard({
-    required this.label,
-    required this.value,
-    required this.icon,
-    required this.color,
-    required this.trend,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 140,
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.xl),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Icon(icon, color: color, size: 20),
-              const Spacer(),
-              Text(
-                trend,
-                style: AppTextStyles.caption.copyWith(
-                  color: trend.contains('+') ? AppColors.error : AppColors.success,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            value,
-            style: AppTextStyles.h3.copyWith(fontSize: 18),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTextStyles.caption,
-          ),
-        ],
-      ),
+  Widget _buildProgramSection(BuildContext context, WellnessProgram? program) {
+    // Fallback if program is null
+    final displayProgram = program ?? const WellnessProgram(
+      id: 'program-insight',
+      name: 'Insight Program',
+      description: 'Advanced assessment and specialist-led profiling',
+      progressPercentage: 0,
+      habitsCount: 0,
     );
+
+    return ProgramCard(
+      program: displayProgram,
+      onViewPlan: () => context.go('/my-plan'),
+    );
+  }
+
+  Widget _buildQuickAccessSection(BuildContext context, List<HomeQuickAccessItem> items) {
+    return QuickAccessGrid(
+      items: items.map((e) => QuickAccessItem(
+        title: e.title,
+        icon: _getIconForName(e.icon),
+        onTap: () => _handleQuickAccessTap(context, e.id),
+      )).toList(),
+    );
+  }
+
+  IconData _getIconForName(String iconName) {
+    switch (iconName.toLowerCase()) {
+      case 'dumbbell':
+      case 'exercise':
+        return Icons.fitness_center;
+      case 'nutrition':
+      case 'apple':
+        return Icons.restaurant;
+      case 'calendar':
+      case 'appointments':
+        return Icons.calendar_today_outlined;
+      case 'heart':
+      case 'health':
+        // For custom images, QuickAccessItem uses imagePath if available. 
+        // Here we return an icon, but if we want images we need to map IDs/icons to asset paths.
+        // The API returns "icon": "dumbbell".
+        // QuickAccessItem accepts icon OR imagePath.
+        // Let's try to map to assets if they match known ones to keep UI consistent.
+        return Icons.favorite_outline;
+      default:
+        return Icons.grid_view;
+    }
+  }
+
+  void _handleQuickAccessTap(BuildContext context, String id) {
+    switch (id) {
+      case 'daily-exercise':
+        context.go('/daily-exercise');
+        break;
+      case 'daily-nutrition':
+        context.go('/daily-nutrition');
+        break;
+      case 'appointments':
+        context.go('/appointments');
+        break;
+      case 'health-insight':
+        context.go('/health');
+        break;
+      default:
+        // Handle unknown or show toast
+        break;
+    }
   }
 }

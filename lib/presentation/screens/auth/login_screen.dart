@@ -4,10 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart' as apple;
 import 'package:sign_in_button/sign_in_button.dart';
 // import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import '../../widgets/common/app_text_field.dart';
-import '../../widgets/common/app_primary_button.dart';
-import '../../widgets/common/or_divider.dart';
-import '../../widgets/common/social_login_buttons.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/auth_state.dart';
 import '../../../core/theme/app_theme.dart';
@@ -48,11 +44,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     // Listen to Auth State for errors
-    ref.listen(authProvider, (previous, next) {
-      if (next.status == AuthStatus.error && next.errorMessage != null) {
+    ref.listen<AuthState>(authProvider, (previous, next) {
+      if (next.status == AuthStatus.error && next.error != null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(next.errorMessage!),
+            content: Text(next.error!),
             backgroundColor: AppColors.error,
           ),
         );
@@ -94,34 +90,75 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 48),
 
                   // Email Input
-                  AppTextField(
+                  TextFormField(
                     controller: _emailController,
-                    hintText: AppStrings.emailAddress,
-                    prefixIcon: Icons.mail_outline,
+                    decoration: InputDecoration(
+                      hintText: AppStrings.emailAddress, 
+                      prefixIcon: const Icon(Icons.mail_outline, color: AppColors.textSecondary),
+                      filled: true,
+                      fillColor: const Color(0xFFFAFAFA), // Very light grey
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.primaryColor),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
                     keyboardType: TextInputType.emailAddress,
                     validator: Validators.validateEmail,
                     enabled: !authState.isLoading,
+                    style: AppTextStyles.bodyMedium,
                   ),
                   const SizedBox(height: 16),
 
                   // Password Input
-                  AppTextField(
+                  TextFormField(
                     controller: _passwordController,
-                    hintText: AppStrings.password,
-                    obscureText: _obscurePassword,
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                        color: AppColors.textSecondary,
+                    decoration: InputDecoration(
+                      hintText: AppStrings.password,
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          color: AppColors.textSecondary,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
                       ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                      filled: true,
+                      fillColor: const Color(0xFFFAFAFA),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: Color(0xFFEEEEEE)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: const BorderSide(color: AppColors.primaryColor),
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16, // No prefix icon means standard padding works well
+                      ),
+                         // Add text padding if needed? Default is fine.
+                         // But since we removed prefixIcon, text might be too close to edge?
+                         // ContentPadding handles it.
+                      prefix: const SizedBox(width: 16), // Add left padding manually or use contentPadding logic
                     ),
+                    obscureText: _obscurePassword,
                     validator: Validators.validateLoginPassword,
                     enabled: !authState.isLoading,
+                    style: AppTextStyles.bodyMedium,
                   ),
                   
                   // Forgot Password
@@ -144,27 +181,89 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   const SizedBox(height: 24),
 
                   // Login Button
-                  AppPrimaryButton(
-                    onPressed: _login,
-                    text: AppStrings.login,
-                    isLoading: authState.isLoading,
+                  SizedBox(
+                    height: 56, // Taller button
+                    child: ElevatedButton(
+                      onPressed: authState.isLoading ? null : _login,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryButtonColor, // Deep Maroon/Primary
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: authState.isLoading
+                          ? const SizedBox(
+                              height: 24,
+                              width: 24,
+                              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: const [
+                                Text(
+                                  AppStrings.login,
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Icon(Icons.arrow_forward_rounded, size: 20),
+                              ],
+                            ),
+                    ),
                   ),
                   
                   const SizedBox(height: 32),
 
                   // Divider
-                  const OrDivider(),
+                  Row(
+                    children: [
+                      const Expanded(child: Divider(color: Color(0xFFEEEEEE), thickness: 1)),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          AppStrings.or,
+                          style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
+                        ),
+                      ),
+                      const Expanded(child: Divider(color: Color(0xFFEEEEEE), thickness: 1)),
+                    ],
+                  ),
                   
                   const SizedBox(height: 32),
 
                   // Social Logins
-                  SocialLoginButtons(
-                    onGooglePressed: () {
-                      ref.read(authProvider.notifier).signInWithGoogle();
-                    },
-                    onApplePressed: () {
+                  // Google
+                  // Social Logins
+                  // Google
+                  SizedBox(
+                    height: 50,
+                    child: SignInButton(
+                      Buttons.google,
+                      text: "Sign in with Google",
+                      onPressed: () {
+                        ref.read(authProvider.notifier).signInWithGoogle();
+                      },
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+                  
+                  // Apple
+                  apple.SignInWithAppleButton(
+                    onPressed: () {
                       ref.read(authProvider.notifier).signInWithApple();
                     },
+                    height: 50, // Match Google button height
+                    style: apple.SignInWithAppleButtonStyle.black, // Native black style
+                    borderRadius: BorderRadius.circular(24), // Match Google button radius
+                    iconAlignment: apple.IconAlignment.left,
                   ),
 
                   const SizedBox(height: 48),
