@@ -104,10 +104,6 @@ final routerProvider = Provider<GoRouter>((ref) {
         return '/login';
       }
 
-
-      return null;
-
-      print('Redirect Decision: returning null (allow)');
       return null;
     },
     routes: [
