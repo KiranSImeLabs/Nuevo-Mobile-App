@@ -14,6 +14,12 @@ import '../screens/splash_screen.dart';
 import '../screens/home/daily_exercise_screen.dart';
 import '../screens/home/daily_nutrition_screen.dart';
 import '../screens/home/task_detail_screen.dart';
+import '../screens/appointments/book_session_screen.dart';
+import '../screens/appointments/select_time_screen.dart';
+import '../screens/appointments/confirm_booking_screen.dart';
+import '../screens/appointments/appointment_details_screen.dart';
+import '../screens/appointments/connecting_session_screen.dart';
+import '../../domain/entities/session.dart';
 import 'main_shell.dart';
 
 // Keys for navigation
@@ -34,7 +40,7 @@ final routerProvider = Provider<GoRouter>((ref) {
   return GoRouter(
     refreshListenable: notifier,
     navigatorKey: rootNavigatorKey,
-    initialLocation: '/',
+    initialLocation: '/', // Revert to default
     debugLogDiagnostics: true,
     redirect: (context, state) {
       final authState = ref.read(authProvider);
@@ -75,17 +81,22 @@ final routerProvider = Provider<GoRouter>((ref) {
       }
 
       // 4. Authenticated User
+      print('Checking isLoggedIn: $isLoggedIn (status=$status)');
       if (isLoggedIn) {
+        print('Authenticated. path="$path", isPublicRoute=$isPublicRoute');
         // If on a public route (Splash/Login/Signup), redirect to Home
         if (isPublicRoute) {
+          print('Redirecting to /home because public route');
           return '/home';
         }
         // Otherwise, allow access to the protected route they are on
+        print('Returning null (allow)');
         return null;
       }
 
       return null;
 
+      print('Redirect Decision: returning null (allow)');
       return null;
     },
     routes: [
@@ -103,7 +114,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       // Shell route for main app with bottom navigation
       ShellRoute(
+        navigatorKey: shellNavigatorKey,
         builder: (context, state, child) {
+          print('ShellRoute builder: path=${state.uri.path}');
           return MainShell(
             currentPath: state.uri.path,
             child: child,
@@ -124,7 +137,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/appointments',
-            builder: (context, state) => const AppointmentsScreen(),
+            builder: (context, state) {
+              print('Appointments route builder called');
+              return const AppointmentsScreen();
+            },
           ),
           GoRoute(
             path: '/profile',
@@ -144,6 +160,38 @@ final routerProvider = Provider<GoRouter>((ref) {
               final taskId = state.pathParameters['id'] ?? '';
               return TaskDetailScreen(taskId: taskId);
             },
+          ),
+          GoRoute(
+            path: '/book-session',
+            builder: (context, state) {
+              final session = state.extra as Session;
+              return BookSessionScreen(session: session);
+            },
+          ),
+          GoRoute(
+            path: '/select-time',
+            builder: (context, state) {
+              final session = state.extra as Session;
+              return SelectTimeScreen(session: session);
+            },
+          ),
+          GoRoute(
+            path: '/confirm-booking',
+            builder: (context, state) {
+              final args = state.extra as BookingConfirmationArgs;
+              return ConfirmBookingScreen(args: args);
+            },
+          ),
+          GoRoute(
+            path: '/appointment-details',
+            builder: (context, state) {
+              final args = state.extra as BookingConfirmationArgs;
+              return AppointmentDetailsScreen(args: args);
+            },
+          ),
+          GoRoute(
+            path: '/connecting-session',
+            builder: (context, state) => const ConnectingSessionScreen(),
           ),
         ],
       ),
