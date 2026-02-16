@@ -1,8 +1,10 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../providers/user_provider.dart';
+import '../../widgets/profile_image_picker_sheet.dart';
 
 class AccountSettingsScreen extends ConsumerStatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -17,6 +19,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   late TextEditingController _emailController;
   late TextEditingController _dobController;
   DateTime? _selectedDate;
+  File? _selectedImage;
 
   @override
   void initState() {
@@ -38,6 +41,26 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   }
   
   bool _isInitialized = false;
+
+  void _handleImageSelection(File image) {
+    setState(() {
+      _selectedImage = image;
+    });
+    // TODO: Implement actual upload logic here
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Image selected for upload')),
+    );
+  }
+
+  void _showImagePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ProfileImagePickerSheet(
+        onImageSelected: _handleImageSelection,
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,11 +116,13 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       Container(
                         width: 120,
                         height: 120,
-                        decoration: const BoxDecoration(
+                        decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.grey,
                           image: DecorationImage(
-                            image: AssetImage('assets/images/details_image.png'), // Placeholder
+                            image: _selectedImage != null
+                                ? FileImage(_selectedImage!) as ImageProvider
+                                : const AssetImage('assets/images/details_image.png'), // Placeholder
                             fit: BoxFit.cover,
                           ),
                         ),
@@ -105,15 +130,18 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                       Positioned(
                         bottom: 0,
                         right: 0,
-                        child: Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: const Color(0xFF8D6E63), // Brown
-                            shape: BoxShape.circle,
-                            border: Border.all(color: Colors.white, width: 3),
+                        child: GestureDetector(
+                          onTap: _showImagePicker,
+                          child: Container(
+                            width: 36,
+                            height: 36,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF8D6E63), // Brown
+                              shape: BoxShape.circle,
+                              border: Border.all(color: Colors.white, width: 3),
+                            ),
+                            child: const Icon(Icons.edit, size: 18, color: Colors.white),
                           ),
-                          child: const Icon(Icons.edit, size: 18, color: Colors.white),
                         ),
                       ),
                     ],
@@ -154,16 +182,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     child: _buildTextField(
                       controller: _dobController,
                       hint: 'dd/mm/yy',
-                      icon: null, // No prefix icon logic in my helper properly? Let's check helper.
-                      // Design shows text field with no prefix, but suffix calendar icon?
-                      // Actually screenshot shows:
-                      // Name: Icon Person (Left)
-                      // Email: Icon Mail (Left)
-                      // DOB: No left icon, maybe? Wait.
-                      // Let's look closer at screenshot.
-                      // Name: Person Icon on Left.
-                      // Email: Mail Icon on Left.
-                      // DOB: No Left Icon. Calendar Icon on Right.
+                      icon: null, 
                       suffixIcon: Icons.calendar_today_outlined,
                     ),
                   ),

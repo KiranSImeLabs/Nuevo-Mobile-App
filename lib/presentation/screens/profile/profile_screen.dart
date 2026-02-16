@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -5,12 +6,40 @@ import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import 'widgets/logout_bottom_sheet.dart';
+import '../../widgets/profile_image_picker_sheet.dart';
 
-class ProfileScreen extends ConsumerWidget {
+class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends ConsumerState<ProfileScreen> {
+  File? _selectedImage;
+
+  void _handleImageSelection(File image) {
+    setState(() {
+      _selectedImage = image;
+    });
+    // TODO: Implement actual upload logic here
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Image selected for upload')),
+    );
+  }
+
+  void _showImagePicker() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => ProfileImagePickerSheet(
+        onImageSelected: _handleImageSelection,
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final userState = ref.watch(userProvider);
     
     return Scaffold(
@@ -39,7 +68,6 @@ class ProfileScreen extends ConsumerWidget {
                 data: (user) {
                   final name = user?.name ?? 'Warren I. Ford';
                   final email = user?.email ?? 'sarah.johnson@email.com';
-                  // Usage of placeholder data if user is null or fields empty for design match
                   
                   return Container(
                     width: double.infinity,
@@ -56,29 +84,36 @@ class ProfileScreen extends ConsumerWidget {
                             Container(
                               width: 80,
                               height: 80,
-                              decoration: const BoxDecoration(
+                              decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: Colors.grey, // Placeholder for image
+                                color: Colors.grey,
                                 image: DecorationImage(
-                                  image: AssetImage('assets/images/details_image.png'), // Need a placeholder asset or network image
+                                  image: _selectedImage != null
+                                      ? FileImage(_selectedImage!) as ImageProvider
+                                      : const AssetImage('assets/images/details_image.png'),
                                   fit: BoxFit.cover,
                                 ),
                               ),
-                              // Fallback if asset missing
-                              child: const Icon(Icons.person, size: 40, color: Colors.white),
+                              // Fallback if asset missing (won't show if image provider works)
+                              child: _selectedImage == null 
+                                  ? const SizedBox() // Assume asset exists or logic handles it
+                                  : null, 
                             ),
                             Positioned(
                               bottom: 0,
                               right: 0,
-                              child: Container(
-                                width: 28,
-                                height: 28,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF8D6E63), // Brown
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                              child: GestureDetector(
+                                onTap: _showImagePicker,
+                                child: Container(
+                                  width: 28,
+                                  height: 28,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFF8D6E63), // Brown
+                                    shape: BoxShape.circle,
+                                    border: Border.all(color: Colors.white, width: 2),
+                                  ),
+                                  child: const Icon(Icons.edit, size: 14, color: Colors.white),
                                 ),
-                                child: const Icon(Icons.edit, size: 14, color: Colors.white),
                               ),
                             ),
                           ],
