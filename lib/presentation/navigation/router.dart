@@ -9,6 +9,9 @@ import '../screens/auth/forgot_password_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/my_plan/my_plan_screen.dart';
 import '../screens/health/health_screen.dart';
+import '../screens/health/session_overview_screen.dart';
+import '../screens/health/active_session_screen.dart';
+import '../screens/health/guided_session_screen.dart';
 import '../screens/appointments/appointments_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/my_plan/edit_goals_screen.dart';
@@ -231,6 +234,18 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
+      GoRoute(
+            path: '/health/session-overview',
+            builder: (context, state) => const SessionOverviewScreen(),
+          ),
+          GoRoute(
+            path: '/health/active-session',
+            builder: (context, state) => const ActiveSessionScreen(),
+          ),
+          GoRoute(
+            path: '/health/guided-session',
+            builder: (context, state) => const GuidedSessionScreen(),
+          ),
       GoRoute(
         path: '/edit-goals',
         parentNavigatorKey: rootNavigatorKey,
