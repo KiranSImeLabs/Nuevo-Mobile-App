@@ -10,9 +10,14 @@ import '../../data/datasources/remote/api_client.dart';
 import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/subscription_repository_impl.dart';
 import '../../data/repositories/user_repository_impl.dart';
+import '../../data/repositories/lab_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/subscription_repository.dart';
 import '../../domain/repositories/user_repository.dart';
+import '../../domain/repositories/lab_repository.dart';
+import '../../domain/usecases/lab/create_lab_request_usecase.dart';
+import '../../domain/usecases/lab/get_lab_requests_usecase.dart';
+import '../../domain/usecases/lab/get_lab_request_by_id_usecase.dart';
 import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/logout_usecase.dart';
 import '../../domain/usecases/auth/refresh_token_usecase.dart';
@@ -170,3 +175,33 @@ final updateUserProfileUseCaseProvider = Provider<UpdateUserProfileUseCase>((ref
   final repository = ref.watch(userRepositoryProvider);
   return UpdateUserProfileUseCase(repository: repository);
 });
+
+// ============================================
+// Repositories - Lab
+// ============================================
+
+final labRepositoryProvider = Provider<LabRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return LabRepositoryImpl(apiClient: apiClient);
+});
+
+// ============================================
+// Use Cases - Lab
+// ============================================
+
+final createLabRequestUseCaseProvider = Provider<CreateLabRequestUseCase>((ref) {
+  final repository = ref.watch(labRepositoryProvider);
+  return CreateLabRequestUseCase(repository: repository);
+});
+
+final getLabRequestsUseCaseProvider = Provider<GetLabRequestsUseCase>((ref) {
+  final repository = ref.watch(labRepositoryProvider);
+  return GetLabRequestsUseCase(repository: repository);
+});
+
+final getLabRequestByIdUseCaseProvider =
+    Provider<GetLabRequestByIdUseCase>((ref) {
+  final repository = ref.watch(labRepositoryProvider);
+  return GetLabRequestByIdUseCase(repository: repository);
+});
+

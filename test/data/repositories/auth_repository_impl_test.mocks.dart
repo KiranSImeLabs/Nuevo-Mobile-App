@@ -6,10 +6,11 @@
 import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:nuevo_app/data/datasources/local/local_data_source.dart' as _i8;
+import 'package:nuevo_app/data/datasources/local/local_data_source.dart' as _i9;
 import 'package:nuevo_app/data/datasources/remote/api_client.dart' as _i4;
 import 'package:nuevo_app/data/models/api_response.dart' as _i2;
 import 'package:nuevo_app/data/models/auth_response_model.dart' as _i6;
+import 'package:nuevo_app/data/models/lab_request_model.dart' as _i8;
 import 'package:nuevo_app/data/models/subscription_model.dart' as _i3;
 import 'package:nuevo_app/data/models/user_model.dart' as _i7;
 
@@ -57,40 +58,40 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
   }
 
   @override
-  _i5.Future<_i2.ApiResponse<_i6.LoginResponseData>> login(
+  _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>> login(
           _i6.LoginRequest? request) =>
       (super.noSuchMethod(
         Invocation.method(
           #login,
           [request],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i6.LoginResponseData>>.value(
-            _FakeApiResponse_0<_i6.LoginResponseData>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>>.value(
+            _FakeApiResponse_0<_i6.AuthResponseData>(
           this,
           Invocation.method(
             #login,
             [request],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i6.LoginResponseData>>);
+      ) as _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i6.LoginResponseData>> register(
+  _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>> register(
           _i6.RegisterRequest? request) =>
       (super.noSuchMethod(
         Invocation.method(
           #register,
           [request],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i6.LoginResponseData>>.value(
-            _FakeApiResponse_0<_i6.LoginResponseData>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>>.value(
+            _FakeApiResponse_0<_i6.AuthResponseData>(
           this,
           Invocation.method(
             #register,
             [request],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i6.LoginResponseData>>);
+      ) as _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>>);
 
   @override
   _i5.Future<_i2.ApiResponse<void>> logout() => (super.noSuchMethod(
@@ -265,12 +266,30 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           ),
         )),
       ) as _i5.Future<_i3.SubscriptionModel>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i8.LabRequestData>> createLabRequest(
+          _i8.CreateLabRequest? request) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #createLabRequest,
+          [request],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>.value(
+            _FakeApiResponse_0<_i8.LabRequestData>(
+          this,
+          Invocation.method(
+            #createLabRequest,
+            [request],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>);
 }
 
 /// A class which mocks [LocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalDataSource extends _i1.Mock implements _i8.LocalDataSource {
+class MockLocalDataSource extends _i1.Mock implements _i9.LocalDataSource {
   MockLocalDataSource() {
     _i1.throwOnMissingStub(this);
   }
@@ -395,6 +414,16 @@ class MockLocalDataSource extends _i1.Mock implements _i8.LocalDataSource {
   _i5.Future<void> clearPreferences() => (super.noSuchMethod(
         Invocation.method(
           #clearPreferences,
+          [],
+        ),
+        returnValue: _i5.Future<void>.value(),
+        returnValueForMissingStub: _i5.Future<void>.value(),
+      ) as _i5.Future<void>);
+
+  @override
+  _i5.Future<void> handleFirstLaunch() => (super.noSuchMethod(
+        Invocation.method(
+          #handleFirstLaunch,
           [],
         ),
         returnValue: _i5.Future<void>.value(),

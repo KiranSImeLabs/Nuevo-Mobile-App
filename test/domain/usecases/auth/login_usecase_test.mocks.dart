@@ -74,7 +74,8 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
   _i4.Future<_i2.Either<_i5.Failure, _i6.User>> signup({
     required String? email,
     required String? password,
-    required String? name,
+    required String? firstName,
+    required String? lastName,
     String? phoneNumber,
   }) =>
       (super.noSuchMethod(
@@ -84,7 +85,8 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
           {
             #email: email,
             #password: password,
-            #name: name,
+            #firstName: firstName,
+            #lastName: lastName,
             #phoneNumber: phoneNumber,
           },
         ),
@@ -97,7 +99,8 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
             {
               #email: email,
               #password: password,
-              #name: name,
+              #firstName: firstName,
+              #lastName: lastName,
               #phoneNumber: phoneNumber,
             },
           ),
@@ -188,4 +191,31 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
         ),
         returnValue: _i4.Future<String?>.value(),
       ) as _i4.Future<String?>);
+
+  @override
+  _i4.Future<void> checkFirstLaunch() => (super.noSuchMethod(
+        Invocation.method(
+          #checkFirstLaunch,
+          [],
+        ),
+        returnValue: _i4.Future<void>.value(),
+        returnValueForMissingStub: _i4.Future<void>.value(),
+      ) as _i4.Future<void>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, void>> forgotPassword(String? email) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #forgotPassword,
+          [email],
+        ),
+        returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
+            _FakeEither_0<_i5.Failure, void>(
+          this,
+          Invocation.method(
+            #forgotPassword,
+            [email],
+          ),
+        )),
+      ) as _i4.Future<_i2.Either<_i5.Failure, void>>);
 }
