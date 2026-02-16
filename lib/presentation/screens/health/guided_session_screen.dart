@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'dart:async';
 import '../../../../core/theme/app_theme.dart';
+import '../../widgets/health/session_completed_sheet.dart';
 
 class GuidedSessionScreen extends StatefulWidget {
   const GuidedSessionScreen({super.key});
@@ -48,6 +50,8 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
     },
   ];
 
+  Timer? _timer;
+
   late int _remainingSeconds;
 
   @override
@@ -55,12 +59,55 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
     super.initState();
     _pageController = PageController();
     _remainingSeconds = _sessionSteps[0]['duration'];
+    _startTimer();
   }
 
   @override
   void dispose() {
+    _timer?.cancel();
     _pageController.dispose();
     super.dispose();
+  }
+
+  void _startTimer() {
+    _timer?.cancel();
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!_isPlaying) return;
+      if (!mounted) return;
+
+      setState(() {
+        if (_remainingSeconds > 0) {
+          _remainingSeconds--;
+        } else {
+          _nextStep();
+        }
+      });
+    });
+  }
+
+  void _nextStep() {
+    if (_currentStep < _sessionSteps.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300), 
+        curve: Curves.easeInOut,
+      );
+    } else {
+      _completeSession();
+    }
+  }
+
+  void _completeSession() {
+    _timer?.cancel();
+    setState(() {
+      _isPlaying = false;
+    });
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const SessionCompletedSheet(),
+    );
   }
 
   void _onStepChanged(int index) {
@@ -321,14 +368,7 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                 // Next
                 _buildCircleButton(
                   icon: Icons.skip_next_rounded,
-                  onTap: () {
-                    if (_currentStep < _sessionSteps.length - 1) {
-                      _pageController.nextPage(
-                        duration: const Duration(milliseconds: 300), 
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
+                  onTap: _nextStep,
                   size: 56,
                   iconColor: const Color(0xFF5D4037),
                   backgroundColor: const Color(0xFFFAF1ED),

@@ -177,38 +177,6 @@ final routerProvider = Provider<GoRouter>((ref) {
             },
           ),
           GoRoute(
-            path: '/book-session',
-            builder: (context, state) {
-              final session = state.extra as Session;
-              return BookSessionScreen(session: session);
-            },
-          ),
-          GoRoute(
-            path: '/select-time',
-            builder: (context, state) {
-              final session = state.extra as Session;
-              return SelectTimeScreen(session: session);
-            },
-          ),
-          GoRoute(
-            path: '/confirm-booking',
-            builder: (context, state) {
-              final args = state.extra as BookingConfirmationArgs;
-              return ConfirmBookingScreen(args: args);
-            },
-          ),
-          GoRoute(
-            path: '/appointment-details',
-            builder: (context, state) {
-              final args = state.extra as BookingConfirmationArgs;
-              return AppointmentDetailsScreen(args: args);
-            },
-          ),
-          GoRoute(
-            path: '/connecting-session',
-            builder: (context, state) => const ConnectingSessionScreen(),
-          ),
-          GoRoute(
             path: '/account-settings',
             builder: (context, state) => const AccountSettingsScreen(),
           ),
@@ -233,6 +201,43 @@ final routerProvider = Provider<GoRouter>((ref) {
             builder: (context, state) => const SupportScreen(),
           ),
         ],
+      ),
+      GoRoute(
+        path: '/book-session',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final session = state.extra as Session;
+          return BookSessionScreen(session: session);
+        },
+      ),
+      GoRoute(
+        path: '/select-time',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final session = state.extra as Session;
+          return SelectTimeScreen(session: session);
+        },
+      ),
+      GoRoute(
+        path: '/confirm-booking',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final args = state.extra as BookingConfirmationArgs;
+          return ConfirmBookingScreen(args: args);
+        },
+      ),
+      GoRoute(
+        path: '/appointment-details',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final args = state.extra as BookingConfirmationArgs;
+          return AppointmentDetailsScreen(args: args);
+        },
+      ),
+      GoRoute(
+        path: '/connecting-session',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const ConnectingSessionScreen(),
       ),
       GoRoute(
             path: '/health/session-overview',

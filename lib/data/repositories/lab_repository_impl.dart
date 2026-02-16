@@ -65,7 +65,7 @@ class LabRepositoryImpl implements LabRepository {
         ));
       }
     } on DioException catch (e) {
-      return _handleDioException(e);
+      return Left(_handleDioException(e));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -85,7 +85,7 @@ class LabRepositoryImpl implements LabRepository {
         ));
       }
     } on DioException catch (e) {
-      return _handleDioException(e);
+      return Left(_handleDioException(e));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
