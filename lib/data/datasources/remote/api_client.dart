@@ -6,6 +6,7 @@ import '../../models/user_model.dart';
 import '../../models/subscription_model.dart';
 import '../../models/program_model.dart';
 import '../../models/booking_model.dart';
+import '../../models/lab_request_model.dart';
 
 /// API Client (Data Layer)
 /// Handles all API calls using Dio directly (Manual Implementation of RestClient interface)
@@ -146,6 +147,42 @@ class ApiClient {
      throw UnimplementedError("Use getUserProfile() instead");
   }
   
+  // ============================================
+  // Lab Requests Endpoints
+  // ============================================
+
+  /// Create Lab Request
+  Future<ApiResponse<LabRequestData>> createLabRequest(
+      CreateLabRequest request) async {
+    final response = await _dioClient.post(
+      ApiConstants.labRequests,
+      data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => LabRequestData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Lab Requests List
+  Future<ApiResponse<LabRequestListResponseData>> getLabRequests() async {
+    final response = await _dioClient.get(ApiConstants.labRequests);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) =>
+          LabRequestListResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Lab Request By ID
+  Future<ApiResponse<LabRequestData>> getLabRequestById(String id) async {
+    final response = await _dioClient.get('${ApiConstants.labRequests}/$id');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => LabRequestData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
   // Add other methods (Programs, Bookings) as needed if they were in the previous attempt
   // For brevity and to fix the immediate error, ensuring register/login/updateProfile exist.
 }
