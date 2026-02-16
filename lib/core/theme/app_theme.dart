@@ -14,6 +14,7 @@ class AppColors {
   static const Color cardBackground = Color(0xFFFFFFFF);
   static const Color surfaceColor = Color(0xFFFFFBF8);
   static const Color roseSurface = Color(0xFFFAF1ED); // Light beige/rose for backgrounds
+  static const Color surfaceContainerLow = Color(0xFFF5EAE8); // Slightly darker rose/beige for inputs/cards
   
   // Health Status Indicators
   static const Color optimalGreen = Color(0xFF4CAF50);

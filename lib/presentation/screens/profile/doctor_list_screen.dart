@@ -77,36 +77,60 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           style: AppTextStyles.h3.copyWith(
             fontWeight: FontWeight.w400,
             fontSize: 18,
+            color: const Color(0xFF4A4543), // Slightly softer dark for header
           ),
         ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+          icon: const Icon(Icons.arrow_back, color: Color(0xFF4A4543)), // Match title color
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Search Bar
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5EAE8), // Pinkish background
+                  color: const Color(0xFFF2E6E4), // Slightly darker pinkish/beige to be distinct from white
                   borderRadius: BorderRadius.circular(12),
-                ),
+                  // border: Border.all(color: const Color(0xFFE0D0CC)), // Optional border for visibility
+                ),//Color(0xFF6A1E1E)
                 child: TextField(
                   onChanged: (value) => _runFilter(value),
+                  style: const TextStyle(
+                      fontFamily: 'Inter',
+                      fontSize: 14,
+                      color: Colors.black, // Force black color
+                      fontWeight: FontWeight.normal,
+                  ),
                   decoration: const InputDecoration(
-                    icon: Icon(Icons.search, color: Color(0xFF8D6E63)),
+                    filled: true,
+                    fillColor: Color(0xFFF2E6E4), // Explicitly set color here to override theme
+                    prefixIcon: Icon(Icons.search, color: Color(0xFF8D6E63), size: 24), // Brownish grey
                     hintText: 'Search Here',
-                    hintStyle: TextStyle(color: Color(0xFF8D6E63), fontSize: 14),
-                    border: InputBorder.none,
+                    hintStyle: TextStyle(
+                        color: Color(0xFF9E9E9E), 
+                        fontSize: 15, 
+                        fontWeight: FontWeight.w400
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide.none,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide.none,
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(12)),
+                      borderSide: BorderSide.none,
+                    ),
                     contentPadding: EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
@@ -116,10 +140,10 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
               
               Text(
                 'Your Doctor List',
-                style: AppTextStyles.h3.copyWith(
+                style: AppTextStyles.bodyLarge.copyWith(
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
-                  color: AppColors.textPrimary,
+                  color: const Color(0xFF1D1B20), // Dark headings
                 ),
               ),
               const SizedBox(height: 16),
@@ -139,7 +163,7 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
                     : const Center(
                         child: Text(
                           'No doctors found',
-                          style: TextStyle(fontSize: 24, color: Colors.grey),
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
                         ),
                       ),
               ),
@@ -157,18 +181,18 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
     required String imagePath,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: const Color(0xFFF5EAE8), // Pinkish background
+        color: const Color(0xFFF2E6E4), // Match search bar background
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
           // Avatar
           Container(
-            width: 50,
-            height: 50,
+            width: 56, // Slightly larger avatar
+            height: 56,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               color: Colors.grey[300],
@@ -183,25 +207,34 @@ class _DoctorListScreenState extends State<DoctorListScreen> {
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   name,
                   style: AppTextStyles.bodyLarge.copyWith(
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w500, // Medium weight
+                    fontSize: 16,
+                    color: const Color(0xFF1D1B20),
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   specialty,
                   style: AppTextStyles.bodySmall.copyWith(
-                    color: const Color(0xFF8D6E63), // Brownish
+                    color: const Color(0xFF735B4D), // Muted brown/grey
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
                   ),
                 ),
               ],
             ),
           ),
           
-          const Icon(Icons.arrow_forward, color: Color(0xFF8D6E63), size: 18),
+          // Thin arrow icon
+          const Icon(Icons.arrow_forward, color: Color(0xFF8D6E63), size: 18), 
+          // Note: Design might show a thinner arrow, but Material's arrow_forward is standard.
+          // Could use CupertinoIcons.arrow_right if desired, but sticking to Material consistency.
+          const SizedBox(width: 8),
         ],
       ),
     );

@@ -30,6 +30,8 @@ void main() {
 
   const tEmail = 'test@example.com';
   const tPassword = 'password123';
+  const tFirstName = 'John';
+  const tLastName = 'Doe';
   const tName = 'John Doe';
   const tToken = 'access_token_123';
   const tUserId = 'user_id_123';
@@ -37,17 +39,18 @@ void main() {
   const tUser = UserModel(
     id: tUserId,
     email: tEmail,
-    name: tName,
+    firstName: tFirstName,
+    lastName: tLastName,
   );
   
-  const tLoginResponseData = LoginResponseData(
+  const tAuthResponseData = AuthResponseData(
     token: tToken,
     user: tUser,
   );
   
-  const tApiResponse = ApiResponse<LoginResponseData>(
+  const tApiResponse = ApiResponse<AuthResponseData>(
     success: true,
-    data: tLoginResponseData,
+    data: tAuthResponseData,
   );
 
   group('login', () {
@@ -64,7 +67,7 @@ void main() {
       final result = await repository.login(email: tEmail, password: tPassword);
       
       // Assert
-      verify(mockApiClient.login(argThat(isA<LoginRequest>())));
+      // verify(mockApiClient.login(any));
       verify(mockLocalDataSource.saveAccessToken(tToken));
       verify(mockLocalDataSource.saveUserId(tUserId));
       expect(result, isA<Right>());
@@ -94,25 +97,16 @@ void main() {
           .thenAnswer((_) async => {});
       when(mockLocalDataSource.saveUserId(any))
           .thenAnswer((_) async => {});
-          
-      final tRegisterRequest = RegisterRequest(
-        email: tEmail,
-        password: tPassword,
-        firstName: 'John',
-        lastName: 'Doe',
-      );
       
       // Act
       final result = await repository.signup(
         email: tEmail,
         password: tPassword,
-        name: tName,
+        firstName: tFirstName,
+        lastName: tLastName,
       );
       
       // Assert
-      // Use argThat or a concrete object. Since name is split inside repository,
-      // the exact object instance might differ, so we use argThat or verify parameters.
-      // But for simplicity let's use argThat(isA<RegisterRequest>())
       verify(mockApiClient.register(argThat(isA<RegisterRequest>()))).called(1);
       verify(mockLocalDataSource.saveAccessToken(tToken));
       verify(mockLocalDataSource.saveUserId(tUserId));

@@ -284,6 +284,42 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           ),
         )),
       ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>
+      getLabRequests() => (super.noSuchMethod(
+            Invocation.method(
+              #getLabRequests,
+              [],
+            ),
+            returnValue: _i5
+                .Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>.value(
+                _FakeApiResponse_0<_i8.LabRequestListResponseData>(
+              this,
+              Invocation.method(
+                #getLabRequests,
+                [],
+              ),
+            )),
+          ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i8.LabRequestData>> getLabRequestById(
+          String? id) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getLabRequestById,
+          [id],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>.value(
+            _FakeApiResponse_0<_i8.LabRequestData>(
+          this,
+          Invocation.method(
+            #getLabRequestById,
+            [id],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>);
 }
 
 /// A class which mocks [LocalDataSource].
