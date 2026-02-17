@@ -6,11 +6,13 @@
 import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:nuevo_app/data/datasources/local/local_data_source.dart' as _i9;
+import 'package:nuevo_app/data/datasources/local/local_data_source.dart'
+    as _i10;
 import 'package:nuevo_app/data/datasources/remote/api_client.dart' as _i4;
 import 'package:nuevo_app/data/models/api_response.dart' as _i2;
 import 'package:nuevo_app/data/models/auth_response_model.dart' as _i6;
-import 'package:nuevo_app/data/models/lab_request_model.dart' as _i8;
+import 'package:nuevo_app/data/models/lab_request_model.dart' as _i9;
+import 'package:nuevo_app/data/models/preferences_model.dart' as _i8;
 import 'package:nuevo_app/data/models/subscription_model.dart' as _i3;
 import 'package:nuevo_app/data/models/user_model.dart' as _i7;
 
@@ -234,6 +236,41 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
       ) as _i5.Future<_i2.ApiResponse<void>>);
 
   @override
+  _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>> updatePreferences(
+          _i8.PreferencesModel? preferences) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #updatePreferences,
+          [preferences],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>>.value(
+            _FakeApiResponse_0<_i8.PreferencesModel>(
+          this,
+          Invocation.method(
+            #updatePreferences,
+            [preferences],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>> getPreferences() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getPreferences,
+          [],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>>.value(
+            _FakeApiResponse_0<_i8.PreferencesModel>(
+          this,
+          Invocation.method(
+            #getPreferences,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>>);
+
+  @override
   _i5.Future<_i3.SubscriptionModel> getSubscriptionStatus() =>
       (super.noSuchMethod(
         Invocation.method(
@@ -268,64 +305,64 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
       ) as _i5.Future<_i3.SubscriptionModel>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i8.LabRequestData>> createLabRequest(
-          _i8.CreateLabRequest? request) =>
+  _i5.Future<_i2.ApiResponse<_i9.LabRequestData>> createLabRequest(
+          _i9.CreateLabRequest? request) =>
       (super.noSuchMethod(
         Invocation.method(
           #createLabRequest,
           [request],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>.value(
-            _FakeApiResponse_0<_i8.LabRequestData>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i9.LabRequestData>>.value(
+            _FakeApiResponse_0<_i9.LabRequestData>(
           this,
           Invocation.method(
             #createLabRequest,
             [request],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>);
+      ) as _i5.Future<_i2.ApiResponse<_i9.LabRequestData>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>
+  _i5.Future<_i2.ApiResponse<_i9.LabRequestListResponseData>>
       getLabRequests() => (super.noSuchMethod(
             Invocation.method(
               #getLabRequests,
               [],
             ),
             returnValue: _i5
-                .Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>.value(
-                _FakeApiResponse_0<_i8.LabRequestListResponseData>(
+                .Future<_i2.ApiResponse<_i9.LabRequestListResponseData>>.value(
+                _FakeApiResponse_0<_i9.LabRequestListResponseData>(
               this,
               Invocation.method(
                 #getLabRequests,
                 [],
               ),
             )),
-          ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>);
+          ) as _i5.Future<_i2.ApiResponse<_i9.LabRequestListResponseData>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i8.LabRequestData>> getLabRequestById(
+  _i5.Future<_i2.ApiResponse<_i9.LabRequestData>> getLabRequestById(
           String? id) =>
       (super.noSuchMethod(
         Invocation.method(
           #getLabRequestById,
           [id],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>.value(
-            _FakeApiResponse_0<_i8.LabRequestData>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i9.LabRequestData>>.value(
+            _FakeApiResponse_0<_i9.LabRequestData>(
           this,
           Invocation.method(
             #getLabRequestById,
             [id],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>);
+      ) as _i5.Future<_i2.ApiResponse<_i9.LabRequestData>>);
 }
 
 /// A class which mocks [LocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalDataSource extends _i1.Mock implements _i9.LocalDataSource {
+class MockLocalDataSource extends _i1.Mock implements _i10.LocalDataSource {
   MockLocalDataSource() {
     _i1.throwOnMissingStub(this);
   }

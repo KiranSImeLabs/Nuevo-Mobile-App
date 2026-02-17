@@ -28,6 +28,8 @@ import '../../domain/usecases/subscription/get_subscription_status_usecase.dart'
 import '../../domain/usecases/subscription/is_subscription_active_usecase.dart';
 import '../../domain/usecases/user/get_user_profile_usecase.dart';
 import '../../domain/usecases/user/update_user_profile_usecase.dart';
+import '../../domain/usecases/user/update_preferences_usecase.dart';
+import '../../domain/usecases/user/get_preferences_usecase.dart';
 // import 'auth_provider.dart'; // Removing to break circularity
 
 // ============================================
@@ -174,6 +176,16 @@ final getUserProfileUseCaseProvider = Provider<GetUserProfileUseCase>((ref) {
 final updateUserProfileUseCaseProvider = Provider<UpdateUserProfileUseCase>((ref) {
   final repository = ref.watch(userRepositoryProvider);
   return UpdateUserProfileUseCase(repository: repository);
+});
+
+final updatePreferencesUseCaseProvider = Provider<UpdatePreferencesUseCase>((ref) {
+  final repository = ref.watch(userRepositoryProvider);
+  return UpdatePreferencesUseCase(repository);
+});
+
+final getPreferencesUseCaseProvider = Provider<GetPreferencesUseCase>((ref) {
+  final repository = ref.watch(userRepositoryProvider);
+  return GetPreferencesUseCase(repository);
 });
 
 // ============================================

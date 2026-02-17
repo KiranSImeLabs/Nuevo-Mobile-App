@@ -7,6 +7,7 @@ import '../../models/subscription_model.dart';
 import '../../models/program_model.dart';
 import '../../models/booking_model.dart';
 import '../../models/lab_request_model.dart';
+import '../../models/preferences_model.dart';
 
 /// API Client (Data Layer)
 /// Handles all API calls using Dio directly (Manual Implementation of RestClient interface)
@@ -132,6 +133,28 @@ class ApiClient {
      return ApiResponse.fromJson(
       response.data,
       (json) => null,
+    );
+  }
+
+  /// Update user preferences (Notification & Consent)
+  Future<ApiResponse<PreferencesModel>> updatePreferences(
+      PreferencesModel preferences) async {
+    final response = await _dioClient.put(
+      ApiConstants.preferences,
+      data: preferences.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PreferencesModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get user preferences
+  Future<ApiResponse<PreferencesModel>> getPreferences() async {
+    final response = await _dioClient.get(ApiConstants.preferences);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PreferencesModel.fromJson(json as Map<String, dynamic>),
     );
   }
   

@@ -1,26 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../presentation/providers/preferences_provider.dart';
 import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'widgets/notification_option_tile.dart';
 
-class NotificationSettingsScreen extends StatefulWidget {
+class NotificationSettingsScreen extends ConsumerStatefulWidget {
   const NotificationSettingsScreen({super.key});
 
   @override
-  State<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
+  ConsumerState<NotificationSettingsScreen> createState() => _NotificationSettingsScreenState();
 }
 
-class _NotificationSettingsScreenState extends State<NotificationSettingsScreen> {
-  // Mock state for the toggles
-  bool _programUpdates = false;
-  bool _guidanceReminders = false;
-  bool _appointmentReminders = true;
-  bool _scheduleUpdates = false;
-  bool _healthInsights = false;
-  bool _resultsAvailable = false;
+class _NotificationSettingsScreenState extends ConsumerState<NotificationSettingsScreen> {
+
 
   @override
   Widget build(BuildContext context) {
+    final preferencesState = ref.watch(preferencesProvider);
+    final notification = preferencesState.data.notification;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -40,43 +39,58 @@ class _NotificationSettingsScreenState extends State<NotificationSettingsScreen>
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            children: [
-              NotificationOptionTile(
-                title: AppStrings.programUpdates,
-                value: _programUpdates,
-                onChanged: (val) => setState(() => _programUpdates = val),
+        child: preferencesState.isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    NotificationOptionTile(
+                      title: AppStrings.programUpdates,
+                      value: notification.programUpdates,
+                      onChanged: (val) => ref
+                          .read(preferencesProvider.notifier)
+                          .updateNotificationPreferences(programUpdates: val),
+                    ),
+                    NotificationOptionTile(
+                      title: AppStrings.guidanceReminders,
+                      value: notification.guidanceReminders,
+                      onChanged: (val) => ref
+                          .read(preferencesProvider.notifier)
+                          .updateNotificationPreferences(guidanceReminders: val),
+                    ),
+                    NotificationOptionTile(
+                      title: AppStrings.appointmentReminders,
+                      value: notification.appointmentReminders,
+                      onChanged: (val) => ref
+                          .read(preferencesProvider.notifier)
+                          .updateNotificationPreferences(
+                              appointmentReminders: val),
+                    ),
+                    NotificationOptionTile(
+                      title: AppStrings.scheduleUpdates,
+                      value: notification.scheduleUpdates,
+                      onChanged: (val) => ref
+                          .read(preferencesProvider.notifier)
+                          .updateNotificationPreferences(scheduleUpdates: val),
+                    ),
+                    NotificationOptionTile(
+                      title: AppStrings.healthInsights,
+                      value: notification.healthInsights,
+                      onChanged: (val) => ref
+                          .read(preferencesProvider.notifier)
+                          .updateNotificationPreferences(healthInsights: val),
+                    ),
+                    NotificationOptionTile(
+                      title: AppStrings.resultsAvailable,
+                      value: notification.resultsAvailable,
+                      onChanged: (val) => ref
+                          .read(preferencesProvider.notifier)
+                          .updateNotificationPreferences(resultsAvailable: val),
+                    ),
+                  ],
+                ),
               ),
-              NotificationOptionTile(
-                title: AppStrings.guidanceReminders,
-                value: _guidanceReminders,
-                onChanged: (val) => setState(() => _guidanceReminders = val),
-              ),
-              NotificationOptionTile(
-                title: AppStrings.appointmentReminders,
-                value: _appointmentReminders,
-                onChanged: (val) => setState(() => _appointmentReminders = val),
-              ),
-              NotificationOptionTile(
-                title: AppStrings.scheduleUpdates,
-                value: _scheduleUpdates,
-                onChanged: (val) => setState(() => _scheduleUpdates = val),
-              ),
-              NotificationOptionTile(
-                title: AppStrings.healthInsights,
-                value: _healthInsights,
-                onChanged: (val) => setState(() => _healthInsights = val),
-              ),
-              NotificationOptionTile(
-                title: AppStrings.resultsAvailable,
-                value: _resultsAvailable,
-                onChanged: (val) => setState(() => _resultsAvailable = val),
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }

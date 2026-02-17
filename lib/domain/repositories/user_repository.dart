@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:nuevo_app/core/errors/failures.dart';
+import 'package:nuevo_app/domain/entities/preferences.dart';
 import 'package:nuevo_app/domain/entities/user.dart';
 
 /// User Repository Interface (Domain Layer)
@@ -16,4 +17,12 @@ abstract class UserRepository {
     String? phoneNumber,
     String? profileImageUrl,
   });
+
+  /// Update user preferences (Notification & Consent)
+  /// Returns updated Preferences on success, Failure on error
+  Future<Either<Failure, Preferences>> updatePreferences(Preferences preferences);
+
+  /// Get user preferences
+  /// Returns Preferences on success, Failure on error
+  Future<Either<Failure, Preferences>> getPreferences();
 }

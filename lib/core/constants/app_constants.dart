@@ -15,6 +15,7 @@ class ApiConstants {
   static const String userProfile = '/auth/profile';
   static const String checkEmail = '/auth/check-email';
   static const String updateProfile = '/auth/profile'; // Typically PUT or PATCH on profile endpoint
+  static const String preferences = '/preferences';
   
   // Programs
   static const String programs = '/programs';
