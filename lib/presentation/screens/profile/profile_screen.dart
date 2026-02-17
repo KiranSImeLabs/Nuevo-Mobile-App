@@ -7,6 +7,8 @@ import '../../providers/user_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import 'widgets/logout_bottom_sheet.dart';
 import '../../widgets/profile_image_picker_sheet.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../core/constants/app_icons.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -112,7 +114,12 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                     shape: BoxShape.circle,
                                     border: Border.all(color: Colors.white, width: 2),
                                   ),
-                                  child: const Icon(Icons.edit, size: 14, color: Colors.white),
+                                  child: SvgPicture.asset(
+                                    AppIcons.icProfileEdit,
+                                    width: 14, 
+                                    height: 14, 
+                                    // colorFilter: const ColorFilter.mode(AppColors.primaryLight, BlendMode.srcIn),
+                                  ),
                                 ),
                               ),
                             ),

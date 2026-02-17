@@ -5,6 +5,8 @@ import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/profile_image_picker_sheet.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import '../../../../core/constants/app_icons.dart';
 
 class AccountSettingsScreen extends ConsumerStatefulWidget {
   const AccountSettingsScreen({super.key});
@@ -140,7 +142,12 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 3),
                             ),
-                            child: const Icon(Icons.edit, size: 18, color: Colors.white),
+                            child: SvgPicture.asset(
+                              AppIcons.icProfileEdit,
+                              width: 18,
+                              height: 18,
+                              // colorFilter: const ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            ),
                           ),
                         ),
                       ),
