@@ -150,4 +150,26 @@ class AppStrings {
   static const String viewHelp = 'View Help';
   static const String contactCareTeamAction = 'Contact Care Team';
   static const String contactSupport = 'Contact Support';
+
+  // Payments & Billing
+  static const String paymentsAndBilling = 'Payments & Billing';
+  static const String active = 'Active';
+  static const String month = 'month';
+  static const String nextRenewal = 'Next renewal';
+  static const String paymentMethods = 'Payment Methods';
+  static const String addNew = 'Add New';
+  static const String primary = 'Primary';
+  static const String billingHistory = 'Billing History';
+  static const String monthlySubscription = 'Monthly Subscription';
+  static const String paid = 'Paid';
+  static const String addCard = 'Add Card';
+  static const String cardName = 'Card Name';
+  static const String enterCardName = 'Enter Card Name';
+  static const String cardNumber = 'Card Number';
+  static const String enterCardNumber = 'Enter Card Number';
+  static const String expiryDate = 'Expiry Date';
+  static const String mmYy = 'MM/YY';
+  static const String cvv = 'CVV';
+  static const String saveCard = 'Save Card';
+  static const String visa = 'Visa';
 }
