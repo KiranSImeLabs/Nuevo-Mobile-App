@@ -6,10 +6,12 @@
 import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
-import 'package:nuevo_app/data/datasources/local/local_data_source.dart' as _i9;
+import 'package:nuevo_app/data/datasources/local/local_data_source.dart'
+    as _i10;
 import 'package:nuevo_app/data/datasources/remote/api_client.dart' as _i4;
 import 'package:nuevo_app/data/models/api_response.dart' as _i2;
 import 'package:nuevo_app/data/models/auth_response_model.dart' as _i6;
+import 'package:nuevo_app/data/models/diet_plan_model.dart' as _i9;
 import 'package:nuevo_app/data/models/lab_request_model.dart' as _i8;
 import 'package:nuevo_app/data/models/subscription_model.dart' as _i3;
 import 'package:nuevo_app/data/models/user_model.dart' as _i7;
@@ -284,12 +286,65 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           ),
         )),
       ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>
+      getLabRequests() => (super.noSuchMethod(
+            Invocation.method(
+              #getLabRequests,
+              [],
+            ),
+            returnValue: _i5
+                .Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>.value(
+                _FakeApiResponse_0<_i8.LabRequestListResponseData>(
+              this,
+              Invocation.method(
+                #getLabRequests,
+                [],
+              ),
+            )),
+          ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestListResponseData>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i8.LabRequestData>> getLabRequestById(
+          String? id) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getLabRequestById,
+          [id],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>.value(
+            _FakeApiResponse_0<_i8.LabRequestData>(
+          this,
+          Invocation.method(
+            #getLabRequestById,
+            [id],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i8.LabRequestData>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i9.DietPlanModel>> getDietPlan() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getDietPlan,
+          [],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i9.DietPlanModel>>.value(
+            _FakeApiResponse_0<_i9.DietPlanModel>(
+          this,
+          Invocation.method(
+            #getDietPlan,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i9.DietPlanModel>>);
 }
 
 /// A class which mocks [LocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalDataSource extends _i1.Mock implements _i9.LocalDataSource {
+class MockLocalDataSource extends _i1.Mock implements _i10.LocalDataSource {
   MockLocalDataSource() {
     _i1.throwOnMissingStub(this);
   }
