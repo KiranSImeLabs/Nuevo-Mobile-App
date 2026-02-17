@@ -1,8 +1,21 @@
 import 'package:flutter/material.dart';
+import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
+import 'widgets/consent_option_card.dart';
+import 'widgets/legal_option_tile.dart';
 
-class PrivacyConsentScreen extends StatelessWidget {
+class PrivacyConsentScreen extends StatefulWidget {
   const PrivacyConsentScreen({super.key});
+
+  @override
+  State<PrivacyConsentScreen> createState() => _PrivacyConsentScreenState();
+}
+
+class _PrivacyConsentScreenState extends State<PrivacyConsentScreen> {
+  // Local state for demonstration purposes
+  bool _dataSharing = true;
+  bool _researchParticipation = false;
+  bool _communicationPreferences = false;
 
   @override
   Widget build(BuildContext context) {
@@ -10,7 +23,7 @@ class PrivacyConsentScreen extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         title: Text(
-          'Privacy & Consent',
+          AppStrings.privacyAndConsent,
           style: AppTextStyles.h3.copyWith(
             fontWeight: FontWeight.w400,
             fontSize: 18,
@@ -28,63 +41,85 @@ class PrivacyConsentScreen extends StatelessWidget {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildSettingItem(context, 'Data Sharing', true),
-              _buildSettingItem(context, 'Marketing Communications', false),
-              _buildSettingItem(context, 'Analytics', true),
-              const SizedBox(height: 24),
-              _buildLinkItem(context, 'Terms and Conditions'),
-              _buildLinkItem(context, 'Privacy Policy'),
+              // Consents Section
+              Text(
+                AppStrings.consents,
+                style: AppTextStyles.bodyLarge.copyWith(
+                  color: const Color(0xFF4A4A4A),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 16),
+              
+              ConsentOptionCard(
+                title: AppStrings.dataSharingConsent,
+                subtitle: AppStrings.dataSharingSubtitle,
+                value: _dataSharing,
+                onChanged: (val) => setState(() => _dataSharing = val),
+                onTapDetails: () {
+                  // TODO: Navigate to Data Sharing details
+                },
+              ),
+              
+              ConsentOptionCard(
+                title: AppStrings.researchParticipation,
+                subtitle: AppStrings.researchSubtitle,
+                value: _researchParticipation,
+                onChanged: (val) => setState(() => _researchParticipation = val),
+                onTapDetails: () {
+                  // TODO: Navigate to Research Participation details
+                },
+              ),
+              
+              ConsentOptionCard(
+                title: AppStrings.communicationPreferences,
+                subtitle: AppStrings.communicationSubtitle,
+                value: _communicationPreferences,
+                onChanged: (val) => setState(() => _communicationPreferences = val),
+                onTapDetails: () {
+                  // TODO: Navigate to Communication Preferences details
+                },
+              ),
+
+              const SizedBox(height: 32),
+
+              // Legal Section
+              Text(
+                AppStrings.legal,
+                style: AppTextStyles.bodyLarge.copyWith(
+                  color: const Color(0xFF4A4A4A),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              LegalOptionTile(
+                title: AppStrings.privacyPolicy,
+                onTap: () {
+                  // TODO: Navigate to Privacy Policy
+                },
+              ),
+              
+              LegalOptionTile(
+                title: AppStrings.termsOfService,
+                onTap: () {
+                  // TODO: Navigate to Terms of Service
+                },
+              ),
+              
+              LegalOptionTile(
+                title: AppStrings.dataProtection,
+                onTap: () {
+                  // TODO: Navigate to Data Protection
+                },
+              ),
             ],
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSettingItem(BuildContext context, String title, bool value) {
-    // Mock state for now
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5EAE8),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-          ),
-          Switch(
-            value: value, 
-            onChanged: (val) {},
-            activeColor: const Color(0xFF964A38),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildLinkItem(BuildContext context, String title) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5EAE8),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            title,
-            style: AppTextStyles.bodyMedium.copyWith(color: AppColors.textPrimary),
-          ),
-          const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFF8D6E63)),
-        ],
       ),
     );
   }

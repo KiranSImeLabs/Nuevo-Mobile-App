@@ -115,4 +115,39 @@ class AppStrings {
   static const String cardiologist = 'Cardiologist'; // Example role
   static const String drSarah = 'Dr. Sarah Bennett'; // Example name
   static const String aboutDrSarah = 'Dr. Sarah specialises in personalised nutrition strategies that support long-term health and sustainable lifestyle changes.'; // Example bio
+
+  // Notification Settings
+  static const String notifications = 'Notifications';
+  static const String programUpdates = 'Program updates';
+  static const String guidanceReminders = 'Guidance reminders';
+  static const String appointmentReminders = 'Appointment reminders';
+  static const String scheduleUpdates = 'Schedule updates';
+  static const String healthInsights = 'Health insights';
+  static const String resultsAvailable = 'Results available';
+
+  // Privacy & Consent
+  static const String privacyAndConsent = 'Privacy & consent';
+  static const String consents = 'Consents';
+  static const String dataSharingConsent = 'Data sharing consent';
+  static const String dataSharingSubtitle = 'How your care team uses your information';
+  static const String researchParticipation = 'Research participation';
+  static const String researchSubtitle = 'Optional, anonymised data use';
+  static const String communicationPreferences = 'Communication preferences';
+  static const String communicationSubtitle = 'How we contact you';
+  static const String viewDetails = 'View Details';
+  static const String legal = 'Legal';
+  static const String dataProtection = 'Data Protection';
+  
+  // Support
+  static const String support = 'Support';
+  static const String supportOptions = 'Support Options';
+  static const String helpCentre = 'Help centre';
+  static const String browseQuestions = 'Browse common questions';
+  static const String contactCareTeam = 'Contact your care team';
+  static const String getInTouch = 'Get in touch directly';
+  static const String technicalSupport = 'Technical support';
+  static const String appIssues = 'App or login issues';
+  static const String viewHelp = 'View Help';
+  static const String contactCareTeamAction = 'Contact Care Team';
+  static const String contactSupport = 'Contact Support';
 }
