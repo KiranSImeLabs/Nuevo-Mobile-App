@@ -16,8 +16,8 @@ PreferencesModel _$PreferencesModelFromJson(Map<String, dynamic> json) =>
 
 Map<String, dynamic> _$PreferencesModelToJson(PreferencesModel instance) =>
     <String, dynamic>{
-      'notification': instance.notification,
-      'consent': instance.consent,
+      'notification': instance.notification.toJson(),
+      'consent': instance.consent.toJson(),
     };
 
 NotificationPreferencesModel _$NotificationPreferencesModelFromJson(

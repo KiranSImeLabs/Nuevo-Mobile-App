@@ -3,15 +3,20 @@ import '../../domain/entities/preferences.dart';
 
 part 'preferences_model.g.dart';
 
-@JsonSerializable()
-class PreferencesModel {
+@JsonSerializable(explicitToJson: true)
+class PreferencesModel extends Preferences {
+  @override
   final NotificationPreferencesModel notification;
+  @override
   final ConsentPreferencesModel consent;
 
   const PreferencesModel({
     required this.notification,
     required this.consent,
-  });
+  }) : super(
+          notification: notification,
+          consent: consent,
+        );
 
   factory PreferencesModel.fromJson(Map<String, dynamic> json) =>
       _$PreferencesModelFromJson(json);
@@ -35,12 +40,18 @@ class PreferencesModel {
 }
 
 @JsonSerializable()
-class NotificationPreferencesModel {
+class NotificationPreferencesModel extends NotificationPreferences {
+  @override
   final bool programUpdates;
+  @override
   final bool guidanceReminders;
+  @override
   final bool appointmentReminders;
+  @override
   final bool scheduleUpdates;
+  @override
   final bool healthInsights;
+  @override
   final bool resultsAvailable;
 
   const NotificationPreferencesModel({
@@ -50,7 +61,14 @@ class NotificationPreferencesModel {
     this.scheduleUpdates = false,
     this.healthInsights = false,
     this.resultsAvailable = false,
-  });
+  }) : super(
+          programUpdates: programUpdates,
+          guidanceReminders: guidanceReminders,
+          appointmentReminders: appointmentReminders,
+          scheduleUpdates: scheduleUpdates,
+          healthInsights: healthInsights,
+          resultsAvailable: resultsAvailable,
+        );
 
   factory NotificationPreferencesModel.fromJson(Map<String, dynamic> json) =>
       _$NotificationPreferencesModelFromJson(json);
@@ -82,16 +100,23 @@ class NotificationPreferencesModel {
 }
 
 @JsonSerializable()
-class ConsentPreferencesModel {
+class ConsentPreferencesModel extends ConsentPreferences {
+  @override
   final bool dataSharingConsent;
+  @override
   final bool researchParticipation;
+  @override
   final bool communicationPreferences;
 
   const ConsentPreferencesModel({
     this.dataSharingConsent = false,
     this.researchParticipation = false,
     this.communicationPreferences = false,
-  });
+  }) : super(
+          dataSharingConsent: dataSharingConsent,
+          researchParticipation: researchParticipation,
+          communicationPreferences: communicationPreferences,
+        );
 
   factory ConsentPreferencesModel.fromJson(Map<String, dynamic> json) =>
       _$ConsentPreferencesModelFromJson(json);
