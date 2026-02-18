@@ -3,6 +3,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/common/care_team_member_card.dart';
 import 'package:go_router/go_router.dart';
+import 'diet_plan_detail_screen.dart';
 
 class MyPlanScreen extends StatelessWidget {
   const MyPlanScreen({super.key});
@@ -317,24 +318,38 @@ class MyPlanScreen extends StatelessWidget {
   }
 
   Widget _buildPlanPillars() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildPillarCard(
-            icon: Icons.fitness_center_outlined,
-            title: AppStrings.exercisePlan,
-            subtitle: AppStrings.strengthFoundations,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: _buildPillarCard(
-            icon: Icons.restaurant_menu, // closest to 'recipe' clipboard
-            title: AppStrings.nutritionPlan,
-            subtitle: AppStrings.wholeFoodFocus,
-          ),
-        ),
-      ],
+    return Builder(
+      builder: (context) {
+        return Row(
+          children: [
+            Expanded(
+              child: _buildPillarCard(
+                icon: Icons.fitness_center_outlined,
+                title: AppStrings.exercisePlan,
+                subtitle: AppStrings.strengthFoundations,
+                onTap: () {
+                  // Navigate to Exercise Plan (Future Impl)
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildPillarCard(
+                icon: Icons.restaurant_menu,
+                title: AppStrings.nutritionPlan,
+                subtitle: AppStrings.wholeFoodFocus,
+                onTap: () {
+                  Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (context) => const DietPlanDetailScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+        );
+      }
     );
   }
 
@@ -342,57 +357,61 @@ class MyPlanScreen extends StatelessWidget {
     required IconData icon,
     required String title,
     required String subtitle,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.roseSurface,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(8),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.roseSurface,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Icon(
+                icon,
+                color: const Color(0xFF8D6E63),
+                size: 20,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: const Color(0xFF8D6E63),
-              size: 20,
+            const SizedBox(height: 16),
+            Text(
+              title,
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textSecondary,
-              fontSize: 12,
+            const SizedBox(height: 4),
+            Text(
+              subtitle,
+              style: AppTextStyles.bodyMedium.copyWith(
+                fontWeight: FontWeight.w600,
+                color: const Color(0xFF2C2C2C),
+                height: 1.2,
+              ),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: AppTextStyles.bodyMedium.copyWith(
-              fontWeight: FontWeight.w600,
-              color: const Color(0xFF2C2C2C),
-              height: 1.2,
+            const SizedBox(height: 16),
+            const Align(
+              alignment: Alignment.centerRight,
+              child: Icon(
+                Icons.arrow_forward,
+                color: Color(0xFF8D6E63),
+                size: 18,
+              ),
             ),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 16),
-          const Align(
-            alignment: Alignment.centerRight,
-            child: Icon(
-              Icons.arrow_forward,
-              color: Color(0xFF8D6E63),
-              size: 18,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

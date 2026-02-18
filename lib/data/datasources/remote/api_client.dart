@@ -7,6 +7,7 @@ import '../../models/subscription_model.dart';
 import '../../models/program_model.dart';
 import '../../models/booking_model.dart';
 import '../../models/lab_request_model.dart';
+import '../../models/diet_plan_model.dart';
 
 /// API Client (Data Layer)
 /// Handles all API calls using Dio directly (Manual Implementation of RestClient interface)
@@ -185,4 +186,20 @@ class ApiClient {
 
   // Add other methods (Programs, Bookings) as needed if they were in the previous attempt
   // For brevity and to fix the immediate error, ensuring register/login/updateProfile exist.
+  // ============================================
+  // Diet Plan Endpoints
+  // ============================================
+
+  /// Get Diet Plan
+  Future<ApiResponse<DietPlanModel>> getDietPlan() async {
+    final response = await _dioClient.get(ApiConstants.dietPlans);
+    
+    print('RAW DIET PLAN JSON: ${response.data}'); // DEBUG Log
+    
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => DietPlanModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
 }
+
