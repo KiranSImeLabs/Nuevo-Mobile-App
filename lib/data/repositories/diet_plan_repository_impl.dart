@@ -12,9 +12,7 @@ class DietPlanRepositoryImpl implements DietPlanRepository {
   Future<DietPlanModel> getDietPlan() async {
     try {
       final response = await apiClient.getDietPlan();
-      
-      print('Diet Plan API Raw Response: ${response.data?.toJson()}'); // Debug log
-      
+            
       if (response.success && response.data != null) {
          return response.data!;
       } else {
