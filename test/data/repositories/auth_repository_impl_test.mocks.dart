@@ -11,6 +11,7 @@ import 'package:nuevo_app/data/datasources/local/local_data_source.dart'
 import 'package:nuevo_app/data/datasources/remote/api_client.dart' as _i4;
 import 'package:nuevo_app/data/models/api_response.dart' as _i2;
 import 'package:nuevo_app/data/models/auth_response_model.dart' as _i6;
+import 'package:nuevo_app/data/models/diet_plan_model.dart' as _i11;
 import 'package:nuevo_app/data/models/lab_request_model.dart' as _i9;
 import 'package:nuevo_app/data/models/preferences_model.dart' as _i8;
 import 'package:nuevo_app/data/models/subscription_model.dart' as _i3;
@@ -357,6 +358,23 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           ),
         )),
       ) as _i5.Future<_i2.ApiResponse<_i9.LabRequestData>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>> getDietPlan() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getDietPlan,
+          [],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>>.value(
+            _FakeApiResponse_0<_i11.DietPlanModel>(
+          this,
+          Invocation.method(
+            #getDietPlan,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>>);
 }
 
 /// A class which mocks [LocalDataSource].

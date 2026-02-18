@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
 import 'package:intl/intl.dart' hide TextDirection;
 import '../../../core/theme/app_theme.dart';
+import '../../providers/diet_plan_provider.dart';
+import '../../../data/models/diet_plan_model.dart'; // Import the model
+import 'package:flutter_svg/flutter_svg.dart';
+import 'widgets/guidance_detail_bottom_sheet.dart';
 
-class HealthScreen extends StatefulWidget {
+class HealthScreen extends ConsumerStatefulWidget {
   const HealthScreen({super.key});
 
   @override
-  State<HealthScreen> createState() => _HealthScreenState();
+  ConsumerState<HealthScreen> createState() => _HealthScreenState();
 }
 
-class _HealthScreenState extends State<HealthScreen> {
+class _HealthScreenState extends ConsumerState<HealthScreen> {
   int _selectedTabIndex = 0; // Default to 'Exercise'
   final List<String> _tabs = ['Exercise', 'Diet', 'Results', 'Insights'];
   DateTime _selectedDate = DateTime.now();
@@ -522,6 +527,36 @@ class _HealthScreenState extends State<HealthScreen> {
   }
 
   Widget _buildDietContent() {
+    final dietPlanAsync = ref.watch(dietPlanProvider);
+
+    return dietPlanAsync.when(
+      data: (dietPlan) => _buildDietUI(dietPlan),
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(20.0),
+          child: CircularProgressIndicator(color: Color(0xFFA05E44)),
+        ),
+      ),
+      error: (error, stack) {
+        debugPrint('Error loading diet plan: $error');
+        // Return empty UI on error, or you could show a retry button. 
+        // For now, adhering to "remove static data", we show empty or basic structure.
+        return const Center(child: Text("Unable to load diet plan"));
+      },
+    );
+  }
+
+  Widget _buildDietUI(DietPlanModel dietPlan) {
+    // Calculate totals or use API values. Default to 0 if null.
+    final totalCalories = dietPlan.calories ?? 
+        (dietPlan.meals?.fold<int>(0, (sum, meal) => sum + (meal.calories ?? 0)) ?? 0);
+    
+    final protein = dietPlan.protein ?? 0;
+    final waterGlasses = dietPlan.waterGlasses ?? 0;
+
+    // Use ONLY API guidance. No static fallback.
+    final displayGuidance = dietPlan.keyGuidance ?? [];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -536,47 +571,222 @@ class _HealthScreenState extends State<HealthScreen> {
         const SizedBox(height: AppSpacing.md),
         Row(
           children: [
-            _buildNutritionCard('1850', 'Calories', const Color(0xFFF5EAE8)),
+            _buildNutritionCard('$totalCalories', 'Calories', const Color(0xFFF5EAE8)),
             const SizedBox(width: AppSpacing.md),
-            _buildNutritionCard('129g', 'Protein', const Color(0xFFF5EAE8)),
+            _buildNutritionCard('${protein}g', 'Protein', const Color(0xFFF5EAE8)),
             const SizedBox(width: AppSpacing.md),
-            _buildNutritionCard('08', 'Glasses', const Color(0xFFF5EAE8)),
+            _buildNutritionCard(waterGlasses.toString().padLeft(2, '0'), 'Glasses', const Color(0xFFF5EAE8)),
           ],
         ),
         const SizedBox(height: AppSpacing.xl),
 
-        // Key Guidance Section
-        Text(
-          "Key Guidance",
-          style: AppTextStyles.bodyLarge.copyWith(
-            color: const Color(0xFF4A4A4A),
-            fontSize: 16,
+        // Meals Section
+        if (dietPlan.meals != null && dietPlan.meals!.isNotEmpty) ...[
+          Text(
+            "Today's Meals",
+            style: AppTextStyles.bodyLarge.copyWith(
+              color: const Color(0xFF4A4A4A),
+              fontSize: 16,
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _buildGuidanceCard(
-          icon: Icons.food_bank_outlined, // Placeholder icon
-          title: 'Increase protein intake',
-          subtitle: 'Aim for 1.2g per kg body weight',
-          iconColor: const Color(0xFFA05E44),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _buildGuidanceCard(
-          icon: Icons.water_drop_outlined,
-          title: 'Hydration reminder',
-          subtitle: 'Drink at least 8 glasses of water',
-          iconColor: const Color(0xFFA05E44),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _buildGuidanceCard(
-          icon: Icons.no_food_outlined,
-          title: 'Limit processed foods',
-          subtitle: 'Focus on whole, unprocessed options',
-          iconColor: const Color(0xFFA05E44),
-        ),
+          const SizedBox(height: AppSpacing.md),
+          ...dietPlan.meals!.map((meal) => _buildMealCard(meal)).toList(),
+          const SizedBox(height: AppSpacing.xl),
+        ],
+
+        // Key Guidance Section
+        if (displayGuidance.isNotEmpty) ...[
+          Text(
+            "Key Guidance",
+            style: AppTextStyles.bodyLarge.copyWith(
+              color: const Color(0xFF4A4A4A),
+              fontSize: 16,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.md),
+          ...displayGuidance.map((guidance) => GestureDetector(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => GuidanceDetailBottomSheet(guidance: guidance),
+              );
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.md),
+              child: _buildGuidanceCard(
+                icon: Icons.lightbulb_outline, // Fallback icon if image fails loading
+                iconUrl: guidance.iconUrl,
+                title: guidance.title ?? 'Guidance',
+                subtitle: guidance.subtitle ?? 'Tap for details',
+                iconColor: const Color(0xFFA05E44),
+              ),
+            ),
+          )).toList(),
+        ],
       ],
     );
   }
+
+  Widget _buildMealCard(MealModel meal) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Meal Image
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5EAE8),
+              borderRadius: BorderRadius.circular(12),
+              image: DecorationImage(
+                image: meal.imageUrl != null 
+                    ? NetworkImage(meal.imageUrl!) 
+                    : const AssetImage('assets/images/daily_nutrition.png') as ImageProvider,
+                fit: BoxFit.cover,
+                onError: (exception, stackTrace) {
+                   // Fallback if network image fails? 
+                   // The NetworkImage doesn't easily allow fallback in DecorationImage.
+                   // But typically we rely on valid URLs.
+                },
+              ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  meal.name ?? 'Unknown Meal',
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1E1E1E),
+                  ),
+                ),
+                if (meal.time != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    meal.time!,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF8C8C8C),
+                    ),
+                  ),
+                ],
+                if (meal.calories != null) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    '${meal.calories} kcal',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFFA05E44),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          const Icon(Icons.arrow_forward_ios, size: 16, color: Color(0xFFBDBDBD)),
+        ],
+      ),
+    );
+  }
+
+
+
+  Widget _buildGuidanceCard({
+    required IconData icon,
+    String? iconUrl,
+    required String title,
+    required String subtitle,
+    required Color iconColor,
+  }) {
+    bool isSvg = iconUrl?.toLowerCase().endsWith('.svg') ?? false;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF5EAE8), 
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: iconUrl != null ? Colors.transparent : iconColor,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: iconUrl != null
+                  ? (isSvg 
+                      ? SvgPicture.network(
+                          iconUrl,
+                          placeholderBuilder: (BuildContext context) => Icon(icon, color: iconColor, size: 24),
+                        )
+                      : Image.network(
+                          iconUrl, 
+                          errorBuilder: (ctx, err, stack) => Icon(icon, color: iconColor, size: 24),
+                        ))
+                  : Image.asset(
+                      'assets/images/daily_nutrition.png',
+                      errorBuilder: (ctx, err, stack) => Icon(icon, color: Colors.white, size: 24),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF1E1E1E),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF8C8C8C),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(
+            Icons.arrow_forward,
+            color: Color(0xFFA05E44),
+            size: 20,
+          ),
+        ],
+      ),
+    );
+  }
+
 
   Widget _buildResultsContent() {
     return Column(
@@ -843,66 +1053,7 @@ class _HealthScreenState extends State<HealthScreen> {
     );
   }
 
-  Widget _buildGuidanceCard({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required Color iconColor,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5EAE8),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: iconColor,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF1E1E1E),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF8C8C8C),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const Icon(
-            Icons.arrow_forward,
-            color: Color(0xFFA05E44),
-            size: 20,
-          ),
-        ],
-      ),
-    );
-  }
+
 }
 
 // Custom Dashed Border Implementation

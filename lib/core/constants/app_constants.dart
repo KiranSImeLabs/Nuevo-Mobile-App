@@ -44,6 +44,7 @@ class ApiConstants {
   static const String labResults = '/health/lab-results';
   static const String wellnessData = '/health/wellness';
   static const String labRequests = '/lab-requests';
+  static const String dietPlans = '/diet-plans';
   
   // Support
   static const String contactSupport = '/support/contact';
