@@ -3,7 +3,11 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
 
-class ClinicianProfileScreen extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/specialist_provider.dart';
+
+class ClinicianProfileScreen extends ConsumerWidget {
+  final String specialistId;
   final String name;
   final String role;
   final String? imageUrl; // For future real image
@@ -11,6 +15,7 @@ class ClinicianProfileScreen extends StatelessWidget {
 
   const ClinicianProfileScreen({
     super.key,
+    required this.specialistId,
     required this.name,
     required this.role,
     this.imageUrl,
@@ -18,7 +23,9 @@ class ClinicianProfileScreen extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final detailsAsync = ref.watch(specialistDetailsProvider(specialistId));
+
     return Scaffold(
       backgroundColor: AppColors.surfaceColor,
       appBar: AppBar(
@@ -38,15 +45,30 @@ class ClinicianProfileScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildProfileHeader(),
+              _buildProfileHeader(
+                name: name,
+                role: role,
+                imageUrl: imageUrl,
+              ),
               const SizedBox(height: 24),
               _buildActionButtons(),
               const SizedBox(height: 24),
-              _buildAboutSection(),
-              const SizedBox(height: 24),
-              _buildRoleCard(),
-              const SizedBox(height: 24),
-              _buildSessionsSection(context),
+              
+              detailsAsync.when(
+                data: (specialist) => Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildAboutSection(specialist.biography),
+                    const SizedBox(height: 24),
+                    _buildRoleCard(), // This seems static for now, or could change base on role
+                    const SizedBox(height: 24),
+                    _buildSessionsSection(context),
+                  ],
+                ),
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text('Error loading details: $err')),
+              ),
+              
               const SizedBox(height: 32),
             ],
           ),
@@ -55,7 +77,11 @@ class ClinicianProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader({
+    required String name,
+    required String role,
+    String? imageUrl,
+  }) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
@@ -162,7 +188,7 @@ class ClinicianProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildAboutSection() {
+  Widget _buildAboutSection(String? bioText) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -183,7 +209,7 @@ class ClinicianProfileScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: Text(
-            bio ?? AppStrings.aboutDrSarah, // Use provided bio or default fallback
+            bioText ?? AppStrings.aboutDrSarah, // Use fetched bio or default fallback
             style: AppTextStyles.bodyMedium.copyWith(
               color: AppColors.textSecondary,
               height: 1.5,

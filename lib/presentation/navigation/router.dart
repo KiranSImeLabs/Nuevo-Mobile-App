@@ -262,6 +262,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final extras = state.extra as Map<String, dynamic>?;
           return ClinicianProfileScreen(
+            specialistId: extras?['id'] ?? '',
             name: extras?['name'] ?? 'Doctor',
             role: extras?['role'] ?? 'Specialist',
             imageUrl: extras?['imageUrl'],
