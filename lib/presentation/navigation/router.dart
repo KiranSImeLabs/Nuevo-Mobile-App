@@ -126,6 +126,30 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/forgot-password',
         builder: (context, state) => const ForgotPasswordScreen(),
       ),
+      GoRoute(
+        path: '/account-settings',
+        builder: (context, state) => const AccountSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/privacy-consent',
+        builder: (context, state) => const PrivacyConsentScreen(),
+      ),
+      GoRoute(
+        path: '/payments',
+        builder: (context, state) => const PaymentsScreen(),
+      ),
+      GoRoute(
+        path: '/notifications',
+        builder: (context, state) => const NotificationSettingsScreen(),
+      ),
+      GoRoute(
+        path: '/doctor-list',
+        builder: (context, state) => const DoctorListScreen(),
+      ),
+      GoRoute(
+        path: '/support',
+        builder: (context, state) => const SupportScreen(),
+      ),
       // Shell route for main app with bottom navigation
       ShellRoute(
         navigatorKey: shellNavigatorKey,
@@ -175,30 +199,6 @@ final routerProvider = Provider<GoRouter>((ref) {
               final taskId = state.pathParameters['id'] ?? '';
               return TaskDetailScreen(taskId: taskId);
             },
-          ),
-          GoRoute(
-            path: '/account-settings',
-            builder: (context, state) => const AccountSettingsScreen(),
-          ),
-          GoRoute(
-            path: '/privacy-consent',
-            builder: (context, state) => const PrivacyConsentScreen(),
-          ),
-          GoRoute(
-            path: '/payments',
-            builder: (context, state) => const PaymentsScreen(),
-          ),
-          GoRoute(
-            path: '/notifications',
-            builder: (context, state) => const NotificationSettingsScreen(),
-          ),
-          GoRoute(
-            path: '/doctor-list',
-            builder: (context, state) => const DoctorListScreen(),
-          ),
-          GoRoute(
-            path: '/support',
-            builder: (context, state) => const SupportScreen(),
           ),
         ],
       ),

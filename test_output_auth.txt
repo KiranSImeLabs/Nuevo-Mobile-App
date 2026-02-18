@@ -1,0 +1,23 @@
+00:00 +0: loading /Users/goodbits/Desktop/GoodBits/Flutter/nuevo_app/test/data/repositories/auth_repository_impl_test.dart                                                                             00:01 +0: loading /Users/goodbits/Desktop/GoodBits/Flutter/nuevo_app/test/data/repositories/auth_repository_impl_test.dart                                                                             00:02 +0: loading /Users/goodbits/Desktop/GoodBits/Flutter/nuevo_app/test/data/repositories/auth_repository_impl_test.dart                                                                             00:03 +0: loading /Users/goodbits/Desktop/GoodBits/Flutter/nuevo_app/test/data/repositories/auth_repository_impl_test.dart                                                                             00:04 +0: loading /Users/goodbits/Desktop/GoodBits/Flutter/nuevo_app/test/data/repositories/auth_repository_impl_test.dart                                                                             00:05 +0: loading /Users/goodbits/Desktop/GoodBits/Flutter/nuevo_app/test/data/repositories/auth_repository_impl_test.dart                                                                             00:05 +0: login should return User when login call is successful                                                                                                                                       00:05 +0: login should return User when login call is successful                                                                                                                                       
+🔍 Login API Response:
+  - success: true
+  - data: Instance of 'AuthResponseData'
+  - message: null
+✅ Login successful!
+00:05 +0 -1: login should return User when login call is successful [E]                                                                                                                                
+  No matching calls (actually, no calls at all).
+  (If you called `verify(...).called(0);`, please instead use `verifyNever(...);`.)
+  package:matcher                                              fail
+  package:mockito/src/mock.dart 797:7                          _VerifyCall._checkWith
+  package:mockito/src/mock.dart 1071:18                        _makeVerify.<fn>
+  test/data/repositories/auth_repository_impl_test.dart 71:13  main.<fn>.<fn>
+  
+
+To run this test again: /usr/local/share/flutter/bin/cache/dart-sdk/bin/dart test /Users/goodbits/Desktop/GoodBits/Flutter/nuevo_app/test/data/repositories/auth_repository_impl_test.dart -p vm --plain-name 'login should return User when login call is successful'
+00:05 +0 -1: login should return ServerFailure when login call is unsuccessful                                                                                                                         00:05 +0 -1: login should return ServerFailure when login call is unsuccessful                                                                                                                         
+🔍 Login API Response:
+  - success: false
+  - data: null
+  - message: Invalid credentials
+❌ Login failed: Invalid credentials
+00:05 +1 -1: login should return ServerFailure when login call is unsuccessful                                                                                                                         00:05 +1 -1: signup should return User when signup call is successful                                                                                                                                  00:05 +2 -1: signup should return User when signup call is successful                                                                                                                                  00:05 +2 -1: logout should clear local data when logout is called                                                                                                                                      00:05 +3 -1: logout should clear local data when logout is called                                                                                                                                      00:05 +3 -1: Some tests failed.                                                                                                                                                                        
