@@ -1,14 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../data/models/api_response.dart';
+import '../../../data/models/payment_integration_models.dart';
+import '../../providers/core_providers.dart';
 import 'widgets/add_card_bottom_sheet.dart';
 
-class PaymentsScreen extends ConsumerWidget {
+class PaymentsScreen extends ConsumerStatefulWidget {
   const PaymentsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<PaymentsScreen> createState() => _PaymentsScreenState();
+}
+
+class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
+  late Future<ApiResponse<SubscriptionPaywayDetails>> _subscriptionFuture;
+  late Future<ApiResponse<PaymentCustomerDetails>> _savedCardsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  void _fetchData() {
+    final apiClient = ref.read(apiClientProvider);
+    _subscriptionFuture = apiClient.getSubscriptionPaywayDetails();
+    _savedCardsFuture = apiClient.getSavedCards();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -33,22 +56,64 @@ class PaymentsScreen extends ConsumerWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildPlanCard(context),
+              // Subscription Info Section
+              FutureBuilder<ApiResponse<SubscriptionPaywayDetails>>(
+                future: _subscriptionFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData && snapshot.data!.success) {
+                    return _buildPlanCard(context, snapshot.data!.data);
+                  } else {
+                     // Fallback/Empty state or static design if fetch failed gracefully-ish
+                     // For now showing error or empty.
+                     return Text(snapshot.data?.message ?? 'Failed to load subscription');
+                  }
+                },
+              ),
               const SizedBox(height: 32),
+              
+              // Saved Cards Section
               _buildSectionHeader(
                 title: AppStrings.paymentMethods,
                 actionLabel: AppStrings.addNew,
-                onAction: () {
-                   showModalBottomSheet( // Correct showModalBottomSheet usage
+                onAction: () async {
+                  await showModalBottomSheet(
                     context: context,
                     isScrollControlled: true,
                     backgroundColor: Colors.transparent,
                     builder: (context) => const AddCardBottomSheet(),
                   );
+                  // Refresh cards after adding
+                  setState(() {
+                     _savedCardsFuture = ref.read(apiClientProvider).getSavedCards();
+                  });
                 },
               ),
               const SizedBox(height: 16),
-              _buildPaymentMethodTile(),
+              FutureBuilder<ApiResponse<PaymentCustomerDetails>>(
+                future: _savedCardsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                     return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                     return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData && snapshot.data!.success) {
+                     final details = snapshot.data!.data;
+                     if (details?.paymentSetup?.creditCard != null || details?.creditCard != null) {
+                        final card = details?.paymentSetup?.creditCard ?? details?.creditCard;
+                        return _buildPaymentMethodTile(card);
+                     } else {
+                        return const Text("No saved cards.");
+                     }
+                  } else {
+                     return Text(snapshot.data?.message ?? 'Failed to load cards');
+                  }
+                },
+              ),
+
               const SizedBox(height: 32),
               _buildSectionHeader(title: AppStrings.billingHistory),
               const SizedBox(height: 16),
@@ -60,7 +125,12 @@ class PaymentsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPlanCard(BuildContext context) {
+  Widget _buildPlanCard(BuildContext context, SubscriptionPaywayDetails? details) {
+    final schedule = details?.paywaySchedule;
+    final amount = schedule?.regularPaymentAmount ?? 0;
+    final periodicity = schedule?.frequency ?? AppStrings.month;
+    final nextDate = schedule?.nextPaymentDate ?? 'N/A';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(24),
@@ -81,9 +151,9 @@ class PaymentsScreen extends ConsumerWidget {
                   shape: BoxShape.rectangle,
                    borderRadius: BorderRadius.all(Radius.circular(12)),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.cached, // Using a similar refresh/cycle icon
-                  color: const Color(0xFFA0503D), // Icon color
+                  color: Color(0xFFA0503D), // Icon color
                   size: 28,
                 ),
               ),
@@ -116,7 +186,7 @@ class PaymentsScreen extends ConsumerWidget {
           const Divider(color: Colors.white24, height: 1),
           const SizedBox(height: 16),
           Text(
-            '\$99.00 / ${AppStrings.month}',
+            '\$$amount / $periodicity',
              style: AppTextStyles.h3.copyWith(
               color: Colors.white,
               fontSize: 20,
@@ -125,7 +195,7 @@ class PaymentsScreen extends ConsumerWidget {
           ),
           const SizedBox(height: 4),
           Text(
-            '${AppStrings.nextRenewal}: Oct 24, 2023', // Hardcoded date for now as per design
+            '${AppStrings.nextRenewal}: $nextDate',
             style: AppTextStyles.bodyMedium.copyWith(
               color: Colors.white70,
             ),
@@ -173,7 +243,17 @@ class PaymentsScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildPaymentMethodTile() {
+  Widget _buildPaymentMethodTile(CreditCardDetails? card) {
+    if (card == null) return const SizedBox();
+
+    final last4 = card.maskedNumber != null 
+        ? card.maskedNumber!.split('...').last 
+        : card.cardNumber != null && card.cardNumber!.length >= 4 
+            ? card.cardNumber!.substring(card.cardNumber!.length - 4) 
+            : 'xxxx';
+    
+    final expiry = '${card.expiryDateMonth}/${card.expiryDateYear}';
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -198,7 +278,7 @@ class PaymentsScreen extends ConsumerWidget {
                 Row(
                    children: [
                       Text(
-                         AppStrings.visa,
+                         card.cardScheme?.toUpperCase() ?? AppStrings.visa, // Default or API value
                          style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w500,
                             color: AppColors.textPrimary,
@@ -209,7 +289,7 @@ class PaymentsScreen extends ConsumerWidget {
                        const Text('••••', style: TextStyle(fontSize: 10, letterSpacing: 2)),
                         const SizedBox(width: 8), // Spacing
                        Text(
-                         '1234',
+                         last4,
                           style: AppTextStyles.bodyLarge.copyWith(
                             fontWeight: FontWeight.w500,
                             color: AppColors.textPrimary,
@@ -219,7 +299,7 @@ class PaymentsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'Expires 12/25',
+                  'Expires $expiry',
                   style: AppTextStyles.bodyMedium.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -248,6 +328,7 @@ class PaymentsScreen extends ConsumerWidget {
 
   Widget _buildBillingHistoryList() {
     // Determine how many items to show based on design (e.g. 3 items)
+    // Currently static as per instructions focusing on Subscription and Cards
     return Column(
       children: List.generate(3, (index) => _buildBillingHistoryItem()),
     );
@@ -327,3 +408,4 @@ class PaymentsScreen extends ConsumerWidget {
     );
   }
 }
+

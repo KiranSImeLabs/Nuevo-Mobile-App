@@ -19,8 +19,8 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
+  final _emailController = TextEditingController(text: "ihimrao+ela64u@yopmail.com");
+  final _passwordController = TextEditingController(text: "Raa@05144");
 
   // Visibility state for password
   bool _obscurePassword = true;
@@ -178,6 +178,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       child: const Text(AppStrings.forgotPassword, style: TextStyle(decoration: TextDecoration.underline)),
                     ),
                   ),
+                  //ihimrao+ela64u@yopmail.com
                   const SizedBox(height: 24),
 
                   // Login Button
