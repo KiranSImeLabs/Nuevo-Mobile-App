@@ -7,9 +7,21 @@ class QuickStatsModel extends QuickStats {
   });
 
   factory QuickStatsModel.fromJson(Map<String, dynamic> json) {
+    SessionInfo? sessionInfo;
+    
+    if (json['nextSession'] is Map) {
+      final session = json['nextSession'] as Map<String, dynamic>;
+      sessionInfo = SessionInfo(
+        time: session['time'] as String? ?? '',
+        date: session['date'] as String? ?? '',
+        label: session['label'] as String? ?? 'Consultation',
+        bookingId: session['bookingId'] as String? ?? '',
+      );
+    }
+
     return QuickStatsModel(
       nuevoAge: json['nuevoAge']?.toString(),
-      nextSession: json['nextSession']?.toString(),
+      nextSession: sessionInfo,
     );
   }
 }

@@ -217,7 +217,7 @@ class ApiClient {
   Future<ApiResponse<DietPlanModel>> getDietPlan() async {
     final response = await _dioClient.get(ApiConstants.dietPlans);
     
-    print('RAW DIET PLAN JSON: ${response.data}'); // DEBUG Log
+
     
     return ApiResponse.fromJson(
       response.data,

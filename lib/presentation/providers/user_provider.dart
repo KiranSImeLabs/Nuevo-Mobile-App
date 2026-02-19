@@ -27,7 +27,7 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
   Future<void> fetchProfile() async {
     state = const AsyncValue.loading();
     final result = await _getUserProfileUseCase(const NoParams());
-    print('fetchProfile result: $result');
+
     result.fold(
       (failure) => state = AsyncValue.error(failure.message, StackTrace.current),
       (user) => state = AsyncValue.data(user),

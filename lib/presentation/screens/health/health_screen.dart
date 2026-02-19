@@ -530,7 +530,15 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final dietPlanAsync = ref.watch(dietPlanProvider);
 
     return dietPlanAsync.when(
-      data: (dietPlan) => _buildDietUI(dietPlan),
+      data: (dietPlan) {
+        if (dietPlan == null) {
+          return const SizedBox(
+            height: 100,
+            child: Center(child: Text("No nutrition plan assigned.")),
+          );
+        }
+        return _buildDietUI(dietPlan);
+      },
       loading: () => const Center(
         child: Padding(
           padding: EdgeInsets.all(20.0),

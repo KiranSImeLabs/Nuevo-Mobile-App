@@ -21,7 +21,7 @@ class InfoCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        height: ResponsiveUtils.spacing(context, base: 68),
+        height: ResponsiveUtils.spacing(context, base: 68), // Fixed height 68
         width: double.infinity,
         padding: const EdgeInsets.all(8), // Fixed padding from spec
         decoration: BoxDecoration(
@@ -41,7 +41,7 @@ class InfoCard extends StatelessWidget {
               color: const Color(0xFF3E160D),
               height: 1.0,
             ),
-            maxLines: 1,
+            maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 2), // Reduced spacing to fit in 68px height

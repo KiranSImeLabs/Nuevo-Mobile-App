@@ -6,7 +6,7 @@ class GetDietPlanUseCase {
 
   GetDietPlanUseCase({required this.repository});
 
-  Future<DietPlanModel> call() async {
+  Future<DietPlanModel?> call() async {
     return await repository.getDietPlan();
   }
 }
