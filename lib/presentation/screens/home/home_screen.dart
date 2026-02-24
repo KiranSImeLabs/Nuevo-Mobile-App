@@ -338,6 +338,7 @@ class HomeScreen extends ConsumerWidget {
     return ProgramCard(
       program: displayProgram,
       onViewPlan: () => context.go('/my-plan'),
+      onCardTap: () => context.push('/your-program'),
     );
   }
 
