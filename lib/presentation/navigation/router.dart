@@ -12,6 +12,7 @@ import '../screens/health/health_screen.dart';
 import '../screens/health/session_overview_screen.dart';
 import '../screens/health/active_session_screen.dart';
 import '../screens/health/guided_session_screen.dart';
+import '../../data/models/daily_exercise_model.dart';
 import '../screens/appointments/appointments_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/my_plan/edit_goals_screen.dart';
@@ -236,7 +237,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
             path: '/health/session-overview',
-            builder: (context, state) => const SessionOverviewScreen(),
+            builder: (context, state) {
+              final sessionId = state.extra as String;
+              return SessionOverviewScreen(sessionId: sessionId);
+            },
           ),
           GoRoute(
             path: '/health/active-session',
@@ -244,7 +248,12 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/health/guided-session',
-            builder: (context, state) => const GuidedSessionScreen(),
+            builder: (context, state) {
+              final args = state.extra as Map<String, dynamic>?;
+              final steps = args?['steps'] as List<ExerciseStepModel>?;
+              final sessionId = args?['sessionId'] as String? ?? '';
+              return GuidedSessionScreen(sessionId: sessionId, steps: steps);
+            },
           ),
           GoRoute(
             path: '/completed-tasks',

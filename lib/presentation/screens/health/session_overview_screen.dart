@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../providers/health_provider.dart';
 
-class SessionOverviewScreen extends StatelessWidget {
-  const SessionOverviewScreen({super.key});
+class SessionOverviewScreen extends ConsumerWidget {
+  final String sessionId;
+
+  const SessionOverviewScreen({super.key, required this.sessionId});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final sessionAsync = ref.watch(sessionDetailsProvider(sessionId));
+
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
       appBar: AppBar(
@@ -26,129 +33,154 @@ class SessionOverviewScreen extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Image
-                  Container(
-                    height: 220,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xFFE0E0E0),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(16),
-                      child: Image.network(
-                        'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return const Center(child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey));
-                        },
+      body: sessionAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFA05E44))),
+        error: (error, stackTrace) => Center(child: Text('Failed to load session details: $error')),
+        data: (session) {
+          if (session == null) {
+            return const Center(child: Text("Session not found"));
+          }
+
+          return Column(
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Image
+                      Container(
+                        height: 220,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          color: const Color(0xFFE0E0E0),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: Image.network(
+                            session.imageUrl ?? 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80', // Yoga/Fitness fallback
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey));
+                            },
+                          ),
+                        ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
+                      const SizedBox(height: AppSpacing.xl),
 
-                  // Title
-                  const Text(
-                    "Lower body strength",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w400,
-                      color: Color(0xFF1E1E1E),
-                      fontFamily: 'Inter',
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-
-                  // Description
-                  const Text(
-                    "Focus on building power and stability in your legs and glutes. This routine helps improve your overall mobility.",
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Color(0xFF757575),
-                      height: 1.5,
-                    ),
-                  ),
-                  const SizedBox(height: AppSpacing.xl),
-
-                  // Stats Cards
-                  _buildStatCard(
-                    icon: Icons.access_time,
-                    label: "Duration",
-                    value: "20 minutes",
-                    iconColor: const Color(0xFFA05E44),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildStatCard(
-                    icon: Icons.track_changes_outlined,
-                    label: "Purpose",
-                    value: "Current phase",
-                    iconColor: const Color(0xFFA05E44),
-                  ),
-                  const SizedBox(height: AppSpacing.md),
-                  _buildStatCard(
-                    icon: Icons.bar_chart,
-                    label: "Intensity",
-                    value: "Medium",
-                    iconColor: const Color(0xFFA05E44),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          
-          // Bottom Button
-          Padding(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: ElevatedButton(
-                onPressed: () {
-                  context.push('/health/guided-session');
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFA05E44),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.play_circle_outline, color: Colors.white, size: 24),
-                    SizedBox(width: 8),
-                    Text(
-                      "Begin Session",
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white,
+                      // Title
+                      Text(
+                        session.title ?? "Guided Session",
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w400,
+                          color: Color(0xFF1E1E1E),
+                          fontFamily: 'Inter',
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: AppSpacing.md),
+
+                      // Description
+                      if (session.description != null) ...[
+                        Text(
+                          session.description!,
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF757575),
+                            height: 1.5,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xl),
+                      ],
+
+                      // Stats Cards
+                      _buildStatCard(
+                        iconWidget: const Icon(Icons.schedule_outlined, color: Color(0xFFA05E44), size: 24),
+                        label: "Duration",
+                        value: "${session.duration ?? 0} minutes",
+                      ),
+                      if (session.purpose != null) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        _buildStatCard(
+                          iconWidget: SvgPicture.asset(
+                            'assets/icons/icn_purpose.svg',
+                            colorFilter: const ColorFilter.mode(Color(0xFFA05E44), BlendMode.srcIn),
+                            height: 24,
+                            width: 24,
+                          ),
+                          label: "Purpose",
+                          value: session.purpose!,
+                        ),
+                      ],
+                      if (session.intensity != null) ...[
+                        const SizedBox(height: AppSpacing.md),
+                        _buildStatCard(
+                          iconWidget: SvgPicture.asset(
+                            'assets/icons/icn_intensity.svg',
+                            colorFilter: const ColorFilter.mode(Color(0xFFA05E44), BlendMode.srcIn),
+                            height: 24,
+                            width: 24,
+                          ),
+                          label: "Intensity",
+                          value: session.intensity!,
+                        ),
+                      ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ],
+              
+              // Bottom Button
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 56,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      context.push('/health/guided-session', extra: {
+                        'sessionId': sessionId,
+                        'steps': session.steps,
+                      });
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFA05E44),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                      elevation: 0,
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.play_circle_outline, color: Colors.white, size: 24),
+                        SizedBox(width: 8),
+                        Text(
+                          "Begin Session",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
   Widget _buildStatCard({
-    required IconData icon,
+    required Widget iconWidget,
     required String label,
     required String value,
-    required Color iconColor,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -165,10 +197,8 @@ class SessionOverviewScreen extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 24,
+            child: Center(
+              child: iconWidget,
             ),
           ),
           const SizedBox(width: 16),

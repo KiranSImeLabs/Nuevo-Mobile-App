@@ -9,6 +9,11 @@ import '../../models/booking_model.dart';
 import '../../models/lab_request_model.dart';
 import '../../models/diet_plan_model.dart';
 import '../../models/preferences_model.dart';
+import '../../models/daily_exercise_model.dart';
+import '../../models/weekly_schedule_model.dart';
+import 'package:dio/dio.dart';
+import '../../models/session_progress_model.dart';
+import '../../models/active_progress_model.dart';
 
 /// API Client (Data Layer)
 /// Handles all API calls using Dio directly (Manual Implementation of RestClient interface)
@@ -223,6 +228,65 @@ class ApiClient {
       response.data,
       (json) => DietPlanModel.fromJson(json as Map<String, dynamic>),
     );
+  }
+
+  // ============================================
+  // Guided Sessions Endpoints
+  // ============================================
+
+  /// Get Today's Exercise
+  Future<ApiResponse<DailyExerciseModel>> getTodayExercise() async {
+    final response = await _dioClient.get(ApiConstants.todayExercise);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => DailyExerciseModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Weekly Schedule
+  Future<ApiResponse<WeeklyScheduleModel>> getWeeklySchedule() async {
+    final response = await _dioClient.get(ApiConstants.weeklySchedule);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => WeeklyScheduleModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Session Details
+  Future<ApiResponse<GuidedSessionModel>> getSessionDetails(String id) async {
+    final response = await _dioClient.get('${ApiConstants.sessionDetails}/$id');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => GuidedSessionModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Start Session
+  Future<ApiResponse<SessionProgressModel>> startSession(String id) async {
+    final response = await _dioClient.post('${ApiConstants.sessionDetails}/$id${ApiConstants.sessionStart}');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => SessionProgressModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Active Progress
+  Future<ApiResponse<ActiveProgressModel?>> getActiveProgress() async {
+    try {
+      final response = await _dioClient.get(ApiConstants.sessionActiveProgress);
+      return ApiResponse.fromJson(
+        response.data,
+        (json) => ActiveProgressModel.fromJson(json as Map<String, dynamic>),
+      );
+    } catch (e) {
+      if (e is DioException) {
+         if (e.response?.statusCode == 404) {
+            // Assume 404 means no active session, return a successful response with null data
+            return ApiResponse(success: true, message: 'No active session', data: null);
+         }
+      }
+      rethrow;
+    }
   }
 }
 

@@ -46,6 +46,13 @@ class ApiConstants {
   static const String labRequests = '/lab-requests';
   static const String dietPlans = '/diet-plans';
   
+  // Guided Sessions
+  static const String todayExercise = '/guided-sessions/today';
+  static const String weeklySchedule = '/guided-sessions/weekly-schedule';
+  static const String sessionDetails = '/guided-sessions'; // Base for /guided-sessions/{id}
+  static const String sessionStart = '/start'; // Base for /guided-sessions/{id}/start
+  static const String sessionActiveProgress = '/guided-sessions/active-progress';
+  
   // Support
   static const String contactSupport = '/support/contact';
 
