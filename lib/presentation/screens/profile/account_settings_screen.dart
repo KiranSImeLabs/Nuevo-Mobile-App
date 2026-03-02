@@ -176,6 +176,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   hint: 'Email Address',
                   icon: Icons.mail_outline,
                   keyboardType: TextInputType.emailAddress,
+                  readOnly: true, // Email is unchangeable
                 ),
                 
                 const SizedBox(height: 24),
@@ -202,10 +203,11 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: _saveProfile,
+                    onPressed: userState.isLoading ? null : _saveProfile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF964A38), // Rust/Brown
                       foregroundColor: Colors.white,
+                      disabledBackgroundColor: const Color(0xFF964A38).withOpacity(0.6),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(30),
                       ),
@@ -213,17 +215,28 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Save',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        const Icon(Icons.arrow_forward, size: 20),
-                      ],
+                      children: userState.isLoading
+                          ? [
+                              const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            ]
+                          : [
+                              const Text(
+                                'Save',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward, size: 20),
+                            ],
                     ),
                   ),
                 ),
@@ -251,17 +264,21 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     IconData? icon,
     IconData? suffixIcon,
     TextInputType keyboardType = TextInputType.text,
+    bool readOnly = false,
   }) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: readOnly ? Colors.grey[100] : Colors.white,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: const Color(0xFFFBECE9)), // Light Pink Border
       ),
       child: TextFormField(
         controller: controller,
+        readOnly: readOnly,
         keyboardType: keyboardType,
-        style: AppTextStyles.bodyMedium,
+        style: AppTextStyles.bodyMedium.copyWith(
+          color: readOnly ? Colors.grey[600] : AppColors.textPrimary,
+        ),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: AppTextStyles.bodyMedium.copyWith(color: Colors.grey[400]),
@@ -312,13 +329,34 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     }
   }
 
-  void _saveProfile() {
+  Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
       // Logic to save profile
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile saved successfully!')),
+      final name = _nameController.text.trim();
+      // Use YYYY-MM-DD format if date is selected, else use empty string
+      final dob = _selectedDate != null 
+          ? DateFormat('yyyy-MM-dd').format(_selectedDate!) 
+          : _dobController.text.trim();
+
+      await ref.read(userProvider.notifier).updateProfile(
+        name: name,
+        dateOfBirth: dob,
+        profileImageUrl: "", // Currently send the profile image as "".
       );
-      Navigator.of(context).pop();
+
+      if (mounted) {
+        final userState = ref.read(userProvider);
+        if (userState.hasError) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(userState.error.toString())),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Profile saved successfully!')),
+          );
+          Navigator.of(context).pop();
+        }
+      }
     }
   }
 }
