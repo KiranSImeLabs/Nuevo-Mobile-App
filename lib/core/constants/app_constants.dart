@@ -51,6 +51,8 @@ class ApiConstants {
   static const String weeklySchedule = '/guided-sessions/weekly-schedule';
   static const String sessionDetails = '/guided-sessions'; // Base for /guided-sessions/{id}
   static const String sessionStart = '/start'; // Base for /guided-sessions/{id}/start
+  static const String sessionComplete = '/complete'; // Base for /guided-sessions/{id}/complete
+  static const String sessionProgressUpdate = '/progress'; // Base for /guided-sessions/{id}/progress
   static const String sessionActiveProgress = '/guided-sessions/active-progress';
   
   // Support

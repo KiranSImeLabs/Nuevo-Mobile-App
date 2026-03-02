@@ -352,7 +352,7 @@ class HomeScreen extends ConsumerWidget {
             (e) => QuickAccessItem(
               title: e.title,
               icon: _getIconForName(e.icon),
-              onTap: () => _handleQuickAccessTap(context, e.id),
+              onTap: () => _handleQuickAccessTap(context, e),
             ),
           )
           .toList(),
@@ -383,19 +383,47 @@ class HomeScreen extends ConsumerWidget {
     }
   }
 
-  void _handleQuickAccessTap(BuildContext context, String id) {
-    switch (id) {
+  void _handleQuickAccessTap(BuildContext context, HomeQuickAccessItem item) {
+    final titleLower = item.title.toLowerCase();
+    final idLower = item.id.toLowerCase();
+
+    if (idLower.contains('insight') || titleLower.contains('insight')) {
+      context.push('/quick-health', extra: {'initialTabIndex': 3}); // Route to Insights tab
+      return;
+    }
+
+    if (idLower.contains('exercise') || titleLower.contains('exercise')) {
+      context.push('/quick-health');
+      return;
+    }
+
+    if (idLower.contains('nutrition') || titleLower.contains('nutrition')) {
+      context.push('/quick-health', extra: {'initialTabIndex': 1}); // Route to Diet tab
+      return;
+    }
+
+    if (idLower.contains('appointment') || titleLower.contains('appointment')) {
+      context.go('/appointments');
+      return;
+    }
+
+    if (idLower.contains('health') || titleLower.contains('health')) {
+      context.push('/quick-health');
+      return;
+    }
+
+    switch (item.id) {
       case 'daily-exercise':
-        context.go('/daily-exercise');
+        context.push('/quick-health');
         break;
       case 'daily-nutrition':
-        context.go('/daily-nutrition');
+        context.push('/quick-health', extra: {'initialTabIndex': 1});
         break;
       case 'appointments':
         context.go('/appointments');
         break;
       case 'health-insight':
-        context.go('/health');
+        context.push('/quick-health', extra: {'initialTabIndex': 3});
         break;
       default:
         // Handle unknown or show toast

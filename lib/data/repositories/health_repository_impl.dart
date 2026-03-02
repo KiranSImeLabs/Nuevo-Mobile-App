@@ -78,6 +78,38 @@ class HealthRepositoryImpl implements HealthRepository {
   }
 
   @override
+  Future<Either<Failure, SessionProgressModel>> completeSession(String id) async {
+    try {
+      final response = await apiClient.completeSession(id);
+      if (response.success && response.data != null) {
+        return Right(response.data!);
+      } else {
+        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+      }
+    } on DioException catch (e) {
+      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, SessionProgressModel>> syncSessionProgress(String id, Map<String, dynamic> data) async {
+    try {
+      final response = await apiClient.syncSessionProgress(id, data);
+      if (response.success && response.data != null) {
+        return Right(response.data!);
+      } else {
+        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+      }
+    } on DioException catch (e) {
+      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, ActiveProgressModel?>> getActiveProgress() async {
     try {
       final response = await apiClient.getActiveProgress();
