@@ -11,9 +11,12 @@ import '../../models/diet_plan_model.dart';
 import '../../models/preferences_model.dart';
 import '../../models/daily_exercise_model.dart';
 import '../../models/weekly_schedule_model.dart';
-import 'package:dio/dio.dart';
 import '../../models/session_progress_model.dart';
 import '../../models/active_progress_model.dart';
+import '../../models/specialist_model.dart';
+
+import 'dart:convert';
+import 'package:dio/dio.dart';
 
 /// API Client (Data Layer)
 /// Handles all API calls using Dio directly (Manual Implementation of RestClient interface)
@@ -290,3 +293,27 @@ class ApiClient {
   }
 }
 
+  // ============================================
+  // Specialist Endpoints
+  // ============================================
+
+  /// Get My Specialists
+  Future<ApiResponse<List<SpecialistModel>>> getMySpecialists() async {
+    final response = await _dioClient.get(ApiConstants.mySpecialists);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => (json as List<dynamic>)
+          .map((item) => SpecialistModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  /// Get Specialist Details
+  Future<ApiResponse<SpecialistModel>> getSpecialistDetails(String id) async {
+    final response = await _dioClient.get('${ApiConstants.specialistDetails}/$id');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => SpecialistModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+}

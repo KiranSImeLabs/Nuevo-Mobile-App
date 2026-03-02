@@ -127,6 +127,8 @@ class AppStrings {
 
   // Privacy & Consent
   static const String privacyAndConsent = 'Privacy & consent';
+  static const String privacyPolicyUrl = 'https://nuevomedical.com.au/privacy-policy/';
+  static const String termsOfServiceUrl = 'https://nuevomedical.com.au/terms-of-service/';
   static const String consents = 'Consents';
   static const String dataSharingConsent = 'Data sharing consent';
   static const String dataSharingSubtitle = 'How your care team uses your information';

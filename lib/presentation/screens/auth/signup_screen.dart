@@ -13,6 +13,7 @@ import '../../providers/auth_state.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/utils/validators.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../widgets/common/app_webview.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -216,7 +217,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                   fontWeight: FontWeight.w500,
                                 ),
                                 recognizer: TapGestureRecognizer()..onTap = () {
-                                  // TODO: Open Terms
+                                  AppWebView.open(
+                                    context,
+                                    url: AppStrings.termsOfServiceUrl,
+                                    title: AppStrings.termsOfService,
+                                  );
                                 },
                               ),
                               const TextSpan(text: AppStrings.and),
@@ -227,7 +232,11 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                                   fontWeight: FontWeight.w500,
                                 ),
                                 recognizer: TapGestureRecognizer()..onTap = () {
-                                  // TODO: Open Privacy Policy
+                                  AppWebView.open(
+                                    context,
+                                    url: AppStrings.privacyPolicyUrl,
+                                    title: AppStrings.privacyPolicy,
+                                  );
                                 },
                               ),
                               const TextSpan(text: '.'),
