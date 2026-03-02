@@ -291,7 +291,6 @@ class ApiClient {
       rethrow;
     }
   }
-}
 
   // ============================================
   // Specialist Endpoints
