@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:ui' as ui;
 import 'package:intl/intl.dart' hide TextDirection;
 import '../../../core/theme/app_theme.dart';
 import '../../providers/diet_plan_provider.dart';
-import '../../../data/models/diet_plan_model.dart'; // Import the model
+import '../../providers/health_provider.dart';
+import '../../../data/models/diet_plan_model.dart';
+import '../../../data/models/daily_exercise_model.dart';
+import '../../../data/models/weekly_schedule_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/guidance_detail_bottom_sheet.dart';
 
@@ -19,7 +23,7 @@ class HealthScreen extends ConsumerStatefulWidget {
 class _HealthScreenState extends ConsumerState<HealthScreen> {
   int _selectedTabIndex = 0; // Default to 'Exercise'
   final List<String> _tabs = ['Exercise', 'Diet', 'Results', 'Insights'];
-  DateTime _selectedDate = DateTime.now();
+  DateTime _selectedDate = DateTime.now(); // Always land on current date
 
   @override
   Widget build(BuildContext context) {
@@ -110,14 +114,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   }
 
   Widget _buildExerciseContent() {
-    final now = DateTime.now();
-    final DateFormat dayFormatter = DateFormat('E'); // Mon, Tue, etc.
-    final DateFormat dateFormatter = DateFormat('d'); // 21, 22, etc.
-
-    // Generate 5 days centered on today
-    final List<DateTime> dates = List.generate(5, (index) {
-      return now.subtract(const Duration(days: 2)).add(Duration(days: index));
-    });
+    final weeklyScheduleAsync = ref.watch(weeklyScheduleProvider);
+    final todayExerciseAsync = ref.watch(todayExerciseProvider);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,223 +139,163 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        const SizedBox(height: AppSpacing.md),
+        
+        // Weekly Schedule List
         SizedBox(
           height: 80,
-          child: ListView.builder(
-            scrollDirection: Axis.horizontal,
-            itemCount: 30, // Show next 30 days
-            itemBuilder: (context, index) {
-              // Start from 3 days ago to show some history context, or just today?
-              // Design usually shows current week. Let's start from 3 days ago.
-              final date = now.subtract(const Duration(days: 3)).add(Duration(days: index));
-              final isToday = date.day == now.day && date.month == now.month && date.year == now.year;
-              final isSelected = date.day == _selectedDate.day &&
-                  date.month == _selectedDate.month &&
-                  date.year == _selectedDate.year;
+          child: weeklyScheduleAsync.when(
+            data: (weeklyData) {
+              if (weeklyData == null || weeklyData.schedules == null || weeklyData.schedules!.isEmpty) {
+                 return const Center(child: Text('No schedule available'));
+              }
               
-              // Disable previous days (before today)
-              // We compare date with today (ignoring time)
-              final DateTime dateOnly = DateTime(date.year, date.month, date.day);
-              final DateTime todayOnly = DateTime(now.year, now.month, now.day);
-              final isDisabled = dateOnly.isBefore(todayOnly);
+              final schedules = weeklyData.schedules!;
 
-              return Padding(
-                padding: const EdgeInsets.only(right: 12.0),
-                child: GestureDetector(
-                  onTap: () {
-                    if (!isDisabled) {
-                      setState(() {
-                        _selectedDate = date;
-                      });
-                    }
-                  },
-                  child: _buildDateCell(
-                    dayFormatter.format(date).toUpperCase(),
-                    dateFormatter.format(date),
-                    isSelected,
-                    isDisabled: isDisabled,
-                  ),
-                ),
+              return ListView.builder(
+                scrollDirection: Axis.horizontal,
+                itemCount: schedules.length,
+                itemBuilder: (context, index) {
+                  final scheduleItem = schedules[index];
+                  if (scheduleItem.scheduledDate == null) return const SizedBox.shrink();
+
+                  DateTime date;
+                  try {
+                    date = DateTime.parse(scheduleItem.scheduledDate!);
+                  } catch (e) {
+                    return const SizedBox.shrink();
+                  }
+
+                  final DateFormat dayFormatter = DateFormat('E');
+                  final DateFormat dateFormatter = DateFormat('d');
+                  
+                  // Selected state
+                  final isSelected = date.day == _selectedDate.day &&
+                      date.month == _selectedDate.month &&
+                      date.year == _selectedDate.year;
+                  
+                  // Past days check
+                  final now = DateTime.now();
+                  final DateTime dateOnly = DateTime(date.year, date.month, date.day);
+                  final DateTime todayOnly = DateTime(now.year, now.month, now.day);
+                  final isDisabled = dateOnly.isBefore(todayOnly);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 12.0),
+                    child: GestureDetector(
+                      onTap: () {
+                        if (!isDisabled) {
+                          setState(() {
+                            _selectedDate = date;
+                          });
+                        }
+                      },
+                      child: _buildDateCell(
+                        dayFormatter.format(date).toUpperCase(),
+                        dateFormatter.format(date),
+                        isSelected,
+                        isDisabled: isDisabled,
+                      ),
+                    ),
+                  );
+                },
               );
             },
+            loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFA05E44))),
+            error: (err, stack) => const Center(child: Text('Failed to load schedule')),
           ),
+        ),
+        
+        const SizedBox(height: AppSpacing.xl),
+
+        // Dynamic Title
+        Builder(
+          builder: (context) {
+            final now = DateTime.now();
+            final isToday = _selectedDate.day == now.day &&
+                 _selectedDate.month == now.month &&
+                 _selectedDate.year == now.year;
+
+            return Text(
+              isToday ? "Today's Exercise" : "Exercise Preview",
+              style: AppTextStyles.bodyLarge.copyWith(
+                color: const Color(0xFF4A4A4A),
+                fontSize: 16,
+              ),
+            );
+          },
+        ),
+        const SizedBox(height: AppSpacing.md),
+        
+        // Exercise Card
+        Builder(
+          builder: (context) {
+            final now = DateTime.now();
+            final isToday = _selectedDate.day == now.day &&
+                 _selectedDate.month == now.month &&
+                 _selectedDate.year == now.year;
+
+            if (isToday) {
+              return todayExerciseAsync.when(
+                data: (exerciseData) {
+                  if (exerciseData == null || exerciseData.session == null) {
+                    return const Center(child: Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text("No exercise scheduled for today."),
+                    ));
+                  }
+                  return _buildTodayExerciseCard(exerciseData);
+                },
+                loading: () => const Center(child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(color: Color(0xFFA05E44))),
+                ),
+                error: (err, stack) => const Center(child: Text('Failed to load exercise')),
+              );
+            } else {
+              return weeklyScheduleAsync.when(
+                data: (weeklyData) {
+                  if (weeklyData == null || weeklyData.schedules == null) {
+                      return const Center(child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Text("No schedule available."),
+                      ));
+                  }
+                  
+                  DailyExerciseModel? selectedExercise;
+                  for (var s in weeklyData.schedules!) {
+                    if (s.scheduledDate != null) {
+                        try {
+                          final date = DateTime.parse(s.scheduledDate!);
+                          if (date.year == _selectedDate.year && 
+                              date.month == _selectedDate.month && 
+                              date.day == _selectedDate.day) {
+                              selectedExercise = s;
+                              break;
+                          }
+                        } catch (_) {}
+                    }
+                  }
+                  
+                  if (selectedExercise == null || selectedExercise.session == null) {
+                      return const Center(child: Padding(
+                        padding: EdgeInsets.all(20.0),
+                        child: Text("No exercise scheduled for this date."),
+                      ));
+                  }
+                  
+                  return _buildTodayExerciseCard(selectedExercise);
+                },
+                loading: () => const Center(child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(color: Color(0xFFA05E44))),
+                ),
+                error: (err, stack) => const Center(child: Text('Failed to load exercise')),
+              );
+            }
+          },
         ),
         const SizedBox(height: AppSpacing.xl),
 
-        // Today's Exercise
-        Text(
-          "Today's Exercise",
-          style: AppTextStyles.bodyLarge.copyWith(
-            color: const Color(0xFF4A4A4A),
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        GestureDetector(
-          onTap: () {
-            context.push('/health/session-overview');
-          },
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(24),
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                // Image Section (Top Half)
-                Container(
-                  height: MediaQuery.of(context).size.height * 0.22, // Responsive height (approx 22% of screen)
-                  width: double.infinity,
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-                    color: Color(0xFFE0E0E0),
-                  ),
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-                    child: Image.network(
-                      'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) {
-                        return const Center(child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey));
-                      },
-                    ),
-                  ),
-                ),
-                
-                // Content Section (Bottom Half - Dark Brown)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
-                    color: Color(0xFF2B1B18), // Dark brown background
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // Tag
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white.withOpacity(0.3)),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.fitness_center_outlined, color: Colors.white.withOpacity(0.9), size: 14),
-                            const SizedBox(width: 6),
-                            Text(
-                              'Strength',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.9),
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      
-                      // Title
-                      const Text(
-                        'Lower Body Strength',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
-                          fontFamily: 'Inter',
-                          letterSpacing: -0.5,
-                        ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 12),
-                      
-                      // Details Row
-                      Row(
-                        children: [
-                          const Icon(Icons.access_time, color: Colors.white, size: 16),
-                          const SizedBox(width: 6),
-                          const Text(
-                            '45 mins',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                          ),
-                          const Spacer(),
-                          const Icon(Icons.local_fire_department, color: Color(0xFFFF9800), size: 16),
-                          const SizedBox(width: 6),
-                          Flexible( // flexible to prevent overflow
-                            child: const Text(
-                              'High Intensity',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      
-                      // Start Session Button
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.white.withOpacity(0.9), width: 1),
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Start Session',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                            Row(
-                              children: [
-                                SizedBox(
-                                  height: 20,
-                                  child: VerticalDivider(
-                                    color: Colors.white,
-                                    thickness: 1,
-                                    width: 20, // width includes padding
-                                  ),
-                                ),
-                                SizedBox(width: 4),
-                                Icon(Icons.arrow_forward, color: Colors.white, size: 20),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xl),
 
         // Plan Overview
         Text(
@@ -478,6 +416,191 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     );
   }
 
+  Widget _buildTodayExerciseCard(DailyExerciseModel exerciseData) {
+    final session = exerciseData.session!;
+    
+    // Check if we have progress, else default to 0
+    // Based on requirements, if there's no progress field in the design we just show the card
+    
+    return GestureDetector(
+      onTap: () {
+        context.push('/health/session-overview', extra: session.id);
+      },
+      child: Container(
+        width: double.infinity,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(24),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            // Image Section (Top Half)
+            Container(
+              height: MediaQuery.of(context).size.height * 0.22, // Responsive height (approx 22% of screen)
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+                color: Color(0xFFE0E0E0),
+              ),
+              child: ClipRRect(
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+                child: Image.network(
+                  session.imageUrl ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1740&q=80',
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return const Center(child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey));
+                  },
+                ),
+              ),
+            ),
+            
+            // Content Section (Bottom Half - Dark Brown)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+                color: Color(0xFF2B1B18), // Dark brown background
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Tag
+                  if (session.purpose != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.white.withOpacity(0.3)),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SvgPicture.asset(
+                            'assets/icons/icn_purpose.svg',
+                            colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.9), BlendMode.srcIn),
+                            height: 14,
+                            width: 14,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            session.purpose!,
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.9),
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  if (session.purpose != null)
+                    const SizedBox(height: 16),
+                  
+                  // Title
+                  Text(
+                    session.title ?? 'Exercise Session',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 24,
+                      fontWeight: FontWeight.w500,
+                      fontFamily: 'Inter',
+                      letterSpacing: -0.5,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 12),
+                  
+                  // Details Row
+                  Row(
+                    children: [
+                      const Icon(Icons.schedule_outlined, color: Colors.white, size: 16),
+                      const SizedBox(width: 6),
+                      Text(
+                        '${session.duration ?? 0} mins',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400,
+                        ),
+                      ),
+                      if (session.intensity != null) ...[
+                        const Spacer(),
+                        SvgPicture.asset(
+                          'assets/icons/icn_intensity.svg',
+                          colorFilter: const ColorFilter.mode(Color(0xFFFF9800), BlendMode.srcIn),
+                          height: 16,
+                          width: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Flexible( // flexible to prevent overflow
+                          child: Text(
+                            session.intensity!,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ]
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  
+                  // Start Session Button
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.white.withOpacity(0.9), width: 1),
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Start Session',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              height: 20,
+                              child: VerticalDivider(
+                                color: Colors.white,
+                                thickness: 1,
+                                width: 20, // width includes padding
+                              ),
+                            ),
+                            SizedBox(width: 4),
+                            Icon(Icons.arrow_forward, color: Colors.white, size: 20),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildDateCell(String day, String date, bool isSelected, {bool isDisabled = false}) {
     return Container(
       width: 50,
@@ -530,7 +653,15 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     final dietPlanAsync = ref.watch(dietPlanProvider);
 
     return dietPlanAsync.when(
-      data: (dietPlan) => _buildDietUI(dietPlan),
+      data: (dietPlan) {
+        if (dietPlan == null) {
+          return const SizedBox(
+            height: 100,
+            child: Center(child: Text("No nutrition plan assigned.")),
+          );
+        }
+        return _buildDietUI(dietPlan);
+      },
       loading: () => const Center(
         child: Padding(
           padding: EdgeInsets.all(20.0),

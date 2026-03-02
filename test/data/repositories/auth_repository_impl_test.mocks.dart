@@ -7,15 +7,18 @@ import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:nuevo_app/data/datasources/local/local_data_source.dart'
-    as _i10;
+    as _i14;
 import 'package:nuevo_app/data/datasources/remote/api_client.dart' as _i4;
 import 'package:nuevo_app/data/models/api_response.dart' as _i2;
 import 'package:nuevo_app/data/models/auth_response_model.dart' as _i6;
-import 'package:nuevo_app/data/models/diet_plan_model.dart' as _i11;
+import 'package:nuevo_app/data/models/daily_exercise_model.dart' as _i11;
+import 'package:nuevo_app/data/models/diet_plan_model.dart' as _i10;
 import 'package:nuevo_app/data/models/lab_request_model.dart' as _i9;
 import 'package:nuevo_app/data/models/preferences_model.dart' as _i8;
+import 'package:nuevo_app/data/models/session_progress_model.dart' as _i13;
 import 'package:nuevo_app/data/models/subscription_model.dart' as _i3;
 import 'package:nuevo_app/data/models/user_model.dart' as _i7;
+import 'package:nuevo_app/data/models/weekly_schedule_model.dart' as _i12;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -360,27 +363,99 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
       ) as _i5.Future<_i2.ApiResponse<_i9.LabRequestData>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>> getDietPlan() =>
+  _i5.Future<_i2.ApiResponse<_i10.DietPlanModel>> getDietPlan() =>
       (super.noSuchMethod(
         Invocation.method(
           #getDietPlan,
           [],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>>.value(
-            _FakeApiResponse_0<_i11.DietPlanModel>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i10.DietPlanModel>>.value(
+            _FakeApiResponse_0<_i10.DietPlanModel>(
           this,
           Invocation.method(
             #getDietPlan,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i10.DietPlanModel>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i11.DailyExerciseModel>> getTodayExercise() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getTodayExercise,
+          [],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i11.DailyExerciseModel>>.value(
+            _FakeApiResponse_0<_i11.DailyExerciseModel>(
+          this,
+          Invocation.method(
+            #getTodayExercise,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i11.DailyExerciseModel>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i12.WeeklyScheduleModel>> getWeeklySchedule() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getWeeklySchedule,
+          [],
+        ),
+        returnValue:
+            _i5.Future<_i2.ApiResponse<_i12.WeeklyScheduleModel>>.value(
+                _FakeApiResponse_0<_i12.WeeklyScheduleModel>(
+          this,
+          Invocation.method(
+            #getWeeklySchedule,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i12.WeeklyScheduleModel>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i11.GuidedSessionModel>> getSessionDetails(
+          String? id) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getSessionDetails,
+          [id],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i11.GuidedSessionModel>>.value(
+            _FakeApiResponse_0<_i11.GuidedSessionModel>(
+          this,
+          Invocation.method(
+            #getSessionDetails,
+            [id],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i11.GuidedSessionModel>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i13.SessionProgressModel>> startSession(
+          String? id) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #startSession,
+          [id],
+        ),
+        returnValue:
+            _i5.Future<_i2.ApiResponse<_i13.SessionProgressModel>>.value(
+                _FakeApiResponse_0<_i13.SessionProgressModel>(
+          this,
+          Invocation.method(
+            #startSession,
+            [id],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i13.SessionProgressModel>>);
 }
 
 /// A class which mocks [LocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalDataSource extends _i1.Mock implements _i10.LocalDataSource {
+class MockLocalDataSource extends _i1.Mock implements _i14.LocalDataSource {
   MockLocalDataSource() {
     _i1.throwOnMissingStub(this);
   }

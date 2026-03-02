@@ -15,6 +15,7 @@ import '../../widgets/home/task_card.dart';
 import '../../widgets/home/program_card.dart';
 import '../../widgets/home/quick_access_grid.dart';
 import '../../widgets/home/quick_access_card.dart';
+import '../../widgets/home/dietitian_session_card.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -33,113 +34,138 @@ class HomeScreen extends ConsumerWidget {
               onRefresh: () async {
                 return ref.refresh(homeDashboardProvider.future);
               },
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  return SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: ResponsiveUtils.getHorizontalPadding(context),
-                        vertical: ResponsiveUtils.spacing(context, base: 20),
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: ResponsiveUtils.getHorizontalPadding(context),
+                    vertical: ResponsiveUtils.spacing(context, base: 20),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // 1. Header with profile and notification
+                      _buildHeader(context, dashboard.welcome),
+                      SizedBox(
+                        height: ResponsiveUtils.spacing(context, base: 24),
                       ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // 1. Header with profile and notification
-                          _buildHeader(context, dashboard.welcome),
-                          SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
 
-                          // 2. Wellness Reset Card (Using WellnessProgress)
-                          _buildWellnessSection(context, dashboard.wellnessProgress),
-                          SizedBox(height: ResponsiveUtils.spacing(context, base: 20)),
-
-                          // 3. Info Cards (Age & Session)
-                          _buildInfoSection(context, dashboard.quickStats),
-                          SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-
-                          // 4. Action Required
-                          // Force show section per request
-                          Builder(
-                            builder: (context) {
-                              final List<entities.Task> actions = dashboard.actionRequired;
-
-                              // Only show header if empty, show list only if not empty
-                              return Column(
-                                children: [
-                                  _buildSectionHeader(
-                                    context,
-                                    'Action required',
-                                    onActionTap: () => context.go('/my-plan'),
-                                    actionLabel: 'Complete Now',
-                                    showArrow: true,
-                                  ),
-                                  // Widget below removed per user request "remove the pression quesioner widget completly"
-                                  // if (actions.isNotEmpty) ...[
-                                  //   SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-                                  //   _buildTasksList(context, actions),
-                                  // ],
-                                  SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-                                ],
-                              );
-                            }
-                          ),
-
-                          // 5. Task Completed
-                          if (dashboard.tasksCompleted.isNotEmpty) ...[
-                            _buildSectionHeader(
-                              context,
-                              'Task Completed',
-                              onActionTap: () => context.go('/my-plan'),
-                              actionLabel: 'See All',
-                              showArrow: false,
-                            ),
-                            SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-                            _buildTasksList(context, dashboard.tasksCompleted),
-                            SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-                          ],
-
-                          // 6. Program Card
-                          // "Your Program" header removed per request
-                          // _buildSectionHeader(
-                          //   context,
-                          //   'Your Program',
-                          //   showArrow: false,
-                          // ),
-                          // SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-                          _buildProgramSection(context, dashboard.yourProgram),
-                          SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-
-                          // 7. Quick Access Grid
-                          _buildSectionHeader(
-                            context,
-                            'Quick Access',
-                            showArrow: false,
-                          ),
-                          SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-                          _buildQuickAccessSection(context, dashboard.quickAccess),
-                          
-                          // Bottom padding for scroll
-                          SizedBox(height: ResponsiveUtils.spacing(context, base: 40)),
-                        ],
+                      // 2. Wellness Reset Card (Using WellnessProgress)
+                      _buildWellnessSection(
+                        context,
+                        dashboard.wellnessProgress,
                       ),
-                    ),
-                  );
-                },
+                      SizedBox(
+                        height: ResponsiveUtils.spacing(context, base: 20),
+                      ),
+
+                      // 3. Info Cards (Age & Session)
+                      _buildInfoSection(context, dashboard.quickStats),
+                      SizedBox(
+                        height: ResponsiveUtils.spacing(context, base: 24),
+                      ),
+
+                      // 4. Action Required
+                      // Force show section per request
+                      Builder(
+                        builder: (context) {
+                          final List<entities.Task> actions =
+                              dashboard.actionRequired;
+
+                          // Only show header if empty, show list only if not empty
+                          return Column(
+                            children: [
+                              _buildSectionHeader(
+                                context,
+                                'Action required',
+                                onActionTap: () => context.go('/my-plan'),
+                                actionLabel: 'Complete Now',
+                                showArrow: true,
+                              ),
+                              // Widget below removed per user request "remove the pression quesioner widget completly"
+                              // if (actions.isNotEmpty) ...[
+                              //   SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                              //   _buildTasksList(context, actions),
+                              // ],
+                              SizedBox(
+                                height: ResponsiveUtils.spacing(
+                                  context,
+                                  base: 24,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+
+                      // 5. Task Completed
+                      if (dashboard.tasksCompleted.isNotEmpty) ...[
+                        _buildSectionHeader(
+                          context,
+                          'Task Completed',
+                          onActionTap: () {
+                            context.push('/completed-tasks');
+                          },
+                          actionLabel: 'See All',
+                          showArrow: false,
+                        ),
+                        SizedBox(
+                          height: ResponsiveUtils.spacing(context, base: 16),
+                        ),
+                        _buildTasksList(context, dashboard.tasksCompleted),
+                        SizedBox(
+                          height: ResponsiveUtils.spacing(context, base: 24),
+                        ),
+                      ],
+
+                      // 6. Program Card
+                      // "Your Program" header removed per request
+                      // _buildSectionHeader(
+                      //   context,
+                      //   'Your Program',
+                      //   showArrow: false,
+                      // ),
+                      // SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                      _buildProgramSection(context, dashboard.yourProgram),
+                      SizedBox(
+                        height: ResponsiveUtils.spacing(context, base: 24),
+                      ),
+
+                      // 7. Quick Access Grid
+                      _buildSectionHeader(
+                        context,
+                        'Quick Access',
+                        showArrow: false,
+                      ),
+                      SizedBox(
+                        height: ResponsiveUtils.spacing(context, base: 16),
+                      ),
+                      _buildQuickAccessSection(context, dashboard.quickAccess),
+
+                      // Bottom padding for scroll
+                      SizedBox(
+                        height: ResponsiveUtils.spacing(context, base: 40),
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Error: $err'),
-            ElevatedButton(
-              onPressed: () => ref.refresh(homeDashboardProvider),
-              child: const Text('Retry'),
-            ),
-          ],
-        )),
+        error: (err, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: $err'),
+              ElevatedButton(
+                onPressed: () => ref.refresh(homeDashboardProvider),
+                child: const Text('Retry'),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -152,7 +178,9 @@ class HomeScreen extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: ResponsiveUtils.iconSize(context, base: 24),
-              backgroundImage: const NetworkImage('https://i.pravatar.cc/150?u=a042581f4e29026704d'), // Placeholder
+              backgroundImage: const NetworkImage(
+                'https://i.pravatar.cc/150?u=a042581f4e29026704d',
+              ), // Placeholder
             ),
             SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
             Column(
@@ -193,28 +221,32 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildWellnessSection(BuildContext context, WellnessProgress progress) {
+  Widget _buildWellnessSection(
+    BuildContext context,
+    WellnessProgress progress,
+  ) {
     return WellnessCard(wellnessProgress: progress);
   }
 
   Widget _buildInfoSection(BuildContext context, QuickStats stats) {
-    return Row(
-      children: [
-        Expanded(
-          child: InfoCard(
-            value: stats.nuevoAge ?? '--',
-            label: 'Nuevo Age',
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Expanded(
+            child: InfoCard(value: stats.nuevoAge ?? '--', label: 'Nuevo Age'),
           ),
-        ),
-        SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
-        Expanded(
-          child: InfoCard(
-            value: stats.nextSession ?? '--', 
-            label: 'Dietitian Session', 
-            backgroundColor: const Color(0xFFF9F3F1),
+          SizedBox(width: ResponsiveUtils.spacing(context, base: 8)),
+          Expanded(
+            child: DietitianSessionCard(
+              sessionInfo: stats.nextSession,
+              onTap: () {
+                // Handle tap, e.g., navigate to session details
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -281,7 +313,8 @@ class HomeScreen extends ConsumerWidget {
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         itemCount: tasks.length,
-        separatorBuilder: (_, __) => SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
+        separatorBuilder: (_, __) =>
+            SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
         itemBuilder: (context, index) => TaskCard(
           task: tasks[index],
           onTap: () => context.go('/task/${tasks[index].id}'),
@@ -292,27 +325,37 @@ class HomeScreen extends ConsumerWidget {
 
   Widget _buildProgramSection(BuildContext context, WellnessProgram? program) {
     // Fallback if program is null
-    final displayProgram = program ?? const WellnessProgram(
-      id: 'program-insight',
-      name: 'Insight Program',
-      description: 'Advanced assessment and specialist-led profiling',
-      progressPercentage: 0,
-      habitsCount: 0,
-    );
+    final displayProgram =
+        program ??
+        const WellnessProgram(
+          id: 'program-insight',
+          name: 'Insight Program',
+          description: 'Advanced assessment and specialist-led profiling',
+          progressPercentage: 0,
+          habitsCount: 0,
+        );
 
     return ProgramCard(
       program: displayProgram,
       onViewPlan: () => context.go('/my-plan'),
+      onCardTap: () => context.push('/your-program'),
     );
   }
 
-  Widget _buildQuickAccessSection(BuildContext context, List<HomeQuickAccessItem> items) {
+  Widget _buildQuickAccessSection(
+    BuildContext context,
+    List<HomeQuickAccessItem> items,
+  ) {
     return QuickAccessGrid(
-      items: items.map((e) => QuickAccessItem(
-        title: e.title,
-        icon: _getIconForName(e.icon),
-        onTap: () => _handleQuickAccessTap(context, e.id),
-      )).toList(),
+      items: items
+          .map(
+            (e) => QuickAccessItem(
+              title: e.title,
+              icon: _getIconForName(e.icon),
+              onTap: () => _handleQuickAccessTap(context, e.id),
+            ),
+          )
+          .toList(),
     );
   }
 
@@ -329,7 +372,7 @@ class HomeScreen extends ConsumerWidget {
         return Icons.calendar_today_outlined;
       case 'heart':
       case 'health':
-        // For custom images, QuickAccessItem uses imagePath if available. 
+        // For custom images, QuickAccessItem uses imagePath if available.
         // Here we return an icon, but if we want images we need to map IDs/icons to asset paths.
         // The API returns "icon": "dumbbell".
         // QuickAccessItem accepts icon OR imagePath.

@@ -24,7 +24,7 @@ class DietPlanDetailScreen extends ConsumerWidget {
       ),
       body: dietPlanAsync.when(
         data: (dietPlan) {
-          if (dietPlan.meals == null || dietPlan.meals!.isEmpty) {
+          if (dietPlan == null || dietPlan.meals == null || dietPlan.meals!.isEmpty) {
             return const Center(child: Text('No diet plan available.'));
           }
           return ListView.builder(

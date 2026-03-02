@@ -25,8 +25,16 @@ class WellnessProgramModel {
     this.iconUrl,
   });
   
-  factory WellnessProgramModel.fromJson(Map<String, dynamic> json) =>
-      _$WellnessProgramModelFromJson(json);
+  factory WellnessProgramModel.fromJson(Map<String, dynamic> json) {
+    return WellnessProgramModel(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? 'Unknown Program',
+      description: json['description'] as String? ?? '',
+      progressPercentage: (json['progress_percentage'] as num?)?.toDouble() ?? 0.0,
+      habitsCount: (json['habits_count'] as num?)?.toInt() ?? 0,
+      iconUrl: json['icon_url'] as String?,
+    );
+  }
   
   Map<String, dynamic> toJson() => _$WellnessProgramModelToJson(this);
   

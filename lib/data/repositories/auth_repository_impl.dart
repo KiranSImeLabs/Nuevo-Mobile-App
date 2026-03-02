@@ -43,18 +43,12 @@ class AuthRepositoryImpl implements AuthRepository {
       final response = await _apiClient.login(request);
       
       // Debug logging
-      print('🔍 Login API Response:');
-      print('  - success: ${response.success}');
-      print('  - data: ${response.data}');
-      print('  - message: ${response.message}');
+
       
       if (response.success && response.data != null) {
         final data = response.data!;
         
-        print('✅ Login successful!');
-        print('  - token: ${data.token.substring(0, 20)}...');
-        print('  - user id: ${data.user.id}');
-        print('  - user email: ${data.user.email}');
+
         
         // Save tokens securely
         await _localDataSource.saveAccessToken(data.token);
@@ -64,12 +58,12 @@ class AuthRepositoryImpl implements AuthRepository {
         
         await _localDataSource.saveUserId(data.user.id);
         
-        print('✅ Tokens saved successfully');
+
         
         // Convert to domain entity and return
         return Right(data.user.toEntity());
       } else {
-        print('❌ Login failed: ${response.message ?? 'Unknown error'}');
+
         return Left(ServerFailure(message: response.message ?? 'Login failed'));
       }
     } on DioException catch (e) {

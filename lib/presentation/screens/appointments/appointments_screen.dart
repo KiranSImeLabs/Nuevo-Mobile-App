@@ -10,7 +10,7 @@ class AppointmentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('BUILDING APPOINTMENTS SCREEN');
+
     // Mock Data
     final sessionsToSchedule = [
       Session(
