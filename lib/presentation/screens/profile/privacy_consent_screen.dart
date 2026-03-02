@@ -5,6 +5,7 @@ import '../../../../core/constants/app_strings.dart';
 import '../../../../core/theme/app_theme.dart';
 import 'widgets/consent_option_card.dart';
 import 'widgets/legal_option_tile.dart';
+import '../../widgets/common/app_webview.dart';
 
 class PrivacyConsentScreen extends ConsumerStatefulWidget {
   const PrivacyConsentScreen({super.key});
@@ -111,14 +112,22 @@ class _PrivacyConsentScreenState extends ConsumerState<PrivacyConsentScreen> {
                     LegalOptionTile(
                       title: AppStrings.privacyPolicy,
                       onTap: () {
-                        // TODO: Navigate to Privacy Policy
+                         AppWebView.open(
+                          context,
+                          url: AppStrings.privacyPolicyUrl,
+                          title: AppStrings.privacyPolicy,
+                        );
                       },
                     ),
                     
                     LegalOptionTile(
                       title: AppStrings.termsOfService,
                       onTap: () {
-                        // TODO: Navigate to Terms of Service
+                        AppWebView.open(
+                          context,
+                          url: AppStrings.termsOfServiceUrl,
+                          title: AppStrings.termsOfService,
+                        );
                       },
                     ),
                     

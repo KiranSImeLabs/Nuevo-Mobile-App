@@ -11,10 +11,12 @@ import '../../data/repositories/auth_repository_impl.dart';
 import '../../data/repositories/subscription_repository_impl.dart';
 import '../../data/repositories/user_repository_impl.dart';
 import '../../data/repositories/lab_repository_impl.dart';
+import '../../data/repositories/specialist_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/subscription_repository.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../../domain/repositories/lab_repository.dart';
+import '../../domain/repositories/specialist_repository.dart';
 import '../../domain/usecases/lab/create_lab_request_usecase.dart';
 import '../../domain/usecases/lab/get_lab_requests_usecase.dart';
 import '../../domain/usecases/lab/get_lab_request_by_id_usecase.dart';
@@ -29,7 +31,10 @@ import '../../domain/usecases/subscription/is_subscription_active_usecase.dart';
 import '../../domain/usecases/user/get_user_profile_usecase.dart';
 import '../../domain/usecases/user/update_user_profile_usecase.dart';
 import '../../domain/usecases/user/update_preferences_usecase.dart';
+import '../../domain/usecases/user/update_preferences_usecase.dart';
 import '../../domain/usecases/user/get_preferences_usecase.dart';
+import '../../domain/usecases/specialist/get_my_specialists_usecase.dart';
+import '../../domain/usecases/specialist/get_specialist_details_usecase.dart';
 // import 'auth_provider.dart'; // Removing to break circularity
 
 // ============================================
@@ -197,6 +202,12 @@ final labRepositoryProvider = Provider<LabRepository>((ref) {
   return LabRepositoryImpl(apiClient: apiClient);
 });
 
+/// Specialist Repository
+final specialistRepositoryProvider = Provider<SpecialistRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return SpecialistRepositoryImpl(apiClient: apiClient);
+});
+
 // ============================================
 // Use Cases - Lab
 // ============================================
@@ -215,5 +226,20 @@ final getLabRequestByIdUseCaseProvider =
     Provider<GetLabRequestByIdUseCase>((ref) {
   final repository = ref.watch(labRepositoryProvider);
   return GetLabRequestByIdUseCase(repository: repository);
+});
+
+// ============================================
+// Use Cases - Specialist
+// ============================================
+
+final getMySpecialistsUseCaseProvider = Provider<GetMySpecialistsUseCase>((ref) {
+  final repository = ref.watch(specialistRepositoryProvider);
+  return GetMySpecialistsUseCase(repository);
+});
+
+final getSpecialistDetailsUseCaseProvider =
+    Provider<GetSpecialistDetailsUseCase>((ref) {
+  final repository = ref.watch(specialistRepositoryProvider);
+  return GetSpecialistDetailsUseCase(repository);
 });
 
