@@ -206,10 +206,10 @@ class LocalDataSource {
   /// If so, clear secure storage to prevent stale tokens from persisting (iOS Keychain issue)
   Future<void> handleFirstLaunch() async {
     if (isFirstLaunch()) {
-      print('🚀 First launch detected (or fresh install). Clearing secure storage...');
+
       await clearSecureData();
       await setFirstLaunchComplete();
-      print('✅ Secure storage cleared and first launch flag set.');
+
     }
   }
 

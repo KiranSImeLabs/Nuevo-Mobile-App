@@ -72,6 +72,7 @@ dependencies:
   sign_in_with_apple: ^7.0.1
   sign_in_button: ^4.0.1
   image_picker: ^1.2.1
+  video_player: ^2.11.0
   webview_flutter: ^4.13.1
   # retrofit removed due to build incompatibility
 

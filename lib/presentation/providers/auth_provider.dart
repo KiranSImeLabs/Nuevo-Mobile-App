@@ -42,7 +42,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // We use this event system to break circular dependency with DioClient
     _ref.listen<int>(logoutEventProvider, (previous, next) {
       if (next > (previous ?? 0)) {
-        print('🚨 Global logout event received, logging out...');
+
         logout();
       }
     });
@@ -63,11 +63,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
         
         profileResult.fold(
           (failure) async {
-            print('🔍 Session invalid on startup, clearing tokens: ${failure.message}');
+
             await logout(); // This handles state update and storage cleanup
           },
           (user) {
-            print('✅ Session validated for user: ${user.email}');
+
             state = AuthState.authenticated(user);
           },
         );

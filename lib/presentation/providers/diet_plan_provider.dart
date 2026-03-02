@@ -18,7 +18,7 @@ final getDietPlanUseCaseProvider = Provider<GetDietPlanUseCase>((ref) {
 });
 
 // Diet Plan State Provider
-final dietPlanProvider = FutureProvider<DietPlanModel>((ref) async {
+final dietPlanProvider = FutureProvider<DietPlanModel?>((ref) async {
   final getDietPlanUseCase = ref.watch(getDietPlanUseCaseProvider);
   return getDietPlanUseCase();
 });

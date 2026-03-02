@@ -12,6 +12,7 @@ import '../screens/health/health_screen.dart';
 import '../screens/health/session_overview_screen.dart';
 import '../screens/health/active_session_screen.dart';
 import '../screens/health/guided_session_screen.dart';
+import '../../data/models/daily_exercise_model.dart';
 import '../screens/appointments/appointments_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/my_plan/edit_goals_screen.dart';
@@ -20,6 +21,8 @@ import '../screens/splash_screen.dart';
 import '../screens/home/daily_exercise_screen.dart';
 import '../screens/home/daily_nutrition_screen.dart';
 import '../screens/home/task_detail_screen.dart';
+import '../screens/home/completed_tasks_screen.dart';
+import '../screens/home/your_program_screen.dart';
 import '../screens/appointments/book_session_screen.dart';
 import '../screens/appointments/select_time_screen.dart';
 import '../screens/appointments/confirm_booking_screen.dart';
@@ -67,7 +70,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isSplash = path == '/';
       final isPublicRoute = isLogin || isSignup || isSplash || isForgotPassword;
 
-      print('Redirect Check: status=$status, path=$path');
+
      
       // 1. Initial State -> Always go to Splash
       if (status == AuthStatus.initial) {
@@ -82,14 +85,14 @@ final routerProvider = Provider<GoRouter>((ref) {
 
       // 3. Authenticated User
       if (isLoggedIn) {
-        print('Authenticated. path="$path", isPublicRoute=$isPublicRoute');
+
         // If on a public route (Splash/Login/Signup), redirect to Home
         if (isPublicRoute) {
-          print('Redirecting to /home because public route');
+
           return '/home';
         }
         // Otherwise, allow access to the protected route they are on
-        print('Returning null (allow)');
+
         return null;
       }
       
@@ -154,7 +157,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       ShellRoute(
         navigatorKey: shellNavigatorKey,
         builder: (context, state, child) {
-          print('ShellRoute builder: path=${state.uri.path}');
+
           return MainShell(
             currentPath: state.uri.path,
             child: child,
@@ -177,7 +180,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/appointments',
             builder: (context, state) {
-              print('Appointments route builder called');
+
               return const AppointmentsScreen();
             },
           ),
@@ -192,13 +195,6 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/daily-nutrition',
             builder: (context, state) => const DailyNutritionScreen(),
-          ),
-          GoRoute(
-            path: '/task/:id',
-            builder: (context, state) {
-              final taskId = state.pathParameters['id'] ?? '';
-              return TaskDetailScreen(taskId: taskId);
-            },
           ),
         ],
       ),
@@ -241,7 +237,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
             path: '/health/session-overview',
-            builder: (context, state) => const SessionOverviewScreen(),
+            builder: (context, state) {
+              final sessionId = state.extra as String;
+              return SessionOverviewScreen(sessionId: sessionId);
+            },
           ),
           GoRoute(
             path: '/health/active-session',
@@ -249,12 +248,33 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/health/guided-session',
-            builder: (context, state) => const GuidedSessionScreen(),
+            builder: (context, state) {
+              final args = state.extra as Map<String, dynamic>?;
+              final steps = args?['steps'] as List<ExerciseStepModel>?;
+              final sessionId = args?['sessionId'] as String? ?? '';
+              return GuidedSessionScreen(sessionId: sessionId, steps: steps);
+            },
+          ),
+          GoRoute(
+            path: '/completed-tasks',
+            builder: (context, state) => const CompletedTasksScreen(),
+          ),
+          GoRoute(
+            path: '/task/:id',
+            builder: (context, state) {
+              final taskId = state.pathParameters['id'] ?? '';
+              return TaskDetailScreen(taskId: taskId);
+            },
           ),
       GoRoute(
         path: '/edit-goals',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const EditGoalsScreen(),
+      ),
+      GoRoute(
+        path: '/your-program',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) => const YourProgramScreen(),
       ),
       GoRoute(
         path: '/clinician-profile',

@@ -9,16 +9,20 @@ class DietPlanRepositoryImpl implements DietPlanRepository {
   DietPlanRepositoryImpl(this.apiClient);
 
   @override
-  Future<DietPlanModel> getDietPlan() async {
+  @override
+  Future<DietPlanModel?> getDietPlan() async {
     try {
       final response = await apiClient.getDietPlan();
             
       if (response.success && response.data != null) {
          return response.data!;
-      } else {
-        throw Exception(response.message ?? 'Failed to load diet plan');
       }
+      return null;
     } catch (e) {
+      // If error is 404 or "not found", return null gracefully
+      if (e.toString().contains('404') || e.toString().contains('not found')) {
+        return null;
+      }
       throw Exception('Failed to load diet plan: $e');
     }
   }

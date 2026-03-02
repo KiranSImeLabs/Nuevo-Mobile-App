@@ -1,94 +1,173 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
+import 'package:video_player/video_player.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../widgets/health/session_completed_sheet.dart';
+import '../../../data/models/daily_exercise_model.dart';
 
-class GuidedSessionScreen extends StatefulWidget {
-  const GuidedSessionScreen({super.key});
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/health_provider.dart';
+import '../../../data/models/active_progress_model.dart';
+
+class GuidedSessionScreen extends ConsumerStatefulWidget {
+  final List<ExerciseStepModel>? steps;
+  final String sessionId;
+
+  const GuidedSessionScreen({super.key, required this.sessionId, this.steps});
 
   @override
-  State<GuidedSessionScreen> createState() => _GuidedSessionScreenState();
+  ConsumerState<GuidedSessionScreen> createState() =>
+      _GuidedSessionScreenState();
 }
 
-
-class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
-  bool _isPlaying = true;
+class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
+  bool _isPlaying = false;
+  bool _isSessionStarted = false;
   int _currentStep = 0;
   late PageController _pageController;
 
-  final List<Map<String, dynamic>> _sessionSteps = [
-    {
-      'title': 'Gently tilt right',
-      'instruction': 'Keep your shoulders down and relaxed. Feel the stretch along the left side.',
-      'image': 'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-      'duration': 45,
-    },
-    {
-        'title': 'Gently tilt left',
-        'instruction': 'Repeat on the other side. Breathe deeply.',
-        'image': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-        'duration': 45,
-    },
-    {
-        'title': 'Forward stretch',
-        'instruction': 'Reach forward and hold. Keep your back straight.',
-        'image': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80', // detailed image needed
-        'duration': 60,
-    },
-    {
-        'title': 'Shoulder rolls',
-        'instruction': 'Roll your shoulders backwards in slow circles.',
-        'image': 'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-        'duration': 30,
-    },
-    {
-        'title': 'Deep breathing',
-        'instruction': 'Inhale deeply through your nose, exhale slowly through your mouth.',
-        'image': 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-        'duration': 30,
-    },
-  ];
-
-  Timer? _timer;
-
-  late int _remainingSeconds;
+  late final List<Map<String, dynamic>> _sessionSteps;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController();
-    _remainingSeconds = _sessionSteps[0]['duration'];
-    _startTimer();
+
+    _checkActiveProgress();
+
+    if (widget.steps != null && widget.steps!.isNotEmpty) {
+      _sessionSteps = widget.steps!
+          .map(
+            (step) => {
+              'title': step.title ?? 'Exercise Step',
+              'instruction': step.description ?? '',
+              'image': (step.videoUrl != null && step.videoUrl!.isNotEmpty)
+                  ? step.videoUrl
+                  : 'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+              'isVideo': (step.videoUrl != null && step.videoUrl!.isNotEmpty),
+              'duration': step.duration ?? 30,
+            },
+          )
+          .toList();
+    } else {
+      // Fallback mock steps... (kept collapsed for edit chunk)
+      _sessionSteps = [
+        {
+          'title': 'Gently tilt right',
+          'instruction':
+              'Keep your shoulders down and relaxed. Feel the stretch along the left side.',
+          'image':
+              'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+          'isVideo': false,
+          'duration': 45,
+        },
+        {
+          'title': 'Gently tilt left',
+          'instruction': 'Repeat on the other side. Breathe deeply.',
+          'image':
+              'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+          'isVideo': false,
+          'duration': 45,
+        },
+        {
+          'title': 'Forward stretch',
+          'instruction': 'Reach forward and hold. Keep your back straight.',
+          'image':
+              'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+          'isVideo': false,
+          'duration': 60,
+        },
+        {
+          'title': 'Shoulder rolls',
+          'instruction': 'Roll your shoulders backwards in slow circles.',
+          'image':
+              'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+          'isVideo': false,
+          'duration': 30,
+        },
+        {
+          'title': 'Deep breathing',
+          'instruction':
+              'Inhale deeply through your nose, exhale slowly through your mouth.',
+          'image':
+              'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+          'isVideo': false,
+          'duration': 30,
+        },
+      ];
+    }
+
+  }
+
+  Future<void> _checkActiveProgress() async {
+    try {
+      final progress = await ref.read(activeProgressProvider.future);
+      if (progress != null &&
+          progress.status == 'STARTED' &&
+          progress.sessionId == widget.sessionId) {
+        // We have an active session for THIS specific session ID
+        setState(() {
+          _isSessionStarted = true;
+          _isPlaying = false;
+          
+          // Clamp index so it doesn't crash on invalid backend states
+          int idx = progress.currentStepIndex ?? 0;
+          if (idx < 0) idx = 0;
+          if (idx >= _sessionSteps.length) idx = _sessionSteps.length - 1;
+          
+          _currentStep = idx;
+        });
+
+        // Jump to correct page
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (_pageController.hasClients) {
+            _pageController.jumpToPage(_currentStep);
+          }
+        });
+      }
+    } catch (e) {
+      debugPrint('Failed to load active progress: $e');
+    }
+  }
+
+  Future<void> _startSessionOnBackend() async {
+    try {
+      // Call the API to start the session immediately when the screen loads
+      await ref.read(startSessionProvider(widget.sessionId).future);
+      debugPrint('Session started successfully on backend');
+    } catch (e) {
+      debugPrint('Failed to start session on backend: $e');
+      // We don't block the UI if this fails, we just log it
+    }
+  }
+
+  void _onPlayPauseTapped() {
+    if (!_isSessionStarted) {
+      // First time play is tapped -> Start the session
+      setState(() {
+        _isSessionStarted = true;
+        _isPlaying = true;
+      });
+      _startSessionOnBackend();
+    } else {
+      // Toggle play/pause
+      setState(() {
+        _isPlaying = !_isPlaying;
+      });
+    }
   }
 
   @override
   void dispose() {
-    _timer?.cancel();
     _pageController.dispose();
     super.dispose();
-  }
-
-  void _startTimer() {
-    _timer?.cancel();
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!_isPlaying) return;
-      if (!mounted) return;
-
-      setState(() {
-        if (_remainingSeconds > 0) {
-          _remainingSeconds--;
-        } else {
-          _nextStep();
-        }
-      });
-    });
   }
 
   void _nextStep() {
     if (_currentStep < _sessionSteps.length - 1) {
       _pageController.nextPage(
-        duration: const Duration(milliseconds: 300), 
+        duration: const Duration(milliseconds: 300),
         curve: Curves.easeInOut,
       );
     } else {
@@ -97,11 +176,10 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
   }
 
   void _completeSession() {
-    _timer?.cancel();
     setState(() {
       _isPlaying = false;
     });
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -113,7 +191,6 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
   void _onStepChanged(int index) {
     setState(() {
       _currentStep = index;
-      _remainingSeconds = _sessionSteps[index]['duration'];
     });
   }
 
@@ -144,7 +221,10 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
         children: [
           // Segmented Progress Bar
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20.0,
+              vertical: 12.0,
+            ),
             child: Row(
               children: List.generate(
                 _sessionSteps.length,
@@ -153,7 +233,7 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                     height: 6,
                     margin: const EdgeInsets.symmetric(horizontal: 3.0),
                     decoration: BoxDecoration(
-                      color: index <= _currentStep 
+                      color: index <= _currentStep
                           ? const Color(0xFFA35940) // Active color
                           : const Color(0xFFEEEAE7), // Inactive color
                       borderRadius: BorderRadius.circular(3),
@@ -163,7 +243,7 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
               ),
             ),
           ),
-          
+
           const SizedBox(height: 8),
 
           // Main Visual / PageView
@@ -180,10 +260,7 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(24),
-                      image: DecorationImage(
-                        image: NetworkImage(step['image']),
-                        fit: BoxFit.cover,
-                      ),
+                      color: Colors.black,
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -194,6 +271,18 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                     ),
                     child: Stack(
                       children: [
+                        // Media Background
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(24),
+                            child: _StepMediaWidget(
+                              url: step['image'],
+                              isVideo: step['isVideo'] ?? false,
+                              isPlaying: _isPlaying && index == _currentStep,
+                            ),
+                          ),
+                        ),
+
                         // Gradient Overlay
                         Container(
                           decoration: BoxDecoration(
@@ -228,37 +317,45 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                             ),
                           ),
                         ),
-                        
-                        // Timer Overlay
-                        Positioned(
-                          bottom: 32,
-                          left: 0,
-                          right: 0,
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                'TIME REMAINING',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 1.2,
+
+                        // "Tap Play to Start" Overlay
+                        if (!_isSessionStarted)
+                          Positioned.fill(
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(24),
+                                color: Colors.black.withOpacity(0.4),
+                              ),
+                              child: Center(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(16),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: const Icon(
+                                        Icons.play_arrow_rounded,
+                                        color: Colors.white,
+                                        size: 48,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    const Text(
+                                      'Tap Play below to Start',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '00:${(index == _currentStep ? _remainingSeconds : step['duration']).toString().padLeft(2, '0')}',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 56,
-                                  fontWeight: FontWeight.w300,
-                                  fontFamily: 'Inter',
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
-                        ),
                       ],
                     ),
                   ),
@@ -340,7 +437,7 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                   onTap: () {
                     if (_currentStep > 0) {
                       _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300), 
+                        duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
                       );
                     }
@@ -349,22 +446,20 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                   iconColor: const Color(0xFF5D4037),
                   backgroundColor: const Color(0xFFFAF1ED),
                 ),
-                
+
                 // Play/Pause
                 _buildCircleButton(
-                  icon: _isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
-                  onTap: () {
-                    setState(() {
-                      _isPlaying = !_isPlaying;
-                    });
-                  },
+                  icon: _isPlaying
+                      ? Icons.pause_rounded
+                      : Icons.play_arrow_rounded,
+                  onTap: _onPlayPauseTapped,
                   size: 88,
                   iconColor: Colors.white,
                   backgroundColor: const Color(0xFFA35940),
                   hasShadow: true,
                   border: Border.all(color: const Color(0xFFFAF1ED), width: 4),
                 ),
-                
+
                 // Next
                 _buildCircleButton(
                   icon: Icons.skip_next_rounded,
@@ -380,31 +475,40 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
           const Spacer(),
 
           // End Session Button
-          Padding(
-            padding: const EdgeInsets.only(left: 20.0, right: 20.0, bottom: 32.0),
-            child: SizedBox(
-              width: double.infinity,
-              height: 56,
-              child: OutlinedButton(
-                onPressed: () => context.pop(),
-                style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFA35940)),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+          if (_isSessionStarted)
+            Padding(
+              padding: const EdgeInsets.only(
+                left: 20.0,
+                right: 20.0,
+                bottom: 32.0,
+              ),
+              child: SizedBox(
+                width: double.infinity,
+                height: 56,
+                child: OutlinedButton(
+                  onPressed: () => context.pop(),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Color(0xFFA35940)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
+                    backgroundColor: const Color(0xFFFAF1ED),
                   ),
-                  backgroundColor: const Color(0xFFFAF1ED),
-                ),
-                child: const Text(
-                  'End Session',
-                  style: TextStyle(
-                    color: Color(0xFFA35940),
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+                  child: const Text(
+                    'End Session',
+                    style: TextStyle(
+                      color: Color(0xFFA35940),
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
               ),
             ),
-          ),
+          if (!_isSessionStarted)
+            const SizedBox(
+              height: 88,
+            ), // Placeholder for when the button is hidden to avoid UI jumping
         ],
       ),
     );
@@ -434,14 +538,119 @@ class _GuidedSessionScreenState extends State<GuidedSessionScreen> {
                     color: const Color(0xFFA35940).withOpacity(0.2),
                     blurRadius: 20,
                     offset: const Offset(0, 8),
-                  )
+                  ),
                 ]
               : [],
         ),
-        child: Icon(
-          icon,
-          color: iconColor,
-          size: size * 0.4,
+        child: Icon(icon, color: iconColor, size: size * 0.4),
+      ),
+    );
+  }
+}
+
+class _StepMediaWidget extends StatefulWidget {
+  final String url;
+  final bool isVideo;
+  final bool isPlaying;
+
+  const _StepMediaWidget({
+    Key? key,
+    required this.url,
+    required this.isVideo,
+    required this.isPlaying,
+  }) : super(key: key);
+
+  @override
+  State<_StepMediaWidget> createState() => _StepMediaWidgetState();
+}
+
+class _StepMediaWidgetState extends State<_StepMediaWidget> {
+  VideoPlayerController? _videoController;
+  bool _isInitialized = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _initMedia();
+  }
+
+  void _initMedia() {
+    if (widget.isVideo) {
+      _videoController = VideoPlayerController.networkUrl(Uri.parse(widget.url))
+        ..initialize().then((_) {
+          if (mounted) {
+            setState(() {
+              _isInitialized = true;
+            });
+            _updatePlaybackState();
+          }
+        }).catchError((error) {
+          debugPrint('Video Player error: $error URL: ${widget.url}');
+        });
+      _videoController?.setLooping(true);
+    }
+  }
+
+  @override
+  void didUpdateWidget(_StepMediaWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.url != widget.url || oldWidget.isVideo != widget.isVideo) {
+      _videoController?.dispose();
+      _videoController = null;
+      _isInitialized = false;
+      _initMedia();
+    } else {
+      _updatePlaybackState();
+    }
+  }
+
+  void _updatePlaybackState() {
+    if (_videoController != null && _isInitialized) {
+      if (widget.isPlaying) {
+        _videoController!.play();
+      } else {
+        _videoController!.pause();
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _videoController?.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!widget.isVideo) {
+      return Image.network(
+        widget.url,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) => Container(
+          color: Colors.grey[300],
+          child: const Center(
+            child: Icon(Icons.error_outline, color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
+    if (_videoController == null || !_isInitialized) {
+      return Container(
+        color: Colors.black,
+        child: const Center(
+          child: CircularProgressIndicator(color: Colors.white),
+        ),
+      );
+    }
+
+    return SizedBox.expand(
+      child: FittedBox(
+        fit: BoxFit.cover,
+        child: SizedBox(
+          width: _videoController!.value.size.width,
+          height: _videoController!.value.size.height,
+          child: VideoPlayer(_videoController!),
         ),
       ),
     );

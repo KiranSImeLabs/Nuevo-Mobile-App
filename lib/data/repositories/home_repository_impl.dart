@@ -16,18 +16,24 @@ class HomeRepositoryImpl implements HomeRepository {
   Future<Either<Failure, HomeDashboard>> getHomeDashboard() async {
     try {
       final response = await _client.get(ApiConstants.home);
-      
+
+
       if (response.statusCode == 200 && response.data['success'] == true) {
-        final dashboardModel = HomeDashboardModel.fromJson(response.data);
-        return Right(dashboardModel.toEntity());
+        try {
+          final dashboardModel = HomeDashboardModel.fromJson(response.data);
+          return Right(dashboardModel.toEntity());
+        } catch (e, stackTrace) {
+
+          return Left(ServerFailure(message: 'Failed to parse dashboard data: $e'));
+        }
       } else {
         return Left(ServerFailure(message: response.data['message'] ?? 'Failed to load dashboard'));
       }
     } on DioException catch (e) {
-      // Use standard error handling from existing setup if available, or manual map
-      // For now manual map based on DioClient's handleDioError but converting exception to Failure
+
       return Left(ServerFailure(message: e.message ?? 'Network Error'));
-    } catch (e) {
+    } catch (e, s) {
+
       return Left(UnknownFailure(message: e.toString()));
     }
   }
