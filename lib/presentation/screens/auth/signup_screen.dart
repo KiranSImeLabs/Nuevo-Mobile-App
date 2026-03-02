@@ -117,7 +117,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     controller: _firstNameController,
                     hintText: AppStrings.firstName,
                     prefixIcon: Icons.person_outline,
-                    validator: Validators.validateName, // Using same validator for now, simpler
+                    validator: (value) => Validators.validateName(value, AppStrings.firstName), // Using same validator for now, simpler
                     enabled: !authState.isLoading,
                   ),
                   const SizedBox(height: 16),
@@ -127,7 +127,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                     controller: _lastNameController,
                     hintText: AppStrings.lastName,
                     prefixIcon: Icons.person_outline,
-                    validator: Validators.validateName,
+                    validator: (value) => Validators.validateName(value, AppStrings.lastName),
                     enabled: !authState.isLoading,
                   ),
                   const SizedBox(height: 16),

@@ -56,17 +56,17 @@ class Validators {
   }
   
   /// Validate Name
-  static String? validateName(String? value) {
+  static String? validateName(String? value, [String fieldName = 'Name']) {
     if (value == null || value.isEmpty) {
-      return 'Name is required';
+      return '$fieldName is required';
     }
     
     if (value.length < ValidationConstants.minNameLength) {
-      return 'Name must be at least ${ValidationConstants.minNameLength} characters';
+      return '$fieldName must be at least ${ValidationConstants.minNameLength} characters';
     }
     
     if (value.length > ValidationConstants.maxNameLength) {
-      return 'Name must not exceed ${ValidationConstants.maxNameLength} characters';
+      return '$fieldName must not exceed ${ValidationConstants.maxNameLength} characters';
     }
     
     return null;
