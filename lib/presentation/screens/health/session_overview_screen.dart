@@ -4,15 +4,20 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../providers/health_provider.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../data/models/daily_exercise_model.dart';
 
 class SessionOverviewScreen extends ConsumerWidget {
   final String sessionId;
+  final GuidedSessionModel? predefinedSession;
 
-  const SessionOverviewScreen({super.key, required this.sessionId});
+  const SessionOverviewScreen({super.key, required this.sessionId, this.predefinedSession});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final sessionAsync = ref.watch(sessionDetailsProvider(sessionId));
+    final sessionAsync = predefinedSession != null 
+        ? AsyncValue.data(predefinedSession) 
+        : ref.watch(sessionDetailsProvider(sessionId));
 
     return Scaffold(
       backgroundColor: AppColors.backgroundColor,
@@ -60,7 +65,7 @@ class SessionOverviewScreen extends ConsumerWidget {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(16),
                           child: Image.network(
-                            session.imageUrl ?? 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80', // Yoga/Fitness fallback
+                            _formatImageUrl(session.imageUrl, 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80'), // Yoga/Fitness fallback
                             fit: BoxFit.cover,
                             errorBuilder: (context, error, stackTrace) {
                               return const Center(child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey));
@@ -175,6 +180,19 @@ class SessionOverviewScreen extends ConsumerWidget {
         },
       ),
     );
+  }
+
+  String _formatImageUrl(String? url, String fallback) {
+    if (url == null || url.isEmpty) return fallback;
+    if (url.startsWith('http')) return url;
+    
+    final uri = Uri.parse(ApiConstants.baseUrl);
+    final baseDomain = '${uri.scheme}://${uri.host}${uri.hasPort ? ':${uri.port}' : ''}';
+    
+    if (url.startsWith('/')) {
+      return '$baseDomain$url';
+    }
+    return '$baseDomain/$url';
   }
 
   Widget _buildStatCard({

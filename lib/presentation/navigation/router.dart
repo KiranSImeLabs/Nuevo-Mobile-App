@@ -248,11 +248,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const ConnectingSessionScreen(),
       ),
-      GoRoute(
+          GoRoute(
             path: '/health/session-overview',
             builder: (context, state) {
-              final sessionId = state.extra as String;
-              return SessionOverviewScreen(sessionId: sessionId);
+              final extra = state.extra;
+              if (extra is GuidedSessionModel) {
+                return SessionOverviewScreen(sessionId: extra.id ?? '', predefinedSession: extra);
+              } else if (extra is String) {
+                return SessionOverviewScreen(sessionId: extra);
+              }
+              return const SessionOverviewScreen(sessionId: '');
             },
           ),
           GoRoute(

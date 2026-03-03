@@ -11,7 +11,9 @@ import '../../../data/models/diet_plan_model.dart';
 import '../../../data/models/daily_exercise_model.dart';
 import '../../../data/models/weekly_schedule_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import '../../providers/specialist_provider.dart';
 import 'widgets/guidance_detail_bottom_sheet.dart';
+import '../../../core/constants/app_constants.dart';
 
 class HealthScreen extends ConsumerStatefulWidget {
   final int initialTabIndex;
@@ -34,6 +36,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
   void initState() {
     super.initState();
     _selectedTabIndex = widget.initialTabIndex;
+    
+    // Fetch specialists when the screen initializes
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(specialistListProvider.notifier).fetchSpecialists();
+    });
   }
 
   @override
@@ -427,31 +434,77 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           ),
         ),
         const SizedBox(height: AppSpacing.md),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5EAE8),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-               const CircleAvatar(
-                 radius: 24,
-                 backgroundImage: NetworkImage('https://i.pravatar.cc/150?img=11'), // Placeholder image
-               ),
-               const SizedBox(width: 12),
-               const Expanded(
-                 child: Column(
-                   crossAxisAlignment: CrossAxisAlignment.start,
-                   children: [
-                     Text('DR. Mike', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-                     Text('Dietitian', style: TextStyle(fontSize: 14, color: Color(0xFF8C8C8C))),
-                   ],
-                 ),
-               ),
-               const Icon(Icons.arrow_forward, color: Color(0xFFA05E44), size: 20),
-            ],
-          ),
+        
+        Consumer(
+          builder: (context, ref, child) {
+            final specialistsAsync = ref.watch(specialistListProvider);
+            
+            return specialistsAsync.when(
+              data: (specialists) {
+                if (specialists.isEmpty) {
+                  return const Text(
+                    "You don't have any specialists assigned yet.",
+                    style: TextStyle(color: Color(0xFF757575), fontSize: 14),
+                  );
+                }
+                
+                return Column(
+                  children: specialists.map((specialist) {
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: GestureDetector(
+                        onTap: () {
+                          context.push('/specialist-details/${specialist.id}');
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5EAE8),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                               CircleAvatar(
+                                 radius: 24,
+                                 backgroundColor: const Color(0xFFE0D6D1),
+                                 backgroundImage: specialist.profileImage != null && specialist.profileImage!.isNotEmpty
+                                     ? NetworkImage(specialist.profileImage!) 
+                                     : null,
+                                 child: specialist.profileImage == null || specialist.profileImage!.isEmpty
+                                     ? const Icon(Icons.person, color: Color(0xFFA05E44))
+                                     : null,
+                               ),
+                               const SizedBox(width: 12),
+                               Expanded(
+                                 child: Column(
+                                   crossAxisAlignment: CrossAxisAlignment.start,
+                                   children: [
+                                     Text(specialist.fullName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                                     Text(specialist.role, style: const TextStyle(fontSize: 14, color: Color(0xFF8C8C8C))),
+                                   ],
+                                 ),
+                               ),
+                               const Icon(Icons.arrow_forward, color: Color(0xFFA05E44), size: 20),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
+              loading: () => const Center(
+                child: Padding(
+                  padding: EdgeInsets.all(20.0),
+                  child: CircularProgressIndicator(color: Color(0xFFA05E44)),
+                ),
+              ),
+              error: (err, stack) => const Text(
+                "Failed to load your care team.",
+                style: TextStyle(color: Color(0xFF757575), fontSize: 14),
+              ),
+            );
+          }
         ),
       ],
     );
@@ -465,7 +518,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     
     return GestureDetector(
       onTap: () {
-        context.push('/health/session-overview', extra: session.id);
+        context.push('/health/session-overview', extra: session);
       },
       child: Container(
         width: double.infinity,
@@ -493,7 +546,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               child: ClipRRect(
                 borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
                 child: Image.network(
-                  session.imageUrl ?? 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1740&q=80',
+                  _formatImageUrl(session.imageUrl, 'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1740&q=80'),
                   fit: BoxFit.cover,
                   errorBuilder: (context, error, stackTrace) {
                     return const Center(child: Icon(Icons.image_not_supported, size: 50, color: Colors.grey));
@@ -642,6 +695,19 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     );
   }
 
+  String _formatImageUrl(String? url, String fallback) {
+    if (url == null || url.isEmpty) return fallback;
+    if (url.startsWith('http')) return url;
+    
+    final uri = Uri.parse(ApiConstants.baseUrl);
+    final baseDomain = '${uri.scheme}://${uri.host}${uri.hasPort ? ':${uri.port}' : ''}';
+    
+    if (url.startsWith('/')) {
+      return '$baseDomain$url';
+    }
+    return '$baseDomain/$url';
+  }
+
   Widget _buildDateCell(String day, String date, bool isSelected, {bool isDisabled = false}) {
     return Container(
       width: 50,
@@ -778,11 +844,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           const SizedBox(height: AppSpacing.md),
           ...displayGuidance.map((guidance) => GestureDetector(
             onTap: () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => GuidanceDetailBottomSheet(guidance: guidance),
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GuidanceDetailBottomSheet(guidance: guidance),
+                ),
               );
             },
             child: Padding(

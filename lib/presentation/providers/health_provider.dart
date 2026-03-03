@@ -8,6 +8,7 @@ import '../../data/models/weekly_schedule_model.dart';
 import '../../data/models/session_progress_model.dart';
 import '../../data/models/active_progress_model.dart';
 import 'core_providers.dart';
+import '../../data/models/api_response.dart';
 
 // Provider for HealthRepository
 final healthRepositoryProvider = Provider<HealthRepository>((ref) {
@@ -61,7 +62,7 @@ final startSessionProvider = FutureProvider.family<SessionProgressModel?, String
 });
 
 // FutureProvider.family for Complete Session
-final completeSessionProvider = FutureProvider.family<SessionProgressModel?, String>((ref, id) async {
+final completeSessionProvider = FutureProvider.family<ApiResponse<SessionProgressModel>?, String>((ref, id) async {
   final repository = ref.watch(healthRepositoryProvider);
   final result = await repository.completeSession(id);
 

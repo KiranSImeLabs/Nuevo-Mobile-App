@@ -7,6 +7,7 @@ import '../models/daily_exercise_model.dart';
 import '../models/weekly_schedule_model.dart';
 import '../models/session_progress_model.dart';
 import '../models/active_progress_model.dart';
+import '../models/api_response.dart';
 
 class HealthRepositoryImpl implements HealthRepository {
   final ApiClient apiClient;
@@ -78,11 +79,11 @@ class HealthRepositoryImpl implements HealthRepository {
   }
 
   @override
-  Future<Either<Failure, SessionProgressModel>> completeSession(String id) async {
+  Future<Either<Failure, ApiResponse<SessionProgressModel>>> completeSession(String id) async {
     try {
       final response = await apiClient.completeSession(id);
       if (response.success && response.data != null) {
-        return Right(response.data!);
+        return Right(response);
       } else {
         return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
       }
