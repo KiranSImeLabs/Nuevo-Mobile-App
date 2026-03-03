@@ -39,14 +39,16 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
     String? name,
     String? phoneNumber,
     String? profileImageUrl,
+    String? dateOfBirth,
   }) async {
     // Optimistic update or set loading
-    // state = const AsyncValue.loading(); 
+    state = const AsyncValue.loading(); 
     
     final result = await _updateUserProfileUseCase(UpdateProfileParams(
       name: name,
       phoneNumber: phoneNumber,
       profileImageUrl: profileImageUrl,
+      dateOfBirth: dateOfBirth,
     ));
     
     result.fold(

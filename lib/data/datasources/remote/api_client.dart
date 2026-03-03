@@ -14,6 +14,7 @@ import '../../models/weekly_schedule_model.dart';
 import '../../models/session_progress_model.dart';
 import '../../models/active_progress_model.dart';
 import '../../models/specialist_model.dart';
+import '../../models/payment_integration_models.dart';
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
@@ -357,6 +358,60 @@ class ApiClient {
     return ApiResponse.fromJson(
       response.data,
       (json) => SpecialistModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  // ============================================
+  // Payment & Subscription Endpoints
+  // ============================================
+
+  /// Get Payway Subscription Details
+  Future<ApiResponse<SubscriptionPaywayDetails>> getSubscriptionPaywayDetails() async {
+    final response = await _dioClient.get(ApiConstants.subscriptionPaywayDetails);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => SubscriptionPaywayDetails.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Saved Cards (Payment Customer)
+  Future<ApiResponse<PaymentCustomerDetails>> getSavedCards() async {
+    final response = await _dioClient.get(ApiConstants.paymentCustomer);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PaymentCustomerDetails.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Tokenize Card
+  Future<ApiResponse<SingleUseTokenResponse>> tokenizeCard(
+      Map<String, dynamic> cardDetails) async {
+    // API Expects URL-encoded form data
+    print("cardDetails: ${cardDetails} ============");
+    final response = await _dioClient.post(
+      ApiConstants.paymentToken,
+      data: cardDetails,
+      options: Options(contentType: Headers.formUrlEncodedContentType),
+    );
+    print("SingleUseTokenResponse: ${response.data}");
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => SingleUseTokenResponse.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Save Card
+  Future<ApiResponse<SaveCardResponse>> saveCard(
+      String singleUseTokenId) async {
+    print("singleUseTokenId: $singleUseTokenId");
+    final response = await _dioClient.post(
+      ApiConstants.paymentSaveCard,
+      data: {'singleUseTokenId': singleUseTokenId},
+    );
+    print("response: ${response.data}");
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => SaveCardResponse.fromJson(json as Map<String, dynamic>),
     );
   }
 }

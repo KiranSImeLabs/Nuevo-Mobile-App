@@ -52,10 +52,40 @@ class UserRepositoryImpl implements UserRepository {
     String? name,
     String? phoneNumber,
     String? profileImageUrl,
+    String? dateOfBirth,
   }) async {
-    // API endpoint not present in Postman collection subset provided.
-    // If it exists, add to RestClient and call here.
-    return Left(ServerFailure(message: 'Update profile not implemented in API'));
+    try {
+      final nameParts = name?.trim().split(' ');
+      final firstName = nameParts != null && nameParts.isNotEmpty ? nameParts.first : '';
+      final lastName = nameParts != null && nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      
+      final data = {
+        "firstName": firstName,
+        "lastName": lastName,
+        "profileImage": profileImageUrl ?? "",
+        "dateOfBirth": dateOfBirth ?? "",
+      };
+      
+      final response = await _apiClient.updateProfile(data);
+      if (response.success && response.data != null) {
+        return Right(response.data!.toEntity());
+      } else {
+        return Left(ServerFailure(message: response.message ?? 'Failed to update profile'));
+      }
+    } on DioException catch (e) {
+      final exception = DioClient.handleDioError(e);
+      if (exception is AuthException) {
+        return Left(AuthFailure(message: exception.message, code: exception.code));
+      } else if (exception is NetworkException) {
+        return Left(NetworkFailure(message: exception.message, code: exception.code));
+      } else if (exception is ServerException) {
+        return Left(ServerFailure(message: exception.message, code: exception.code));
+      } else {
+        return Left(UnknownFailure(message: exception.toString()));
+      }
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
   }
 
   @override

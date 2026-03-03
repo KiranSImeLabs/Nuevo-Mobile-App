@@ -83,7 +83,6 @@ class DioClient {
         
       case DioExceptionType.badResponse:
         final statusCode = error.response?.statusCode;
-        
         if (statusCode == 401) {
           return AuthException(
             message: ErrorMessages.sessionExpired,
@@ -101,6 +100,7 @@ class DioClient {
           );
         } else if (statusCode == 400) {
           // Check for validation errors
+          
           if (error.response?.data is Map && error.response?.data['errors'] != null) {
              return ValidationException(
               message: 'Validation failed',
@@ -176,8 +176,10 @@ class DioClient {
         queryParameters: queryParameters,
         options: options,
       );
+       print("response: ${response.data} ====================");
       return response;
     } on DioException catch (e) {
+      print("handleDioError(e): ${handleDioError(e)} ===================");
       throw handleDioError(e);
     }
   }

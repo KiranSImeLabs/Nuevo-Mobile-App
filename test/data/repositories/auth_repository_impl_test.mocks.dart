@@ -7,7 +7,7 @@ import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:nuevo_app/data/datasources/local/local_data_source.dart'
-    as _i16;
+    as _i17;
 import 'package:nuevo_app/data/datasources/remote/api_client.dart' as _i4;
 import 'package:nuevo_app/data/models/active_progress_model.dart' as _i14;
 import 'package:nuevo_app/data/models/api_response.dart' as _i2;
@@ -15,6 +15,7 @@ import 'package:nuevo_app/data/models/auth_response_model.dart' as _i6;
 import 'package:nuevo_app/data/models/daily_exercise_model.dart' as _i11;
 import 'package:nuevo_app/data/models/diet_plan_model.dart' as _i10;
 import 'package:nuevo_app/data/models/lab_request_model.dart' as _i9;
+import 'package:nuevo_app/data/models/payment_integration_models.dart' as _i16;
 import 'package:nuevo_app/data/models/preferences_model.dart' as _i8;
 import 'package:nuevo_app/data/models/session_progress_model.dart' as _i13;
 import 'package:nuevo_app/data/models/specialist_model.dart' as _i15;
@@ -552,12 +553,85 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           ),
         )),
       ) as _i5.Future<_i2.ApiResponse<_i15.SpecialistModel>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i16.SubscriptionPaywayDetails>>
+      getSubscriptionPaywayDetails() => (super.noSuchMethod(
+            Invocation.method(
+              #getSubscriptionPaywayDetails,
+              [],
+            ),
+            returnValue: _i5
+                .Future<_i2.ApiResponse<_i16.SubscriptionPaywayDetails>>.value(
+                _FakeApiResponse_0<_i16.SubscriptionPaywayDetails>(
+              this,
+              Invocation.method(
+                #getSubscriptionPaywayDetails,
+                [],
+              ),
+            )),
+          ) as _i5.Future<_i2.ApiResponse<_i16.SubscriptionPaywayDetails>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i16.PaymentCustomerDetails>> getSavedCards() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getSavedCards,
+          [],
+        ),
+        returnValue:
+            _i5.Future<_i2.ApiResponse<_i16.PaymentCustomerDetails>>.value(
+                _FakeApiResponse_0<_i16.PaymentCustomerDetails>(
+          this,
+          Invocation.method(
+            #getSavedCards,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i16.PaymentCustomerDetails>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i16.SingleUseTokenResponse>> tokenizeCard(
+          Map<String, dynamic>? cardDetails) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #tokenizeCard,
+          [cardDetails],
+        ),
+        returnValue:
+            _i5.Future<_i2.ApiResponse<_i16.SingleUseTokenResponse>>.value(
+                _FakeApiResponse_0<_i16.SingleUseTokenResponse>(
+          this,
+          Invocation.method(
+            #tokenizeCard,
+            [cardDetails],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i16.SingleUseTokenResponse>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i16.SaveCardResponse>> saveCard(
+          String? singleUseTokenId) =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #saveCard,
+          [singleUseTokenId],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<_i16.SaveCardResponse>>.value(
+            _FakeApiResponse_0<_i16.SaveCardResponse>(
+          this,
+          Invocation.method(
+            #saveCard,
+            [singleUseTokenId],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<_i16.SaveCardResponse>>);
 }
 
 /// A class which mocks [LocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalDataSource extends _i1.Mock implements _i16.LocalDataSource {
+class MockLocalDataSource extends _i1.Mock implements _i17.LocalDataSource {
   MockLocalDataSource() {
     _i1.throwOnMissingStub(this);
   }
