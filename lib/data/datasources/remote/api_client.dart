@@ -274,6 +274,27 @@ class ApiClient {
     );
   }
 
+  /// Complete Session
+  Future<ApiResponse<SessionProgressModel>> completeSession(String id) async {
+    final response = await _dioClient.post('${ApiConstants.sessionDetails}/$id${ApiConstants.sessionComplete}');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => SessionProgressModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Sync Session Progress
+  Future<ApiResponse<SessionProgressModel>> syncSessionProgress(String id, Map<String, dynamic> data) async {
+    final response = await _dioClient.post(
+      '${ApiConstants.sessionDetails}/$id${ApiConstants.sessionProgressUpdate}',
+      data: data,
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => SessionProgressModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
   /// Get Active Progress
   Future<ApiResponse<ActiveProgressModel?>> getActiveProgress() async {
     try {

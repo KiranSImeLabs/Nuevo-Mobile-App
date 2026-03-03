@@ -175,7 +175,11 @@ final routerProvider = Provider<GoRouter>((ref) {
 
           GoRoute(
             path: '/health',
-            builder: (context, state) => const HealthScreen(),
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              final initialTabIndex = extra?['initialTabIndex'] as int? ?? 0;
+              return HealthScreen(initialTabIndex: initialTabIndex);
+            },
           ),
           GoRoute(
             path: '/appointments',
@@ -204,6 +208,15 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final session = state.extra as Session;
           return BookSessionScreen(session: session);
+        },
+      ),
+      GoRoute(
+        path: '/quick-health',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final extra = state.extra as Map<String, dynamic>?;
+          final initialTabIndex = extra?['initialTabIndex'] as int? ?? 0;
+          return HealthScreen(initialTabIndex: initialTabIndex);
         },
       ),
       GoRoute(

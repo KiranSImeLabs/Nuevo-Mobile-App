@@ -14,16 +14,35 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'widgets/guidance_detail_bottom_sheet.dart';
 
 class HealthScreen extends ConsumerStatefulWidget {
-  const HealthScreen({super.key});
+  final int initialTabIndex;
+  
+  const HealthScreen({
+    super.key,
+    this.initialTabIndex = 0,
+  });
 
   @override
   ConsumerState<HealthScreen> createState() => _HealthScreenState();
 }
 
 class _HealthScreenState extends ConsumerState<HealthScreen> {
-  int _selectedTabIndex = 0; // Default to 'Exercise'
+  late int _selectedTabIndex;
   final List<String> _tabs = ['Exercise', 'Diet', 'Results', 'Insights'];
   DateTime _selectedDate = DateTime.now(); // Always land on current date
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedTabIndex = widget.initialTabIndex;
+  }
+
+  @override
+  void didUpdateWidget(covariant HealthScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialTabIndex != oldWidget.initialTabIndex) {
+      _selectedTabIndex = widget.initialTabIndex;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,15 +55,37 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header
-              const Center(
-                child: Text(
-                  'Health',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w500,
-                    color: AppColors.textPrimary,
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  if (Navigator.of(context).canPop())
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: IconButton(
+                        icon: const Icon(Icons.arrow_back, color: AppColors.textPrimary),
+                        onPressed: () {
+                          if (context.canPop()) {
+                            context.pop();
+                          } else {
+                            context.go('/home');
+                          }
+                        },
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ),
+                  const Align(
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Health',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
                   ),
-                ),
+                ],
               ),
               const SizedBox(height: AppSpacing.xl),
 

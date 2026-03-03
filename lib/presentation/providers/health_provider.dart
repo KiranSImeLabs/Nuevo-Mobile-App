@@ -60,6 +60,30 @@ final startSessionProvider = FutureProvider.family<SessionProgressModel?, String
   );
 });
 
+// FutureProvider.family for Complete Session
+final completeSessionProvider = FutureProvider.family<SessionProgressModel?, String>((ref, id) async {
+  final repository = ref.watch(healthRepositoryProvider);
+  final result = await repository.completeSession(id);
+
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (data) => data,
+  );
+});
+
+// FutureProvider.family for Sync Session Progress
+final syncSessionProgressProvider = FutureProvider.family<SessionProgressModel?, Map<String, dynamic>>((ref, params) async {
+  final repository = ref.watch(healthRepositoryProvider);
+  final id = params['id'] as String;
+  final data = params['data'] as Map<String, dynamic>;
+  final result = await repository.syncSessionProgress(id, data);
+
+  return result.fold(
+    (failure) => throw Exception(failure.message),
+    (data) => data,
+  );
+});
+
 // FutureProvider for Active Progress
 final activeProgressProvider = FutureProvider.autoDispose<ActiveProgressModel?>((ref) async {
   final repository = ref.watch(healthRepositoryProvider);

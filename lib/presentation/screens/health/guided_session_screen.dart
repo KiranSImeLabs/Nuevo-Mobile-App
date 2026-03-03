@@ -24,6 +24,7 @@ class GuidedSessionScreen extends ConsumerStatefulWidget {
 class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
   bool _isPlaying = false;
   bool _isSessionStarted = false;
+  bool _isCompletingSession = false;
   int _currentStep = 0;
   late PageController _pageController;
 
@@ -42,60 +43,14 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
             (step) => {
               'title': step.title ?? 'Exercise Step',
               'instruction': step.description ?? '',
-              'image': (step.videoUrl != null && step.videoUrl!.isNotEmpty)
-                  ? step.videoUrl
-                  : 'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
+              'image': step.videoUrl ?? '',
               'isVideo': (step.videoUrl != null && step.videoUrl!.isNotEmpty),
               'duration': step.duration ?? 30,
             },
           )
           .toList();
     } else {
-      // Fallback mock steps... (kept collapsed for edit chunk)
-      _sessionSteps = [
-        {
-          'title': 'Gently tilt right',
-          'instruction':
-              'Keep your shoulders down and relaxed. Feel the stretch along the left side.',
-          'image':
-              'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-          'isVideo': false,
-          'duration': 45,
-        },
-        {
-          'title': 'Gently tilt left',
-          'instruction': 'Repeat on the other side. Breathe deeply.',
-          'image':
-              'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-          'isVideo': false,
-          'duration': 45,
-        },
-        {
-          'title': 'Forward stretch',
-          'instruction': 'Reach forward and hold. Keep your back straight.',
-          'image':
-              'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-          'isVideo': false,
-          'duration': 60,
-        },
-        {
-          'title': 'Shoulder rolls',
-          'instruction': 'Roll your shoulders backwards in slow circles.',
-          'image':
-              'https://images.unsplash.com/photo-1571019615243-308fb4344b80?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-          'isVideo': false,
-          'duration': 30,
-        },
-        {
-          'title': 'Deep breathing',
-          'instruction':
-              'Inhale deeply through your nose, exhale slowly through your mouth.',
-          'image':
-              'https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80',
-          'isVideo': false,
-          'duration': 30,
-        },
-      ];
+      _sessionSteps = [];
     }
 
   }
@@ -142,6 +97,24 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
     }
   }
 
+  void _syncProgress() {
+    if (!_isSessionStarted) return;
+    
+    // Fire and forget progress update
+    final data = {
+      "currentStepIndex": _currentStep,
+      "currentTimeInStep": 0, // Assuming 0 as we removed the timer
+      "heartRate": 120 // Static for now as requested or placeholder
+    };
+    
+    ref.read(syncSessionProgressProvider({
+      'id': widget.sessionId,
+      'data': data,
+    }).future).catchError((e) {
+      debugPrint('Failed to sync progress: $e');
+    });
+  }
+
   void _onPlayPauseTapped() {
     if (!_isSessionStarted) {
       // First time play is tapped -> Start the session
@@ -155,6 +128,11 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
       setState(() {
         _isPlaying = !_isPlaying;
       });
+
+      // Sync progress when pausing
+      if (!_isPlaying) {
+        _syncProgress();
+      }
     }
   }
 
@@ -171,24 +149,46 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
         curve: Curves.easeInOut,
       );
     } else {
-      _completeSession();
+      _endSession();
     }
   }
 
-  void _completeSession() {
+  Future<void> _endSession() async {
     setState(() {
       _isPlaying = false;
+      _isCompletingSession = true;
     });
 
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (context) => const SessionCompletedSheet(),
-    );
+    try {
+      await ref.read(completeSessionProvider(widget.sessionId).future);
+      
+      if (!mounted) return;
+      showModalBottomSheet(
+        context: context,
+        isScrollControlled: true,
+        backgroundColor: Colors.transparent,
+        builder: (context) => const SessionCompletedSheet(),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      // If it fails, we fall back to popping the screen since the user wanted to end it anyway
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to complete session: $e')),
+      );
+      context.pop();
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isCompletingSession = false;
+        });
+      }
+    }
   }
 
   void _onStepChanged(int index) {
+    if (_isSessionStarted && index != _currentStep) {
+      _syncProgress(); // Sync progress when changing steps manually
+    }
     setState(() {
       _currentStep = index;
     });
@@ -196,6 +196,38 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_sessionSteps.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back, color: Color(0xFF5D4037)),
+            onPressed: () => context.pop(),
+          ),
+          title: const Text(
+            'Guided Session',
+            style: TextStyle(
+              color: Color(0xFF5D4037),
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: true,
+        ),
+        body: const Center(
+          child: Text(
+            'No session steps available.',
+            style: TextStyle(
+              color: Color(0xFF5D4037),
+              fontSize: 16,
+            ),
+          ),
+        ),
+      );
+    }
+
     final currentStepData = _sessionSteps[_currentStep];
 
     return Scaffold(
@@ -436,6 +468,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                   icon: Icons.skip_previous_rounded,
                   onTap: () {
                     if (_currentStep > 0) {
+                      _syncProgress();
                       _pageController.previousPage(
                         duration: const Duration(milliseconds: 300),
                         curve: Curves.easeInOut,
@@ -463,7 +496,10 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                 // Next
                 _buildCircleButton(
                   icon: Icons.skip_next_rounded,
-                  onTap: _nextStep,
+                  onTap: () {
+                    _syncProgress();
+                    _nextStep();
+                  },
                   size: 56,
                   iconColor: const Color(0xFF5D4037),
                   backgroundColor: const Color(0xFFFAF1ED),
@@ -486,22 +522,34 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                 width: double.infinity,
                 height: 56,
                 child: OutlinedButton(
-                  onPressed: () => context.pop(),
+                  onPressed: _isCompletingSession ? null : _endSession,
                   style: OutlinedButton.styleFrom(
-                    side: const BorderSide(color: Color(0xFFA35940)),
+                    side: BorderSide(
+                        color: _isCompletingSession
+                            ? Colors.grey
+                            : const Color(0xFFA35940)),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                     backgroundColor: const Color(0xFFFAF1ED),
                   ),
-                  child: const Text(
-                    'End Session',
-                    style: TextStyle(
-                      color: Color(0xFFA35940),
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: _isCompletingSession
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            color: Color(0xFFA35940),
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : const Text(
+                          'End Session',
+                          style: TextStyle(
+                            color: Color(0xFFA35940),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ),
