@@ -4,6 +4,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../data/models/api_response.dart';
 import '../../../data/models/payment_integration_models.dart';
+import '../../../data/models/billing_response_model.dart';
 import '../../providers/core_providers.dart';
 import 'widgets/add_card_bottom_sheet.dart';
 
@@ -17,6 +18,7 @@ class PaymentsScreen extends ConsumerStatefulWidget {
 class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
   late Future<ApiResponse<SubscriptionPaywayDetails>> _subscriptionFuture;
   late Future<ApiResponse<PaymentCustomerDetails>> _savedCardsFuture;
+  late Future<ApiResponse<BillingResponseData>> _billingDetailsFuture;
 
   @override
   void initState() {
@@ -28,6 +30,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
     final apiClient = ref.read(apiClientProvider);
     _subscriptionFuture = apiClient.getSubscriptionPaywayDetails();
     _savedCardsFuture = apiClient.getSavedCards();
+    _billingDetailsFuture = apiClient.getBillingDetails();
   }
 
   @override
@@ -65,11 +68,18 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   } else if (snapshot.hasError) {
                     return Text('Error: ${snapshot.error}');
                   } else if (snapshot.hasData && snapshot.data!.success) {
-                    return _buildPlanCard(context, snapshot.data!.data);
+                    return FutureBuilder<ApiResponse<BillingResponseData>>(
+                      future: _billingDetailsFuture,
+                      builder: (context, billingSnapshot) {
+                        if (billingSnapshot.connectionState == ConnectionState.waiting) {
+                          return const Center(child: CircularProgressIndicator());
+                        }
+                        final currentSub = billingSnapshot.data?.data?.currentSubscription;
+                        return _buildPlanCard(context, snapshot.data!.data, currentSub);
+                      },
+                    );
                   } else {
-                     // Fallback/Empty state or static design if fetch failed gracefully-ish
-                     // For now showing error or empty.
-                     return Text(snapshot.data?.message ?? 'Failed to load subscription');
+                     return Text(snapshot.data?.message ?? 'Failed to load subscription status');
                   }
                 },
               ),
@@ -86,9 +96,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                     backgroundColor: Colors.transparent,
                     builder: (context) => const AddCardBottomSheet(),
                   );
-                  // Refresh cards after adding
+                  // Refresh logic
                   setState(() {
                      _savedCardsFuture = ref.read(apiClientProvider).getSavedCards();
+                     _billingDetailsFuture = ref.read(apiClientProvider).getBillingDetails();
                   });
                 },
               ),
@@ -117,7 +128,25 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
               const SizedBox(height: 32),
               _buildSectionHeader(title: AppStrings.billingHistory),
               const SizedBox(height: 16),
-              _buildBillingHistoryList(),
+              FutureBuilder<ApiResponse<BillingResponseData>>(
+                future: _billingDetailsFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                     return const Center(child: CircularProgressIndicator());
+                  } else if (snapshot.hasError) {
+                     return Text('Error: ${snapshot.error}');
+                  } else if (snapshot.hasData && snapshot.data!.success) {
+                     final history = snapshot.data!.data?.billingHistory;
+                     if (history != null && history.isNotEmpty) {
+                        return _buildBillingHistoryList(history);
+                     } else {
+                        return const Text("No billing history available.");
+                     }
+                  } else {
+                     return Text(snapshot.data?.message ?? 'Failed to load billing history');
+                  }
+                },
+              ),
             ],
           ),
         ),
@@ -125,11 +154,21 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
     );
   }
 
-  Widget _buildPlanCard(BuildContext context, SubscriptionPaywayDetails? details) {
+  Widget _buildPlanCard(
+    BuildContext context, 
+    SubscriptionPaywayDetails? details,
+    CurrentSubscriptionModel? currentSub,
+  ) {
     final schedule = details?.paywaySchedule;
     final amount = schedule?.regularPaymentAmount ?? 0;
     final periodicity = schedule?.frequency ?? AppStrings.month;
     final nextDate = schedule?.nextPaymentDate ?? 'N/A';
+
+    final programName = currentSub?.programName ?? 'N/A';
+    String displayStatus = 'N/A';
+    if (currentSub?.status != null && currentSub!.status!.isNotEmpty) {
+      displayStatus = _toCamelCase(currentSub.status!);
+    }
 
     return Container(
       width: double.infinity,
@@ -164,7 +203,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  AppStrings.active,
+                  displayStatus,
                   style: AppTextStyles.caption.copyWith(
                     color: Colors.white,
                     fontWeight: FontWeight.w600,
@@ -175,7 +214,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
           ),
           const SizedBox(height: 16),
           Text(
-            AppStrings.insightProgram,
+            programName,
             style: AppTextStyles.h3.copyWith(
               color: Colors.white,
               fontSize: 18,
@@ -326,15 +365,26 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
     );
   }
 
-  Widget _buildBillingHistoryList() {
-    // Determine how many items to show based on design (e.g. 3 items)
-    // Currently static as per instructions focusing on Subscription and Cards
+  Widget _buildBillingHistoryList(List<BillingHistoryModel> history) {
     return Column(
-      children: List.generate(3, (index) => _buildBillingHistoryItem()),
+      children: history.map((item) => _buildBillingHistoryItem(item)).toList(),
     );
   }
 
-  Widget _buildBillingHistoryItem() {
+  Widget _buildBillingHistoryItem(BillingHistoryModel item) {
+    String formattedDate = item.date ?? 'N/A';
+    try {
+      if (item.date != null) {
+        final dt = DateTime.parse(item.date!);
+        formattedDate = '${dt.day.toString().padLeft(2, '0')} ${_getShortMonth(dt.month)} ${dt.year}';
+      }
+    } catch (_) {}
+
+    final description = item.description ?? "Subscription";
+    final amount = item.amount ?? 0;
+    final currency = item.currency ?? "AUD";
+    final status = item.status ?? "Paid";
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 12.0),
       child: Container(
@@ -359,7 +409,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    AppStrings.monthlySubscription,
+                    description,
                     style: AppTextStyles.bodyLarge.copyWith(
                       fontWeight: FontWeight.w400, // Regular weight as per list item
                       color: AppColors.textPrimary,
@@ -367,7 +417,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    'Oct 01, 2023',
+                    formattedDate,
                     style: AppTextStyles.bodyMedium.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -379,7 +429,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  '\$99.00',
+                  '\$$amount $currency',
                    style: AppTextStyles.bodyLarge.copyWith(
                       fontWeight: FontWeight.w500,
                       color: AppColors.textPrimary,
@@ -393,7 +443,7 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Text(
-                      AppStrings.paid,
+                      status.toUpperCase(),
                       style: AppTextStyles.caption.copyWith(
                         color: const Color(0xFF5D2E24),
                          fontWeight: FontWeight.w600,
@@ -407,5 +457,25 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
       ),
     );
   }
-}
 
+  String _getShortMonth(int month) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    if (month >= 1 && month <= 12) {
+      return months[month - 1];
+    }
+    return '';
+  }
+
+  String _toCamelCase(String text) {
+    if (text.isEmpty) return '';
+    final words = text.split(RegExp(r'[_\s]'));
+    String result = '';
+    for (int i = 0; i < words.length; i++) {
+      final word = words[i];
+      if (word.isNotEmpty) {
+        result += word[0].toUpperCase() + word.substring(1).toLowerCase();
+      }
+    }
+    return result;
+  }
+}

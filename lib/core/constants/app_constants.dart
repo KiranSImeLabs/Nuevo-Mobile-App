@@ -29,6 +29,7 @@ class ApiConstants {
   static const String paymentCustomer = '/payments/customer';
   static const String paymentToken = '/payments/token';
   static const String paymentSaveCard = '/payments/save-card';
+  static const String billingDetails = '/mobile/billing';
   
   // Subscriptions (Using existing constants if they map to Programs/Bookings, 
   // but keeping placeholders if not explicitly in the Postman subset provided)

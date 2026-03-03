@@ -341,7 +341,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       await ref.read(userProvider.notifier).updateProfile(
         name: name,
         dateOfBirth: dob,
-        profileImageUrl: "", // Currently send the profile image as "".
+        profileImageUrl: "https://fastly.picsum.photos/id/1/5000/3333.jpg?hmac=Asv2DU3rA_5D1xSe22xZK47WEAN0wjWeFOhzd13ujW4", // Currently send the profile image as "".
       );
 
       if (mounted) {

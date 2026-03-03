@@ -15,6 +15,7 @@ import '../../models/session_progress_model.dart';
 import '../../models/active_progress_model.dart';
 import '../../models/specialist_model.dart';
 import '../../models/payment_integration_models.dart';
+import '../../models/billing_response_model.dart';
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
@@ -389,6 +390,15 @@ class ApiClient {
     return ApiResponse.fromJson(
       response.data,
       (json) => SaveCardResponse.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Billing Details (Subscription, Cards, History)
+  Future<ApiResponse<BillingResponseData>> getBillingDetails() async {
+    final response = await _dioClient.get(ApiConstants.billingDetails);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => BillingResponseData.fromJson(json as Map<String, dynamic>),
     );
   }
 }
