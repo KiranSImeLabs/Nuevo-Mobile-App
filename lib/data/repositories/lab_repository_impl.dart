@@ -24,7 +24,7 @@ class LabRepositoryImpl implements LabRepository {
         return Right(response.data!);
       } else {
         return Left(ServerFailure(
-          message: response.message ?? 'Failed to create lab request',
+          response.message ?? 'Failed to create lab request',
         ));
       }
     } on DioException catch (e) {
@@ -37,7 +37,7 @@ class LabRepositoryImpl implements LabRepository {
             message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
         return Left(ServerFailure(
-            message: exception.message, code: exception.code));
+            exception.message, exception.code));
       } else if (exception is ValidationException) {
          final msg = exception.errors != null && exception.errors!.isNotEmpty
             ? exception.errors!.join(', ')
@@ -60,8 +60,7 @@ class LabRepositoryImpl implements LabRepository {
         return Right(response.data!);
       } else {
         return Left(ServerFailure(
-          message:
-              response.message ?? 'Failed to retrieve lab requests',
+          response.message ?? 'Failed to retrieve lab requests',
         ));
       }
     } on DioException catch (e) {
@@ -80,8 +79,7 @@ class LabRepositoryImpl implements LabRepository {
         return Right(response.data!);
       } else {
         return Left(ServerFailure(
-          message:
-              response.message ?? 'Failed to retrieve lab request details',
+          response.message ?? 'Failed to retrieve lab request details',
         ));
       }
     } on DioException catch (e) {
@@ -98,7 +96,7 @@ class LabRepositoryImpl implements LabRepository {
     } else if (exception is NetworkException) {
       return NetworkFailure(message: exception.message, code: exception.code);
     } else if (exception is ServerException) {
-      return ServerFailure(message: exception.message, code: exception.code);
+      return ServerFailure(exception.message, exception.code);
     } else if (exception is ValidationException) {
       final msg = exception.errors != null && exception.errors!.isNotEmpty
           ? exception.errors!.join(', ')

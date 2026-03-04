@@ -49,6 +49,9 @@ class ApiConstants {
   static const String labRequests = '/lab-requests';
   static const String dietPlans = '/diet-plans';
 
+  // Goals
+  static const String goals = '/goals';
+
   // Specialists
   static const String mySpecialists = '/patients/my-specialists';
   static const String specialistDetails = '/patients/specialists';

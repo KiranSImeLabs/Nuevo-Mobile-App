@@ -23,7 +23,7 @@ class SpecialistRepositoryImpl implements SpecialistRepository {
         return Right(specialists);
       } else {
         return Left(ServerFailure(
-            message: response.message ?? 'Failed to get specialists'));
+            response.message ?? 'Failed to get specialists'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -35,7 +35,7 @@ class SpecialistRepositoryImpl implements SpecialistRepository {
             NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
         return Left(
-            ServerFailure(message: exception.message, code: exception.code));
+            ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }
@@ -52,7 +52,7 @@ class SpecialistRepositoryImpl implements SpecialistRepository {
         return Right(response.data!.toEntity());
       } else {
         return Left(ServerFailure(
-            message: response.message ?? 'Failed to get specialist details'));
+            response.message ?? 'Failed to get specialist details'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -64,7 +64,7 @@ class SpecialistRepositoryImpl implements SpecialistRepository {
             NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
         return Left(
-            ServerFailure(message: exception.message, code: exception.code));
+            ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }

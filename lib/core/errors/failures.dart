@@ -1,4 +1,5 @@
 import 'package:equatable/equatable.dart';
+import 'package:dio/dio.dart';
 
 /// Base class for all application failures
 abstract class Failure extends Equatable {
@@ -24,10 +25,11 @@ class NetworkFailure extends Failure {
 
 /// Server-related failures
 class ServerFailure extends Failure {
-  const ServerFailure({
-    required super.message,
-    super.code,
-  });
+  const ServerFailure(String message, [int? code]) : super(message: message, code: code);
+
+  factory ServerFailure.fromDioException(DioException e) {
+    return ServerFailure(e.message ?? 'Server connection failed', e.response?.statusCode);
+  }
 }
 
 /// Authentication failures

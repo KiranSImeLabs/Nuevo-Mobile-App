@@ -148,7 +148,7 @@ void main() {
     
     test('should return ServerFailure when server error occurs', () async {
       // arrange
-      const tFailure = ServerFailure(message: 'Server error', code: 500);
+      const tFailure = ServerFailure('Server error', 500);
       when(mockSubscriptionRepository.getSubscriptionStatus())
           .thenAnswer((_) async => const Left(tFailure));
       

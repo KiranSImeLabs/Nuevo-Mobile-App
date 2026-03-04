@@ -101,7 +101,7 @@ void main() {
     
     test('should return ServerFailure when server error occurs', () async {
       // arrange
-      const tFailure = ServerFailure(message: 'Server error', code: 500);
+      const tFailure = ServerFailure('Server error', 500);
       when(mockAuthRepository.login(
         email: anyNamed('email'),
         password: anyNamed('password'),

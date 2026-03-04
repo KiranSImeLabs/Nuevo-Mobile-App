@@ -16,6 +16,7 @@ import '../../models/active_progress_model.dart';
 import '../../models/specialist_model.dart';
 import '../../models/payment_integration_models.dart';
 import '../../models/billing_response_model.dart';
+import '../../models/goal_model.dart';
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
@@ -219,6 +220,64 @@ class ApiClient {
 
   // Add other methods (Programs, Bookings) as needed if they were in the previous attempt
   // For brevity and to fix the immediate error, ensuring register/login/updateProfile exist.
+  
+  // ============================================
+  // Goal Endpoints
+  // ============================================
+
+  /// Get All Goals
+  Future<ApiResponse<List<GoalModel>>> getGoals() async {
+    final response = await _dioClient.get(ApiConstants.goals);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => (json as List<dynamic>)
+          .map((item) => GoalModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
+  /// Create Goal
+  Future<ApiResponse<GoalModel>> createGoal(Map<String, dynamic> data) async {
+    final response = await _dioClient.post(
+      ApiConstants.goals,
+      data: data,
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => GoalModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Goal By ID
+  Future<ApiResponse<GoalModel>> getGoalById(String id) async {
+    final response = await _dioClient.get('${ApiConstants.goals}/$id');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => GoalModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Update Goal
+  Future<ApiResponse<GoalModel>> updateGoal(String id, Map<String, dynamic> data) async {
+    final response = await _dioClient.put(
+      '${ApiConstants.goals}/$id',
+      data: data,
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => GoalModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Delete Goal
+  Future<ApiResponse<void>> deleteGoal(String id) async {
+    final response = await _dioClient.delete('${ApiConstants.goals}/$id');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => null,
+    );
+  }
+
   // ============================================
   // Diet Plan Endpoints
   // ============================================

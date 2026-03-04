@@ -20,10 +20,10 @@ class HealthRepositoryImpl implements HealthRepository {
       if (response.success && response.data != null) {
         return Right(response.data!);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -36,10 +36,10 @@ class HealthRepositoryImpl implements HealthRepository {
       if (response.success && response.data != null) {
         return Right(response.data!);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -52,10 +52,10 @@ class HealthRepositoryImpl implements HealthRepository {
       if (response.success && response.data != null) {
         return Right(response.data!);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -68,10 +68,10 @@ class HealthRepositoryImpl implements HealthRepository {
       if (response.success && response.data != null) {
         return Right(response.data!);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -84,10 +84,10 @@ class HealthRepositoryImpl implements HealthRepository {
       if (response.success && response.data != null) {
         return Right(response.data!);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -100,10 +100,10 @@ class HealthRepositoryImpl implements HealthRepository {
       if (response.success && response.data != null) {
         return Right(response.data!);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -116,10 +116,10 @@ class HealthRepositoryImpl implements HealthRepository {
       if (response.success) {
         return Right(response.data);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Unknown Error'));
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
     } on DioException catch (e) {
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }

@@ -64,7 +64,7 @@ class AuthRepositoryImpl implements AuthRepository {
         return Right(data.user.toEntity());
       } else {
 
-        return Left(ServerFailure(message: response.message ?? 'Login failed'));
+        return Left(ServerFailure(response.message ?? 'Login failed'));
       }
     } on DioException catch (e) {
       // Map DioException to domain Failure
@@ -74,7 +74,7 @@ class AuthRepositoryImpl implements AuthRepository {
       } else if (exception is NetworkException) {
         return Left(NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
-        return Left(ServerFailure(message: exception.message, code: exception.code));
+        return Left(ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }
@@ -121,7 +121,7 @@ class AuthRepositoryImpl implements AuthRepository {
         // Convert to domain entity and return
         return Right(data.user.toEntity());
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Signup failed'));
+        return Left(ServerFailure(response.message ?? 'Signup failed'));
       }
     } on DioException catch (e) {
        final exception = DioClient.handleDioError(e);
@@ -130,7 +130,7 @@ class AuthRepositoryImpl implements AuthRepository {
       } else if (exception is NetworkException) {
         return Left(NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
-        return Left(ServerFailure(message: exception.message, code: exception.code));
+        return Left(ServerFailure(exception.message, exception.code));
       } else if (exception is ValidationException) {
         final msg = exception.errors != null && exception.errors!.isNotEmpty
             ? exception.errors!.join(', ')
@@ -294,7 +294,7 @@ class AuthRepositoryImpl implements AuthRepository {
       if (response.success) {
         return const Right(null);
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Failed to send reset email'));
+        return Left(ServerFailure(response.message ?? 'Failed to send reset email'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -304,7 +304,7 @@ class AuthRepositoryImpl implements AuthRepository {
             : exception.message;
         return Left(ValidationFailure(message: msg, code: exception.code));
       }
-      return Left(ServerFailure(message: exception.message));
+      return Left(ServerFailure(exception.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }

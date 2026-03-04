@@ -54,13 +54,13 @@ void main() {
       () async {
     // arrange
     when(mockUserRepository.getPreferences())
-        .thenAnswer((_) async => const Left(ServerFailure(message: 'Server Error')));
+        .thenAnswer((_) async => const Left(ServerFailure('Server Error')));
 
     // act
     final result = await usecase(const NoParams());
 
     // assert
-    expect(result, const Left(ServerFailure(message: 'Server Error')));
+    expect(result, const Left(ServerFailure('Server Error')));
     verify(mockUserRepository.getPreferences());
     verifyNoMoreInteractions(mockUserRepository);
   });
