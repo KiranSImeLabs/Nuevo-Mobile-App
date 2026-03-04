@@ -29,6 +29,7 @@ class ApiConstants {
   static const String paymentCustomer = '/payments/customer';
   static const String paymentToken = '/payments/token';
   static const String paymentSaveCard = '/payments/save-card';
+  static const String billingDetails = '/mobile/billing';
   
   // Subscriptions (Using existing constants if they map to Programs/Bookings, 
   // but keeping placeholders if not explicitly in the Postman subset provided)
@@ -47,6 +48,9 @@ class ApiConstants {
   static const String wellnessData = '/health/wellness';
   static const String labRequests = '/lab-requests';
   static const String dietPlans = '/diet-plans';
+
+  // Goals
+  static const String goals = '/goals';
 
   // Specialists
   static const String mySpecialists = '/patients/my-specialists';

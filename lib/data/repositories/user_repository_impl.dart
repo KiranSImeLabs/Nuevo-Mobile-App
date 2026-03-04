@@ -29,7 +29,7 @@ class UserRepositoryImpl implements UserRepository {
       if (response.success && response.data != null) {
         return Right(response.data!.toEntity());
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Failed to get user profile'));
+        return Left(ServerFailure(response.message ?? 'Failed to get user profile'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -38,7 +38,7 @@ class UserRepositoryImpl implements UserRepository {
       } else if (exception is NetworkException) {
          return Left(NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
-        return Left(ServerFailure(message: exception.message, code: exception.code));
+        return Left(ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }
@@ -70,7 +70,7 @@ class UserRepositoryImpl implements UserRepository {
       if (response.success && response.data != null) {
         return Right(response.data!.toEntity());
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Failed to update profile'));
+        return Left(ServerFailure(response.message ?? 'Failed to update profile'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -79,7 +79,7 @@ class UserRepositoryImpl implements UserRepository {
       } else if (exception is NetworkException) {
         return Left(NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
-        return Left(ServerFailure(message: exception.message, code: exception.code));
+        return Left(ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }
@@ -99,7 +99,7 @@ class UserRepositoryImpl implements UserRepository {
         return Right(response.data!.toEntity());
       } else {
         return Left(ServerFailure(
-            message: response.message ?? 'Failed to update preferences'));
+            response.message ?? 'Failed to update preferences'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -111,7 +111,7 @@ class UserRepositoryImpl implements UserRepository {
             NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
         return Left(
-            ServerFailure(message: exception.message, code: exception.code));
+            ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }
@@ -129,7 +129,7 @@ class UserRepositoryImpl implements UserRepository {
         return Right(response.data!.toEntity());
       } else {
         return Left(ServerFailure(
-            message: response.message ?? 'Failed to get preferences'));
+            response.message ?? 'Failed to get preferences'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -141,7 +141,7 @@ class UserRepositoryImpl implements UserRepository {
             NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
         return Left(
-            ServerFailure(message: exception.message, code: exception.code));
+            ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }

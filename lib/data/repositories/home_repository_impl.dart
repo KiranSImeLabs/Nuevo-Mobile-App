@@ -24,14 +24,14 @@ class HomeRepositoryImpl implements HomeRepository {
           return Right(dashboardModel.toEntity());
         } catch (e, stackTrace) {
 
-          return Left(ServerFailure(message: 'Failed to parse dashboard data: $e'));
+          return Left(ServerFailure('Failed to parse dashboard data: $e'));
         }
       } else {
-        return Left(ServerFailure(message: response.data['message'] ?? 'Failed to load dashboard'));
+        return Left(ServerFailure(response.data['message'] ?? 'Failed to load dashboard'));
       }
     } on DioException catch (e) {
 
-      return Left(ServerFailure(message: e.message ?? 'Network Error'));
+      return Left(ServerFailure(e.message ?? 'Network Error'));
     } catch (e, s) {
 
       return Left(UnknownFailure(message: e.toString()));

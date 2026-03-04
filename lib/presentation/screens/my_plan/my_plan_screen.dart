@@ -1,12 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../widgets/common/care_team_member_card.dart';
-import 'package:go_router/go_router.dart';
+import '../../providers/home_provider.dart';
+import '../../providers/specialist_provider.dart';
+import '../../providers/goal_provider.dart';
 import 'diet_plan_detail_screen.dart';
 
-class MyPlanScreen extends StatelessWidget {
+class MyPlanScreen extends ConsumerStatefulWidget {
   const MyPlanScreen({super.key});
+
+  @override
+  ConsumerState<MyPlanScreen> createState() => _MyPlanScreenState();
+}
+
+class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(specialistListProvider.notifier).fetchSpecialists();
+      ref.read(goalListProvider.notifier).fetchGoals();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,74 +87,90 @@ class MyPlanScreen extends StatelessWidget {
   }
 
   Widget _buildHeaderCard() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFF6B3528), // Deep brown from design
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
+    final dashboardState = ref.watch(homeDashboardProvider);
+    
+    return dashboardState.when(
+      data: (dashboard) {
+        final program = dashboard.yourProgram;
+        if (program == null) {
+          return const SizedBox.shrink();
+        }
+        return Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
+            color: const Color(0xFF6B3528), // Deep brown from design
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const Icon(
-                  Icons.self_improvement, // Lotus position icon as placeholder
-                  color: Color(0xFF6B3528),
-                  size: 28,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Column(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    AppStrings.insightProgram,
-                    style: AppTextStyles.h3.copyWith(
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
                       color: Colors.white,
-                      fontSize: 18,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.self_improvement,
+                      color: Color(0xFF6B3528),
+                      size: 28,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    AppStrings.resetPhase,
-                    style: AppTextStyles.bodyMedium.copyWith(
-                      color: Colors.white.withOpacity(0.8),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          program.name,
+                          style: AppTextStyles.h3.copyWith(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          program.description,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppStrings.overview,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const Icon(
+                    Icons.arrow_forward,
+                    color: Colors.white,
+                    size: 20,
                   ),
                 ],
               ),
             ],
           ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                AppStrings.overview,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const Icon(
-                Icons.arrow_forward,
-                color: Colors.white,
-                size: 20,
-              ),
-            ],
-          ),
-        ],
-      ),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('Error: $error')),
     );
   }
 
@@ -223,39 +257,42 @@ class MyPlanScreen extends StatelessWidget {
   }
 
   Widget _buildCareTeam(BuildContext context) {
-    return Column(
-      children: [
-        CareTeamMemberCard(
-          name: AppStrings.drMike,
-          role: AppStrings.dietitian,
-          placeholderColor: Colors.blue.shade100, 
-          onTap: () => context.push(
-            '/clinician-profile',
-            extra: {
-              'name': AppStrings.drMike,
-              'role': AppStrings.dietitian,
-               // 'imageUrl': ..., // Pass real image URL when available
-            },
-          ),
-        ),
-        const SizedBox(height: 12),
-        CareTeamMemberCard(
-          name: AppStrings.drSmith,
-          role: AppStrings.generalPractitioner,
-          placeholderColor: Colors.teal.shade100,
-          onTap: () => context.push(
-            '/clinician-profile',
-            extra: {
-              'name': AppStrings.drSmith,
-              'role': AppStrings.generalPractitioner,
-            },
-          ),
-        ),
-      ],
+    final specialistsState = ref.watch(specialistListProvider);
+
+    return specialistsState.when(
+      data: (specialists) {
+        if (specialists.isEmpty) {
+          return const Text('No care team members found.');
+        }
+        return Column(
+          children: specialists.map((specialist) {
+            return Padding(
+              padding: const EdgeInsets.only(bottom: 12.0),
+              child: CareTeamMemberCard(
+                name: specialist.fullName,
+                role: specialist.role,
+                placeholderColor: Colors.blue.shade100, 
+                onTap: () => context.push(
+                  '/clinician-profile',
+                  extra: {
+                    'name': specialist.fullName,
+                    'role': specialist.role,
+                    'id': specialist.id,
+                  },
+                ),
+              ),
+            );
+          }).toList(),
+        );
+      },
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Center(child: Text('Error: $error')),
     );
   }
 
   Widget _buildGoalsSection(BuildContext context) {
+    final goalsState = ref.watch(goalListProvider);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -286,15 +323,26 @@ class MyPlanScreen extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
-          // Goal 1
-          _buildGoalItem(Icons.bolt_outlined, AppStrings.improveEnergy),
-          const SizedBox(height: 16),
-          // Goal 2
-          _buildGoalItem(Icons.monitor_heart_outlined, AppStrings.reduceFat), 
-          const SizedBox(height: 16),
-          // Goal 3
-          // Using updated Bed icon
-          _buildGoalItem(Icons.nightlight_round, AppStrings.buildSleepRoutine),
+          goalsState.when(
+            data: (goals) {
+              if (goals.isEmpty) {
+                return Text(
+                  'No goals added yet.',
+                  style: AppTextStyles.bodyMedium.copyWith(color: const Color(0xFF4A4A4A)),
+                );
+              }
+              return Column(
+                children: goals.map((goal) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 16.0),
+                    child: _buildGoalItem(Icons.bookmark_border, goal.goal),
+                  );
+                }).toList(),
+              );
+            },
+            loading: () => const Center(child: CircularProgressIndicator()),
+            error: (error, _) => Center(child: Text('Error: $error')),
+          ),
         ],
       ),
     );

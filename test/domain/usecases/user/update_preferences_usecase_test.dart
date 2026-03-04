@@ -49,13 +49,13 @@ void main() {
   test('should return a failure when the update is unsuccessful', () async {
     // arrange
     when(mockUserRepository.updatePreferences(any))
-        .thenAnswer((_) async => const Left(ServerFailure(message: 'Update Failed')));
+        .thenAnswer((_) async => const Left(ServerFailure('Update Failed')));
 
     // act
     final result = await usecase(tPreferences);
 
     // assert
-    expect(result, const Left(ServerFailure(message: 'Update Failed')));
+    expect(result, const Left(ServerFailure('Update Failed')));
     verify(mockUserRepository.updatePreferences(tPreferences));
     verifyNoMoreInteractions(mockUserRepository);
   });

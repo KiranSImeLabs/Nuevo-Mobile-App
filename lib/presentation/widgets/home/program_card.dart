@@ -52,9 +52,8 @@ class ProgramCard extends StatelessWidget {
               children: [
 
 
-                // "Insight Program"
                 Text(
-                  'Insight Program', // Manual override for now as per design text, disregarding program.name if needed or assuming program.name IS this
+                  program.name,
                   style: TextStyle(
                     fontSize: ResponsiveUtils.fontSize(context, base: 22), // Larger title
                     fontWeight: FontWeight.w600, // Medium/SemiBold
@@ -67,7 +66,7 @@ class ProgramCard extends StatelessWidget {
                 // Description
                 Expanded(
                   child: Text(
-                    'Advanced assessment and specialist-led profiling',
+                    program.description,
                     style: TextStyle(
                       fontSize: ResponsiveUtils.fontSize(context, base: 14),
                       fontWeight: FontWeight.w300,

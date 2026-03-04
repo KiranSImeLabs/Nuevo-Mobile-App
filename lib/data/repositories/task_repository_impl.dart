@@ -42,7 +42,7 @@ class TaskRepositoryImpl implements TaskRepository {
       
       return Right(tasks.map((t) => t.toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to load pending tasks'));
+      return Left(ServerFailure('Failed to load pending tasks'));
     }
   }
   
@@ -78,7 +78,7 @@ class TaskRepositoryImpl implements TaskRepository {
       
       return Right(tasks.map((t) => t.toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to load completed tasks'));
+      return Left(ServerFailure('Failed to load completed tasks'));
     }
   }
   
@@ -89,7 +89,7 @@ class TaskRepositoryImpl implements TaskRepository {
       // Mock implementation
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to complete task'));
+      return Left(ServerFailure('Failed to complete task'));
     }
   }
   
@@ -113,7 +113,7 @@ class TaskRepositoryImpl implements TaskRepository {
       
       return Right(sessions.map((s) => s.toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to load sessions'));
+      return Left(ServerFailure('Failed to load sessions'));
     }
   }
   
@@ -137,7 +137,7 @@ class TaskRepositoryImpl implements TaskRepository {
       
       return Right(session.toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to load next session'));
+      return Left(ServerFailure('Failed to load next session'));
     }
   }
 }

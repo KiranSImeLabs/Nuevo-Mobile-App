@@ -200,6 +200,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               ),
               _buildSettingsTile(
                 context,
+                icon: Icons.delete_outline,
+                label: 'Delete Account',
+                onTap: () {
+                  // TODO: Implement delete account functionality
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Delete Account - Not implemented yet!')),
+                  );
+                },
+                isLast: true, 
+              ),
+              _buildSettingsTile(
+                context,
                 icon: Icons.power_settings_new,
                 label: 'Logout',
                 onTap: () {
@@ -209,7 +221,6 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                     builder: (context) => const LogoutBottomSheet(),
                   );
                 },
-                isLast: true, 
               ),
             ],
           ),

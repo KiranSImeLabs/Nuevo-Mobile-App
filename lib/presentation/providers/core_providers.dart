@@ -35,6 +35,13 @@ import '../../domain/usecases/user/update_preferences_usecase.dart';
 import '../../domain/usecases/user/get_preferences_usecase.dart';
 import '../../domain/usecases/specialist/get_my_specialists_usecase.dart';
 import '../../domain/usecases/specialist/get_specialist_details_usecase.dart';
+import '../../domain/repositories/goal_repository.dart';
+import '../../data/repositories/goal_repository_impl.dart';
+import '../../domain/usecases/goal/get_goals_usecase.dart';
+import '../../domain/usecases/goal/create_goal_usecase.dart';
+import '../../domain/usecases/goal/get_goal_by_id_usecase.dart';
+import '../../domain/usecases/goal/update_goal_usecase.dart';
+import '../../domain/usecases/goal/delete_goal_usecase.dart';
 // import 'auth_provider.dart'; // Removing to break circularity
 
 // ============================================
@@ -208,6 +215,12 @@ final specialistRepositoryProvider = Provider<SpecialistRepository>((ref) {
   return SpecialistRepositoryImpl(apiClient: apiClient);
 });
 
+/// Goal Repository
+final goalRepositoryProvider = Provider<GoalRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return GoalRepositoryImpl(apiClient: apiClient);
+});
+
 // ============================================
 // Use Cases - Lab
 // ============================================
@@ -243,3 +256,31 @@ final getSpecialistDetailsUseCaseProvider =
   return GetSpecialistDetailsUseCase(repository);
 });
 
+// ============================================
+// Use Cases - Goal
+// ============================================
+
+final getGoalsUseCaseProvider = Provider<GetGoalsUseCase>((ref) {
+  final repository = ref.watch(goalRepositoryProvider);
+  return GetGoalsUseCase(repository);
+});
+
+final createGoalUseCaseProvider = Provider<CreateGoalUseCase>((ref) {
+  final repository = ref.watch(goalRepositoryProvider);
+  return CreateGoalUseCase(repository);
+});
+
+final getGoalByIdUseCaseProvider = Provider<GetGoalByIdUseCase>((ref) {
+  final repository = ref.watch(goalRepositoryProvider);
+  return GetGoalByIdUseCase(repository);
+});
+
+final updateGoalUseCaseProvider = Provider<UpdateGoalUseCase>((ref) {
+  final repository = ref.watch(goalRepositoryProvider);
+  return UpdateGoalUseCase(repository);
+});
+
+final deleteGoalUseCaseProvider = Provider<DeleteGoalUseCase>((ref) {
+  final repository = ref.watch(goalRepositoryProvider);
+  return DeleteGoalUseCase(repository);
+});

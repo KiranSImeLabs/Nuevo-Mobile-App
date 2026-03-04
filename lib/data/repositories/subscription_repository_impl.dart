@@ -40,7 +40,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
           ));
         }
       } else {
-        return Left(ServerFailure(message: response.message ?? 'Failed to get subscription status'));
+        return Left(ServerFailure(response.message ?? 'Failed to get subscription status'));
       }
     } on DioException catch (e) {
       final exception = DioClient.handleDioError(e);
@@ -49,7 +49,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       } else if (exception is NetworkException) {
         return Left(NetworkFailure(message: exception.message, code: exception.code));
       } else if (exception is ServerException) {
-        return Left(ServerFailure(message: exception.message, code: exception.code));
+        return Left(ServerFailure(exception.message, exception.code));
       } else {
         return Left(UnknownFailure(message: exception.toString()));
       }

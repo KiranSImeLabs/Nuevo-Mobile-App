@@ -26,7 +26,7 @@ class WellnessRepositoryImpl implements WellnessRepository {
       
       return Right(model.toEntity());
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to load wellness program'));
+      return Left(ServerFailure('Failed to load wellness program'));
     }
   }
   
@@ -54,7 +54,7 @@ class WellnessRepositoryImpl implements WellnessRepository {
       
       return Right(habits.map((h) => h.toEntity()).toList());
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to load habits'));
+      return Left(ServerFailure('Failed to load habits'));
     }
   }
   
@@ -65,7 +65,7 @@ class WellnessRepositoryImpl implements WellnessRepository {
       // Mock implementation - in real app, would call API
       return const Right(null);
     } catch (e) {
-      return Left(ServerFailure(message: 'Failed to update habit'));
+      return Left(ServerFailure('Failed to update habit'));
     }
   }
 }
