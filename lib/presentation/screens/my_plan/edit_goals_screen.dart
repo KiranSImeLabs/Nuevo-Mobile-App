@@ -1,31 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../providers/core_providers.dart';
+import '../../providers/goal_provider.dart';
+import '../../../domain/usecases/goal/delete_goal_usecase.dart';
+import '../../../domain/usecases/goal/create_goal_usecase.dart';
 
-class EditGoalsScreen extends StatefulWidget {
+class EditGoalsScreen extends ConsumerStatefulWidget {
   const EditGoalsScreen({super.key});
 
   @override
-  State<EditGoalsScreen> createState() => _EditGoalsScreenState();
+  ConsumerState<EditGoalsScreen> createState() => _EditGoalsScreenState();
 }
 
-class _EditGoalsScreenState extends State<EditGoalsScreen> {
-  // Mock data for initial goals
-  final List<Map<String, dynamic>> _goals = [
-    {'icon': Icons.bolt_outlined, 'text': AppStrings.improveEnergy},
-    {'icon': Icons.monitor_heart_outlined, 'text': AppStrings.reduceFat},
-    {'icon': Icons.nightlight_round, 'text': AppStrings.buildSleepRoutine},
-  ];
-
+class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
   // Mock data for suggested goals
   final List<Map<String, dynamic>> _suggestedGoals = [
     {'icon': Icons.schedule, 'text': AppStrings.prioritizeSleep},
     {'icon': Icons.water_drop_outlined, 'text': AppStrings.increaseHydration},
     {'icon': Icons.self_improvement, 'text': AppStrings.practiceMindfulness},
   ];
+  
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(goalListProvider.notifier).fetchGoals();
+    });
+  }
 
-  void _deleteGoal(int index) {
+  void _deleteGoal(String id) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -37,11 +43,31 @@ class _EditGoalsScreenState extends State<EditGoalsScreen> {
             child: const Text(AppStrings.cancel),
           ),
           TextButton(
-            onPressed: () {
-              setState(() {
-                _goals.removeAt(index);
-              });
-              Navigator.pop(context);
+            onPressed: () async {
+              Navigator.pop(context); // Close the first dialog (confirmation)
+              showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => const Center(child: CircularProgressIndicator()),
+              );
+              
+              final navigator = Navigator.of(context);
+              final scaffoldMessenger = ScaffoldMessenger.of(context);
+              final deleteGoalUseCase = ref.read(deleteGoalUseCaseProvider);
+              final result = await deleteGoalUseCase(DeleteGoalParams(id: id));
+              
+              navigator.pop(); // Hide loading
+              
+              result.fold(
+                (failure) {
+                  scaffoldMessenger.showSnackBar(
+                    SnackBar(content: Text(failure.message), backgroundColor: AppColors.error),
+                  );
+                },
+                (_) {
+                  ref.read(goalListProvider.notifier).fetchGoals(); // Refresh state
+                },
+              );
             },
             child: const Text(
               AppStrings.deleteGoal, // Or specific "Delete" string if needed
@@ -70,15 +96,33 @@ class _EditGoalsScreenState extends State<EditGoalsScreen> {
             child: const Text(AppStrings.cancel),
           ),
           TextButton(
-            onPressed: () {
+            onPressed: () async {
               if (controller.text.isNotEmpty) {
-                setState(() {
-                  _goals.add({
-                    'icon': Icons.star_outline, // Default icon for new goals
-                    'text': controller.text,
-                  });
-                });
-                Navigator.pop(context);
+                final text = controller.text;
+                Navigator.pop(context); // Close the original dialog
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (context) => const Center(child: CircularProgressIndicator()),
+                );
+                
+                final navigator = Navigator.of(context);
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                final createGoalUseCase = ref.read(createGoalUseCaseProvider);
+                final result = await createGoalUseCase(CreateGoalParams(goal: text));
+                
+                navigator.pop(); // Hide loading indicator
+                
+                result.fold(
+                  (failure) {
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(content: Text(failure.message), backgroundColor: AppColors.error),
+                    );
+                  },
+                  (_) {
+                    ref.read(goalListProvider.notifier).fetchGoals(); // Refresh state
+                  },
+                );
               }
             },
             child: const Text(AppStrings.add),
@@ -172,38 +216,71 @@ class _EditGoalsScreenState extends State<EditGoalsScreen> {
             ),
           ),
           const Divider(height: 1, color: Color(0xFFEFEBE9)),
-          ListView.separated(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: _goals.length,
-            separatorBuilder: (context, index) => const Divider(
-              height: 1,
-              color: Colors.transparent, // Clean look as per design
-            ),
-            itemBuilder: (context, index) {
-              final goal = _goals[index];
-              return Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    Icon(goal['icon'], size: 20, color: const Color(0xFF8D6E63)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        goal['text'],
-                        style: AppTextStyles.bodyMedium.copyWith(
-                          color: const Color(0xFF4A4A4A),
+          Consumer(
+            builder: (context, ref, child) {
+              final goalsState = ref.watch(goalListProvider);
+              return goalsState.when(
+                loading: () => const Padding(
+                  padding: EdgeInsets.all(24.0),
+                  child: Center(child: CircularProgressIndicator()),
+                ),
+                error: (error, _) => Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: Text(
+                      error.toString(),
+                      style: const TextStyle(color: AppColors.error),
+                    ),
+                  ),
+                ),
+                data: (goals) {
+                  if (goals.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Center(
+                        child: Text(
+                          "No goals found. Add a new goal to get started.",
+                          style: TextStyle(color: AppColors.textSecondary),
                         ),
                       ),
+                    );
+                  }
+                  return ListView.separated(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: goals.length,
+                    separatorBuilder: (context, index) => const Divider(
+                      height: 1,
+                      color: Colors.transparent, // Clean look as per design
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.close, size: 20, color: Color(0xFF8D6E63)),
-                      onPressed: () => _deleteGoal(index),
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                    ),
-                  ],
-                ),
+                    itemBuilder: (context, index) {
+                      final goal = goals[index];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.star_outline, size: 20, color: Color(0xFF8D6E63)),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                goal.goal,
+                                style: AppTextStyles.bodyMedium.copyWith(
+                                  color: const Color(0xFF4A4A4A),
+                                ),
+                              ),
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.close, size: 20, color: Color(0xFF8D6E63)),
+                              onPressed: () => _deleteGoal(goal.id),
+                              padding: EdgeInsets.zero,
+                              constraints: const BoxConstraints(),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                },
               );
             },
           ),

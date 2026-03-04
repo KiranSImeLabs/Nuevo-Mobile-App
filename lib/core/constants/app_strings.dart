@@ -7,6 +7,8 @@ class AppStrings {
   static const String retry = 'Retry';
   static const String or = 'Or';
   static const String loading = 'Loading...';
+  static const String notFound = 'Not found';
+  static const String notAvailable = 'N/A';
   
   // Auth - Login
   static const String welcomeBack = 'Welcome back';
