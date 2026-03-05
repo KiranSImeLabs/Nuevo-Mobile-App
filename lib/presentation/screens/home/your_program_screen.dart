@@ -2,12 +2,36 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../utils/responsive_utils.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import '../../providers/home_provider.dart';
+import '../../providers/specialist_provider.dart';
+import '../../providers/goal_provider.dart';
+import '../../../core/constants/app_strings.dart';
+import '../../../domain/entities/wellness_program.dart';
+import '../../widgets/common/care_team_member_card.dart';
 
-class YourProgramScreen extends StatelessWidget {
+class YourProgramScreen extends  ConsumerStatefulWidget {
   const YourProgramScreen({super.key});
 
   @override
+  ConsumerState<YourProgramScreen> createState() => _YourProgramScreenState();
+}
+
+class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(specialistListProvider.notifier).fetchSpecialists();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final dashboardState = ref.watch(homeDashboardProvider);
+    final specialistState = ref.watch(specialistListProvider);
+    
     return Scaffold(
       backgroundColor: const Color(0xFFFCF9F8),
       appBar: AppBar(
@@ -35,7 +59,11 @@ class YourProgramScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildMainProgramCard(context),
+            dashboardState.when(
+              data: (data) => _buildMainProgramCard(context, program: data.yourProgram),
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => _buildMainProgramCard(context, program: null),
+            ),
             SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
             Text(
               'Program Phases',
@@ -84,7 +112,7 @@ class YourProgramScreen extends StatelessWidget {
             
             SizedBox(height: ResponsiveUtils.spacing(context, base: 32)),
             Text(
-              'Your Care Team',
+              AppStrings.yourCareTeam,
               style: TextStyle(
                 fontSize: ResponsiveUtils.fontSize(context, base: 16),
                 fontWeight: FontWeight.w400,
@@ -92,18 +120,35 @@ class YourProgramScreen extends StatelessWidget {
               ),
             ),
             SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-            _buildCareTeamCard(
-              context,
-              name: 'DR. Mike',
-              role: 'Dietitian',
-              imageUrl: 'https://i.pravatar.cc/150?u=mike',
-            ),
-            SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-            _buildCareTeamCard(
-              context,
-              name: 'Dr. A. Smith',
-              role: 'General Practitioner',
-              imageUrl: 'https://i.pravatar.cc/150?u=smith',
+            specialistState.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => const Text(AppStrings.notFound),
+              data: (specialists) {
+                if (specialists.isEmpty) {
+                  return const Text(AppStrings.notAvailable);
+                }
+                return Column(
+                  children: specialists.map((specialist) {
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: ResponsiveUtils.spacing(context, base: 12)),
+                      child: CareTeamMemberCard(
+                        name: specialist.fullName,
+                        role: specialist.role,
+                        placeholderColor: Colors.blue.shade100,
+                        imageUrl: specialist.profileImage, // Now nullable, handled in widget
+                        onTap: () => context.push(
+                          '/clinician-profile',
+                          extra: {
+                            'name': specialist.fullName,
+                            'role': specialist.role,
+                            'id': specialist.id,
+                          },
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
             SizedBox(height: ResponsiveUtils.spacing(context, base: 40)),
           ],
@@ -112,7 +157,10 @@ class YourProgramScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMainProgramCard(BuildContext context) {
+  Widget _buildMainProgramCard(BuildContext context, {WellnessProgram? program}) {
+    final title = program?.name ?? AppStrings.notFound;
+    final description = program?.description ?? AppStrings.notAvailable;
+
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(ResponsiveUtils.spacing(context, base: 20)),
@@ -137,7 +185,7 @@ class YourProgramScreen extends StatelessWidget {
           ),
           SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
           Text(
-            'Insight Program',
+            title,
             style: TextStyle(
               fontSize: ResponsiveUtils.fontSize(context, base: 18),
               fontWeight: FontWeight.w500,
@@ -146,7 +194,7 @@ class YourProgramScreen extends StatelessWidget {
           ),
           SizedBox(height: ResponsiveUtils.spacing(context, base: 4)),
           Text(
-            'Personalised, clinician-guided care',
+            description,
             style: TextStyle(
               fontSize: ResponsiveUtils.fontSize(context, base: 14),
               fontWeight: FontWeight.w300,
@@ -252,57 +300,4 @@ class YourProgramScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCareTeamCard(
-    BuildContext context, {
-    required String name,
-    required String role,
-    required String imageUrl,
-  }) {
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(ResponsiveUtils.spacing(context, base: 16)),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF6ECE9),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 24,
-            backgroundImage: NetworkImage(imageUrl),
-          ),
-          SizedBox(width: ResponsiveUtils.spacing(context, base: 16)),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  name,
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.fontSize(context, base: 16),
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF17110D),
-                  ),
-                ),
-                SizedBox(height: ResponsiveUtils.spacing(context, base: 2)),
-                Text(
-                  role,
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.fontSize(context, base: 14),
-                    fontWeight: FontWeight.w400,
-                    color: const Color(0xFF735B4D),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Icon(
-            Icons.arrow_forward,
-            size: ResponsiveUtils.iconSize(context, base: 18),
-            color: const Color(0xFF964A38),
-          ),
-        ],
-      ),
-    );
-  }
 }
