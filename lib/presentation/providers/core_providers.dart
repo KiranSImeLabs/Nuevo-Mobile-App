@@ -42,6 +42,9 @@ import '../../domain/usecases/goal/create_goal_usecase.dart';
 import '../../domain/usecases/goal/get_goal_by_id_usecase.dart';
 import '../../domain/usecases/goal/update_goal_usecase.dart';
 import '../../domain/usecases/goal/delete_goal_usecase.dart';
+import '../../domain/usecases/phase/get_phases_usecase.dart';
+import '../../data/repositories/phase_repository_impl.dart';
+import '../../domain/repositories/phase_repository.dart';
 // import 'auth_provider.dart'; // Removing to break circularity
 
 // ============================================
@@ -221,6 +224,12 @@ final goalRepositoryProvider = Provider<GoalRepository>((ref) {
   return GoalRepositoryImpl(apiClient: apiClient);
 });
 
+/// Phase Repository
+final phaseRepositoryProvider = Provider<PhaseRepository>((ref) {
+  final apiClient = ref.watch(apiClientProvider);
+  return PhaseRepositoryImpl(apiClient: apiClient);
+});
+
 // ============================================
 // Use Cases - Lab
 // ============================================
@@ -283,4 +292,13 @@ final updateGoalUseCaseProvider = Provider<UpdateGoalUseCase>((ref) {
 final deleteGoalUseCaseProvider = Provider<DeleteGoalUseCase>((ref) {
   final repository = ref.watch(goalRepositoryProvider);
   return DeleteGoalUseCase(repository);
+});
+
+// ============================================
+// Use Cases - Phase
+// ============================================
+
+final getPhasesUseCaseProvider = Provider<GetPhasesUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return GetPhasesUseCase(repository);
 });

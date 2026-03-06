@@ -17,6 +17,7 @@ import '../../models/specialist_model.dart';
 import '../../models/payment_integration_models.dart';
 import '../../models/billing_response_model.dart';
 import '../../models/goal_model.dart';
+import '../../models/phase_model.dart';
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
@@ -275,6 +276,21 @@ class ApiClient {
     return ApiResponse.fromJson(
       response.data,
       (json) => null,
+    );
+  }
+
+  // ============================================
+  // Phase Endpoints
+  // ============================================
+
+  /// Get All Phases
+  Future<ApiResponse<List<PhaseModel>>> getPhases() async {
+    final response = await _dioClient.get(ApiConstants.phases);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => (json as List<dynamic>)
+          .map((item) => PhaseModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 
