@@ -4,6 +4,7 @@ import 'dart:async';
 import 'package:video_player/video_player.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../widgets/health/session_completed_sheet.dart';
+import '../../widgets/health/session_paused_sheet.dart';
 import '../../../data/models/daily_exercise_model.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -13,8 +14,9 @@ import '../../../data/models/active_progress_model.dart';
 class GuidedSessionScreen extends ConsumerStatefulWidget {
   final List<ExerciseStepModel>? steps;
   final String sessionId;
+  final int? initialStepIndex;
 
-  const GuidedSessionScreen({super.key, required this.sessionId, this.steps});
+  const GuidedSessionScreen({super.key, required this.sessionId, this.steps, this.initialStepIndex});
 
   @override
   ConsumerState<GuidedSessionScreen> createState() =>
@@ -49,9 +51,9 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
   @override
   void initState() {
     super.initState();
-    _pageController = PageController();
-
-    _checkActiveProgress();
+    int initialPage = widget.initialStepIndex ?? 0;
+    _pageController = PageController(initialPage: initialPage);
+    _currentStep = initialPage;
 
     if (widget.steps != null && widget.steps!.isNotEmpty) {
       _sessionSteps = widget.steps!
@@ -59,7 +61,10 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
             (step) => {
               'title': step.title ?? 'Exercise Step',
               'instruction': step.description ?? '',
-              'image': step.videoUrl ?? '',
+              'image': (step.videoUrl != null && step.videoUrl!.isNotEmpty)
+                  ? step.videoUrl!
+                  : (step.imageUrl ?? ''),
+              'poster': step.imageUrl ?? '',
               'isVideo': (step.videoUrl != null && step.videoUrl!.isNotEmpty),
               'duration': step.duration ?? 30,
               'subtitles': step.subtitles ?? [],
@@ -70,7 +75,9 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
     } else {
       _sessionSteps = [];
     }
-
+    
+    _resetTimerForCurrentStep();
+    _checkActiveProgress();
   }
 
   Future<void> _checkActiveProgress() async {
@@ -84,35 +91,35 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
           _isSessionStarted = true;
           _isPlaying = false;
           
-          // 1. Find the correct step index by matching the 'order'
-          int savedOrder = progress.currentStepIndex ?? 1;
-          int foundIndex = _sessionSteps.indexWhere((s) => s['order'] == savedOrder);
-          
-          if (foundIndex == -1) {
-            // Fallback if order not found, safely cap it
-            foundIndex = savedOrder - 1; // Assuming 1-based order
+          if (widget.initialStepIndex == null) {
+            // 1. Find the correct step index by mapping 1-based API index to 0-based list
+            int savedOrder = progress.currentStepIndex ?? 1;
+            
+            // Map directly 1-based API index to 0-based array index
+            int foundIndex = savedOrder - 1;
+            
             if (foundIndex < 0) foundIndex = 0;
             if (foundIndex >= _sessionSteps.length) foundIndex = _sessionSteps.length - 1;
-          }
-          
-          _currentStep = foundIndex;
-          _resetTimerForCurrentStep();
-          
-          // 2. Set the elapsed time to the saved paused time
-          int savedTime = progress.currentTimeInStep ?? 0;
-          if (savedTime < 0) savedTime = 0;
-          if (savedTime > _currentStepDuration) savedTime = _currentStepDuration;
-          
-          _elapsedTimeNotifier.value = savedTime;
-          
-          // Pass the exact time to the video player as well
-          _videoPositionNotifier.value = savedTime;
-        });
+            
+            _currentStep = foundIndex;
+            _resetTimerForCurrentStep();
+            
+            // 2. Set the elapsed time to the saved paused time
+            int savedTime = progress.currentTimeInStep ?? 0;
+            if (savedTime < 0) savedTime = 0;
+            if (savedTime > _currentStepDuration) savedTime = _currentStepDuration;
+            
+            _elapsedTimeNotifier.value = savedTime;
+            
+            // Pass the exact time to the video player as well
+            _videoPositionNotifier.value = savedTime;
 
-        // Jump to correct page
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          if (_pageController.hasClients) {
-            _pageController.jumpToPage(_currentStep);
+            // Jump to correct page
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              if (_pageController.hasClients) {
+                _pageController.jumpToPage(_currentStep);
+              }
+            });
           }
         });
       }
@@ -135,11 +142,9 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
   void _syncProgress() {
     if (!_isSessionStarted) return;
     
-    // Fire and forget progress update
-    // Note: API expects 'currentStepIndex' but we map it to the actual step 'order'
-    final int stepOrder = _sessionSteps.isNotEmpty && _currentStep < _sessionSteps.length 
-        ? (_sessionSteps[_currentStep]['order'] as int? ?? 1) 
-        : 1;
+    // Note: API expects 'currentStepIndex' 
+    // We strictly map 0-based array index to 1-based API index
+    final int stepOrder = _currentStep + 1;
 
     final data = {
       "currentStepIndex": stepOrder,
@@ -180,10 +185,36 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
       if (!_isPlaying) {
         _timer?.cancel();
         _syncProgress();
+        _showPausedSheet();
       } else {
         _startTimer();
       }
     }
+  }
+
+  void _showPausedSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      isDismissible: false,
+      enableDrag: false,
+      builder: (context) => SessionPausedSheet(
+        timeString: _formatDuration(_elapsedTimeNotifier.value),
+        heartRate: 128, // Static matching the design requirement
+        onResume: () {
+          Navigator.pop(context);
+          setState(() {
+            _isPlaying = true;
+          });
+          _startTimer();
+        },
+        onEnd: () {
+          Navigator.pop(context);
+          _endSession();
+        },
+      ),
+    );
   }
 
   @override
@@ -271,6 +302,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
     
     _currentStepDuration = _sessionSteps[_currentStep]['duration'] ?? 30;
     _elapsedTimeNotifier.value = 0; // Reset progress tracker
+    _videoPositionNotifier.value = 0; // Reset video position to match progress tracker and avoid mis-syncs
     
     if (_isPlaying) {
       _startTimer();
@@ -486,11 +518,15 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                                 borderRadius: BorderRadius.circular(8),
                                 child: _StepMediaWidget(
                                   url: step['image'],
+                                  posterUrl: step['poster'],
                                   isVideo: step['isVideo'] ?? false,
                                   isPlaying: _isPlaying && index == _currentStep,
                                   isMuted: _isMuted,
                                   positionNotifier: index == _currentStep ? _videoPositionNotifier : null,
                                   replayCount: index == _currentStep ? _replayCount : 0,
+                                  initialPosition: index == _currentStep && _isSessionStarted && !_isPlaying 
+                                      ? _elapsedTimeNotifier.value 
+                                      : 0,
                                 ),
                               ),
                             ),
@@ -730,20 +766,26 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Previous
-                _buildCircleButton(
-                  icon: Icons.skip_previous_rounded,
-                  onTap: () {
-                    if (_currentStep > 0) {
-                      _syncProgress();
-                      _pageController.previousPage(
-                        duration: const Duration(milliseconds: 300),
-                        curve: Curves.easeInOut,
-                      );
-                    }
-                  },
-                  size: 56,
-                  iconColor: const Color(0xFF5D4037),
-                  backgroundColor: const Color(0xFFFAF1ED),
+                Visibility(
+                  visible: _currentStep > 0,
+                  maintainSize: true,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  child: _buildCircleButton(
+                    icon: Icons.skip_previous_rounded,
+                    onTap: () {
+                      if (_currentStep > 0) {
+                        _syncProgress();
+                        _pageController.previousPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeInOut,
+                        );
+                      }
+                    },
+                    size: 56,
+                    iconColor: const Color(0xFF5D4037),
+                    backgroundColor: const Color(0xFFFAF1ED),
+                  ),
                 ),
 
                 // Play/Pause
@@ -760,15 +802,21 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                 ),
 
                 // Next
-                _buildCircleButton(
-                  icon: Icons.skip_next_rounded,
-                  onTap: () {
-                    _syncProgress();
-                    _nextStep();
-                  },
-                  size: 56,
-                  iconColor: const Color(0xFF5D4037),
-                  backgroundColor: const Color(0xFFFAF1ED),
+                Visibility(
+                  visible: _currentStep < _sessionSteps.length - 1,
+                  maintainSize: true,
+                  maintainAnimation: true,
+                  maintainState: true,
+                  child: _buildCircleButton(
+                    icon: Icons.skip_next_rounded,
+                    onTap: () {
+                      _syncProgress();
+                      _nextStep();
+                    },
+                    size: 56,
+                    iconColor: const Color(0xFF5D4037),
+                    backgroundColor: const Color(0xFFFAF1ED),
+                  ),
                 ),
               ],
             ),
@@ -866,20 +914,24 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
 
 class _StepMediaWidget extends StatefulWidget {
   final String url;
+  final String? posterUrl;
   final bool isVideo;
   final bool isPlaying;
   final bool isMuted;
   final ValueNotifier<int>? positionNotifier;
   final int replayCount;
+  final int initialPosition;
 
   const _StepMediaWidget({
     Key? key,
     required this.url,
+    this.posterUrl,
     required this.isVideo,
     required this.isPlaying,
     required this.isMuted,
     this.positionNotifier,
     this.replayCount = 0,
+    this.initialPosition = 0,
   }) : super(key: key);
 
   @override
@@ -921,11 +973,15 @@ class _StepMediaWidgetState extends State<_StepMediaWidget> {
             });
             
             // If we have an initial saved position, seek to it immediately
-            if (widget.positionNotifier != null && widget.positionNotifier!.value > 0) {
-               _videoController!.seekTo(Duration(seconds: widget.positionNotifier!.value));
+            if (widget.initialPosition > 0) {
+               _videoController!.seekTo(Duration(seconds: widget.initialPosition)).then((_) {
+                 if (mounted && widget.isPlaying) {
+                   _updatePlaybackState();
+                 }
+               });
+            } else {
+               _updatePlaybackState();
             }
-            
-            _updatePlaybackState();
           }
         }).catchError((error) {
           debugPrint('Video Player error: $error URL: ${widget.url}');
@@ -990,7 +1046,16 @@ class _StepMediaWidgetState extends State<_StepMediaWidget> {
 
     if (_videoController == null || !_isInitialized) {
       return Container(
-        color: Colors.black,
+        decoration: widget.posterUrl != null && widget.posterUrl!.isNotEmpty
+            ? BoxDecoration(
+                color: Colors.black,
+                image: DecorationImage(
+                  image: NetworkImage(widget.posterUrl!),
+                  fit: BoxFit.cover,
+                  colorFilter: ColorFilter.mode(Colors.black.withOpacity(0.5), BlendMode.darken),
+                ),
+              )
+            : const BoxDecoration(color: Colors.black),
         child: const Center(
           child: CircularProgressIndicator(color: Colors.white),
         ),

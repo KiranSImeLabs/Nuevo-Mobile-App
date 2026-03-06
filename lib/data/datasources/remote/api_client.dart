@@ -301,9 +301,6 @@ class ApiClient {
   /// Get Today's Exercise
   Future<ApiResponse<DailyExerciseModel>> getTodayExercise() async {
     final response = await _dioClient.get(ApiConstants.todayExercise);
-    print("=== TODAY'S EXERCISE API RESPONSE ===");
-    print(response.data.toString());
-    print("=====================================");
 
     return ApiResponse.fromJson(
       response.data,
@@ -314,9 +311,6 @@ class ApiClient {
   /// Get Weekly Schedule
   Future<ApiResponse<WeeklyScheduleModel>> getWeeklySchedule() async {
     final response = await _dioClient.get(ApiConstants.weeklySchedule);
-    print("=== WEEKLY SCHEDULE API RESPONSE ===");
-    print(response.data.toString());
-    print("====================================");
     return ApiResponse.fromJson(
       response.data,
       (json) => WeeklyScheduleModel.fromJson(json as Map<String, dynamic>),
@@ -326,9 +320,6 @@ class ApiClient {
   /// Get Session Details
   Future<ApiResponse<GuidedSessionModel>> getSessionDetails(String id) async {
     final response = await _dioClient.get('${ApiConstants.sessionDetails}/$id');
-    print("=== SESSION DETAILS API RESPONSE ===");
-    print(response.data.toString());
-    print("====================================");
     return ApiResponse.fromJson(
       response.data,
       (json) => GuidedSessionModel.fromJson(json as Map<String, dynamic>),
@@ -338,9 +329,6 @@ class ApiClient {
   /// Start Session
   Future<ApiResponse<SessionProgressModel>> startSession(String id) async {
     final response = await _dioClient.post('${ApiConstants.sessionDetails}/$id${ApiConstants.sessionStart}');
-    print("=== START SESSION API RESPONSE ===");
-    print(response.data.toString());
-    print("==================================");
     return ApiResponse.fromJson(
       response.data,
       (json) => SessionProgressModel.fromJson(json as Map<String, dynamic>),
@@ -350,9 +338,6 @@ class ApiClient {
   /// Complete Session
   Future<ApiResponse<SessionProgressModel>> completeSession(String id) async {
     final response = await _dioClient.post('${ApiConstants.sessionDetails}/$id${ApiConstants.sessionComplete}');
-    print("=== COMPLETE SESSION API RESPONSE ===");
-    print(response.data.toString());
-    print("=====================================");
     return ApiResponse.fromJson(
       response.data,
       (json) => SessionProgressModel.fromJson(json as Map<String, dynamic>),
@@ -360,18 +345,15 @@ class ApiClient {
   }
 
   /// Sync Session Progress
-  Future<ApiResponse<SessionProgressModel>> syncSessionProgress(String id, Map<String, dynamic> data) async {
+  Future<ApiResponse<SessionProgressModel?>> syncSessionProgress(String id, Map<String, dynamic> data) async {
     // Note: The backend expects a PATCH request for updating progress
     final response = await _dioClient.dio.patch(
       '${ApiConstants.sessionDetails}/$id${ApiConstants.sessionProgressUpdate}',
       data: data,
     );
-    print("=== SYNC PROGRESS API RESPONSE ===");
-    print(response.data.toString());
-    print("==================================");
     return ApiResponse.fromJson(
       response.data,
-      (json) => SessionProgressModel.fromJson(json as Map<String, dynamic>),
+      (json) => json == null ? null : SessionProgressModel.fromJson(json as Map<String, dynamic>),
     );
   }
 
@@ -379,9 +361,6 @@ class ApiClient {
   Future<ApiResponse<ActiveProgressModel?>> getActiveProgress() async {
     try {
       final response = await _dioClient.get(ApiConstants.sessionActiveProgress);
-      print("=== GET ACTIVE PROGRESS API RESPONSE ===");
-      print(response.data.toString());
-      print("========================================");
       return ApiResponse.fromJson(
         response.data,
         (json) => ActiveProgressModel.fromJson(json as Map<String, dynamic>),
@@ -447,13 +426,11 @@ class ApiClient {
   Future<ApiResponse<SingleUseTokenResponse>> tokenizeCard(
       Map<String, dynamic> cardDetails) async {
     // API Expects URL-encoded form data
-    print("cardDetails: ${cardDetails} ============");
     final response = await _dioClient.post(
       ApiConstants.paymentToken,
       data: cardDetails,
       options: Options(contentType: Headers.formUrlEncodedContentType),
     );
-    print("SingleUseTokenResponse: ${response.data}");
     return ApiResponse.fromJson(
       response.data,
       (json) => SingleUseTokenResponse.fromJson(json as Map<String, dynamic>),
@@ -463,12 +440,10 @@ class ApiClient {
   /// Save Card
   Future<ApiResponse<SaveCardResponse>> saveCard(
       String singleUseTokenId) async {
-    print("singleUseTokenId: $singleUseTokenId");
     final response = await _dioClient.post(
       ApiConstants.paymentSaveCard,
       data: {'singleUseTokenId': singleUseTokenId},
     );
-    print("response: ${response.data}");
     return ApiResponse.fromJson(
       response.data,
       (json) => SaveCardResponse.fromJson(json as Map<String, dynamic>),

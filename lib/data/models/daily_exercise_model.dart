@@ -77,6 +77,7 @@ class ExerciseStepModel {
   final int? duration;
   final String? videoUrl;
   final String? audioUrl;
+  final String? imageUrl;
   final int? order;
   final String? createdAt;
   final String? updatedAt;
@@ -90,6 +91,7 @@ class ExerciseStepModel {
     this.duration,
     this.videoUrl,
     this.audioUrl,
+    this.imageUrl,
     this.order,
     this.createdAt,
     this.updatedAt,

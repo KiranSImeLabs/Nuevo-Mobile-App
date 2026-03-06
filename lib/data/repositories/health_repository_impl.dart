@@ -95,11 +95,11 @@ class HealthRepositoryImpl implements HealthRepository {
   }
 
   @override
-  Future<Either<Failure, SessionProgressModel>> syncSessionProgress(String id, Map<String, dynamic> data) async {
+  Future<Either<Failure, SessionProgressModel?>> syncSessionProgress(String id, Map<String, dynamic> data) async {
     try {
       final response = await apiClient.syncSessionProgress(id, data);
-      if (response.success && response.data != null) {
-        return Right(response.data!);
+      if (response.success) {
+        return Right(response.data);
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }

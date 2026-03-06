@@ -248,7 +248,7 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
   _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>> updatePreferences(
           _i8.PreferencesModel? preferences) =>
       (super.noSuchMethod(
-        Invocation.method(
+        Invocation.method(l
           #updatePreferences,
           [preferences],
         ),

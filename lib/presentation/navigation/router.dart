@@ -270,7 +270,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               final args = state.extra as Map<String, dynamic>?;
               final steps = args?['steps'] as List<ExerciseStepModel>?;
               final sessionId = args?['sessionId'] as String? ?? '';
-              return GuidedSessionScreen(sessionId: sessionId, steps: steps);
+              final initialStepIndex = args?['initialStepIndex'] as int?;
+              return GuidedSessionScreen(
+                sessionId: sessionId,
+                steps: steps,
+                initialStepIndex: initialStepIndex,
+              );
             },
           ),
           GoRoute(

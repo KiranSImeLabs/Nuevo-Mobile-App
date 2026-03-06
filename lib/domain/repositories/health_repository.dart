@@ -12,6 +12,6 @@ abstract class HealthRepository {
   Future<Either<Failure, GuidedSessionModel>> getSessionDetails(String id);
   Future<Either<Failure, SessionProgressModel>> startSession(String id);
   Future<Either<Failure, ApiResponse<SessionProgressModel>>> completeSession(String id);
-  Future<Either<Failure, SessionProgressModel>> syncSessionProgress(String id, Map<String, dynamic> data);
+  Future<Either<Failure, SessionProgressModel?>> syncSessionProgress(String id, Map<String, dynamic> data);
   Future<Either<Failure, ActiveProgressModel?>> getActiveProgress();
 }
