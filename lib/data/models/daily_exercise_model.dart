@@ -77,9 +77,11 @@ class ExerciseStepModel {
   final int? duration;
   final String? videoUrl;
   final String? audioUrl;
+  final String? imageUrl;
   final int? order;
   final String? createdAt;
   final String? updatedAt;
+  final List<SubtitleModel>? subtitles;
 
   ExerciseStepModel({
     this.id,
@@ -89,12 +91,35 @@ class ExerciseStepModel {
     this.duration,
     this.videoUrl,
     this.audioUrl,
+    this.imageUrl,
     this.order,
     this.createdAt,
     this.updatedAt,
+    this.subtitles,
   });
 
   factory ExerciseStepModel.fromJson(Map<String, dynamic> json) =>
       _$ExerciseStepModelFromJson(json);
   Map<String, dynamic> toJson() => _$ExerciseStepModelToJson(this);
+}
+
+@JsonSerializable()
+class SubtitleModel {
+  final int? order;
+  final int? startTime;
+  final int? endTime;
+  final String? subtitle;
+  final String? description;
+
+  SubtitleModel({
+    this.order,
+    this.startTime,
+    this.endTime,
+    this.subtitle,
+    this.description,
+  });
+
+  factory SubtitleModel.fromJson(Map<String, dynamic> json) =>
+      _$SubtitleModelFromJson(json);
+  Map<String, dynamic> toJson() => _$SubtitleModelToJson(this);
 }

@@ -248,11 +248,16 @@ final routerProvider = Provider<GoRouter>((ref) {
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const ConnectingSessionScreen(),
       ),
-      GoRoute(
+          GoRoute(
             path: '/health/session-overview',
             builder: (context, state) {
-              final sessionId = state.extra as String;
-              return SessionOverviewScreen(sessionId: sessionId);
+              final extra = state.extra;
+              if (extra is GuidedSessionModel) {
+                return SessionOverviewScreen(sessionId: extra.id ?? '', predefinedSession: extra);
+              } else if (extra is String) {
+                return SessionOverviewScreen(sessionId: extra);
+              }
+              return const SessionOverviewScreen(sessionId: '');
             },
           ),
           GoRoute(
@@ -265,7 +270,12 @@ final routerProvider = Provider<GoRouter>((ref) {
               final args = state.extra as Map<String, dynamic>?;
               final steps = args?['steps'] as List<ExerciseStepModel>?;
               final sessionId = args?['sessionId'] as String? ?? '';
-              return GuidedSessionScreen(sessionId: sessionId, steps: steps);
+              final initialStepIndex = args?['initialStepIndex'] as int?;
+              return GuidedSessionScreen(
+                sessionId: sessionId,
+                steps: steps,
+                initialStepIndex: initialStepIndex,
+              );
             },
           ),
           GoRoute(

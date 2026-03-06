@@ -78,11 +78,15 @@ ExerciseStepModel _$ExerciseStepModelFromJson(Map<String, dynamic> json) =>
       title: json['title'] as String?,
       description: json['description'] as String?,
       duration: (json['duration'] as num?)?.toInt(),
-      videoUrl: json['videoUrl'] as String?,
-      audioUrl: json['audioUrl'] as String?,
+      videoUrl: json['videoUrl'] as String? ?? json['video_url'] as String?,
+      audioUrl: json['audioUrl'] as String? ?? json['audio_url'] as String?,
+      imageUrl: json['imageUrl'] as String? ?? json['image_url'] as String?,
       order: (json['order'] as num?)?.toInt(),
       createdAt: json['createdAt'] as String?,
       updatedAt: json['updatedAt'] as String?,
+      subtitles: (json['subtitles'] as List<dynamic>?)
+          ?.map((e) => SubtitleModel.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
 
 Map<String, dynamic> _$ExerciseStepModelToJson(ExerciseStepModel instance) =>
@@ -94,7 +98,27 @@ Map<String, dynamic> _$ExerciseStepModelToJson(ExerciseStepModel instance) =>
       'duration': instance.duration,
       'videoUrl': instance.videoUrl,
       'audioUrl': instance.audioUrl,
+      'imageUrl': instance.imageUrl,
       'order': instance.order,
       'createdAt': instance.createdAt,
       'updatedAt': instance.updatedAt,
+      'subtitles': instance.subtitles,
+    };
+
+SubtitleModel _$SubtitleModelFromJson(Map<String, dynamic> json) =>
+    SubtitleModel(
+      order: (json['order'] as num?)?.toInt(),
+      startTime: (json['startTime'] as num?)?.toInt(),
+      endTime: (json['endTime'] as num?)?.toInt(),
+      subtitle: json['subtitle'] as String?,
+      description: json['description'] as String?,
+    );
+
+Map<String, dynamic> _$SubtitleModelToJson(SubtitleModel instance) =>
+    <String, dynamic>{
+      'order': instance.order,
+      'startTime': instance.startTime,
+      'endTime': instance.endTime,
+      'subtitle': instance.subtitle,
+      'description': instance.description,
     };

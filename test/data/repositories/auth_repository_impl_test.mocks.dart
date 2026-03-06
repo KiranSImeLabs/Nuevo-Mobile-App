@@ -248,7 +248,7 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
   _i5.Future<_i2.ApiResponse<_i8.PreferencesModel>> updatePreferences(
           _i8.PreferencesModel? preferences) =>
       (super.noSuchMethod(
-        Invocation.method(
+        Invocation.method(l
           #updatePreferences,
           [preferences],
         ),
@@ -571,7 +571,7 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
       ) as _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>> syncSessionProgress(
+  _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel?>> syncSessionProgress(
     String? id,
     Map<String, dynamic>? data,
   ) =>
@@ -584,8 +584,8 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           ],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>>.value(
-                _FakeApiResponse_0<_i14.SessionProgressModel>(
+            _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel?>>.value(
+                _FakeApiResponse_0<_i14.SessionProgressModel?>(
           this,
           Invocation.method(
             #syncSessionProgress,
@@ -595,7 +595,7 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
             ],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel?>>);
 
   @override
   _i5.Future<_i2.ApiResponse<_i15.ActiveProgressModel?>> getActiveProgress() =>
