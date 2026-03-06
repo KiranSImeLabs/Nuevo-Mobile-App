@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 class SessionCompletedSheet extends StatelessWidget {
-  const SessionCompletedSheet({super.key});
+  final String? message;
+
+  const SessionCompletedSheet({super.key, this.message});
 
   @override
   Widget build(BuildContext context) {
@@ -61,10 +63,10 @@ class SessionCompletedSheet extends StatelessWidget {
           const SizedBox(height: 12),
 
           // Subtitle
-          const Text(
-            'Great work. This session supports your\nprogram goals.',
+          Text(
+            message ?? 'Great work. This session supports your\nprogram goals.',
             textAlign: TextAlign.center,
-            style: TextStyle(
+            style: const TextStyle(
               fontSize: 16,
               color: Color(0xFF757575),
               height: 1.5,
