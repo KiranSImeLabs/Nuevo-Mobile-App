@@ -38,7 +38,8 @@ class InfoCard extends StatelessWidget {
             style: TextStyle(
               fontSize: ResponsiveUtils.fontSize(context, base: 24),
               fontWeight: FontWeight.w500,
-              color: const Color(0xFF3E160D),
+             // color: const Color(0xFF3E160D),
+             color: Colors.green, 
               height: 1.0,
             ),
             maxLines: 2,
