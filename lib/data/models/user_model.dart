@@ -14,7 +14,7 @@ class UserModel {
   final String? lastName;
   @JsonKey(name: 'phone_number')
   final String? phoneNumber;
-  @JsonKey(name: 'profile_image_url')
+  @JsonKey(name: 'profileImage')
   final String? profileImageUrl;
   final SubscriptionModel? subscription;
   @JsonKey(name: 'created_at')

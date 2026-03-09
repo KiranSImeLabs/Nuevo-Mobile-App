@@ -23,12 +23,23 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
   DateTime? _selectedDate;
   File? _selectedImage;
 
+  bool _isInitialized = false;
+  String _initialName = '';
+  String _initialDob = '';
+
+  void _onFieldChanged() {
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
     _nameController = TextEditingController();
     _emailController = TextEditingController();
     _dobController = TextEditingController();
+    
+    _nameController.addListener(_onFieldChanged);
+    _dobController.addListener(_onFieldChanged);
     
     // Initialize with user data if available
     // In a real app, we'd listen to the provider. For now, we'll set defaults or wait for the provider build.
@@ -42,7 +53,15 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
     super.dispose();
   }
   
-  bool _isInitialized = false;
+  bool get _hasChanges {
+    if (!_isInitialized) return false;
+    if (_nameController.text.trim() != _initialName.trim()) return true;
+    if (_dobController.text.trim() != _initialDob.trim()) return true;
+    if (_selectedImage != null) return true;
+    return false;
+  }
+  
+
 
   void _handleImageSelection(File image) {
     setState(() {
@@ -73,12 +92,15 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       final user = userState.value!;
       _nameController.text = user.name;
       _emailController.text = user.email;
-      // If user had DOB, set it here. For now, empty or mock.
+      _initialName = user.name;
+      _initialDob = ''; // Defaulting as DOB is not in the model yet
       _isInitialized = true;
     } else if (!_isInitialized) {
        // Fallback defaults if user provider is empty or loading for dev
        _nameController.text = "Warren I. Ford";
        _emailController.text = "sarah.johnson@email.com";
+       _initialName = "Warren I. Ford";
+       _initialDob = '';
        _isInitialized = true;
     }
 
@@ -121,13 +143,31 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.grey,
-                          image: DecorationImage(
-                            image: _selectedImage != null
-                                ? FileImage(_selectedImage!) as ImageProvider
-                                : const AssetImage('assets/images/details_image.png'), // Placeholder
-                            fit: BoxFit.cover,
-                          ),
                         ),
+                        clipBehavior: Clip.antiAlias,
+                        child: _selectedImage != null
+                            ? Image.file(
+                                _selectedImage!,
+                                fit: BoxFit.cover,
+                              )
+                            : (userState.value?.profileImageUrl != null && userState.value!.profileImageUrl!.isNotEmpty)
+                                ? (userState.value!.profileImageUrl!.toLowerCase().endsWith('.svg')
+                                    ? Image.asset(
+                                        'assets/images/details_image.png',
+                                        fit: BoxFit.cover,
+                                      )
+                                    : Image.network(
+                                        userState.value!.profileImageUrl!,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) => Image.asset(
+                                          'assets/images/details_image.png',
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ))
+                                : Image.asset(
+                                    'assets/images/details_image.png',
+                                    fit: BoxFit.cover,
+                                  ),
                       ),
                       Positioned(
                         bottom: 0,
@@ -203,7 +243,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                   width: double.infinity,
                   height: 56,
                   child: ElevatedButton(
-                    onPressed: userState.isLoading ? null : _saveProfile,
+                    onPressed: (userState.isLoading || !_hasChanges) ? null : _saveProfile,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xFF964A38), // Rust/Brown
                       foregroundColor: Colors.white,
@@ -331,17 +371,31 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
 
   Future<void> _saveProfile() async {
     if (_formKey.currentState!.validate()) {
-      // Logic to save profile
       final name = _nameController.text.trim();
-      // Use YYYY-MM-DD format if date is selected, else use empty string
-      final dob = _selectedDate != null 
-          ? DateFormat('yyyy-MM-dd').format(_selectedDate!) 
-          : _dobController.text.trim();
-
+      
+      String? updatedName;
+      if (name != _initialName.trim()) {
+         updatedName = name;
+      }
+      
+      String? updatedDob;
+      if (_dobController.text.trim() != _initialDob.trim()) {
+         if (_selectedDate != null) {
+            updatedDob = DateFormat("yyyy-MM-dd'T'00:00:00'Z'").format(_selectedDate!);
+         } else {
+            updatedDob = _dobController.text.trim();
+         }
+      }
+      
+      String? updatedImage;
+      if (_selectedImage != null) {
+         updatedImage = _selectedImage!.path;
+      }
+      print(updatedImage);
       await ref.read(userProvider.notifier).updateProfile(
-        name: name,
-        dateOfBirth: dob,
-        profileImageUrl: "https://fastly.picsum.photos/id/1/5000/3333.jpg?hmac=Asv2DU3rA_5D1xSe22xZK47WEAN0wjWeFOhzd13ujW4", // Currently send the profile image as "".
+        name: updatedName,
+        dateOfBirth: updatedDob,
+        profileImageUrl: updatedImage,
       );
 
       if (mounted) {
@@ -351,6 +405,9 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
             SnackBar(content: Text(userState.error.toString())),
           );
         } else {
+          // Refresh user data (acting as getUserdetails())
+          ref.read(userProvider.notifier).fetchProfile();
+          
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profile saved successfully!')),
           );

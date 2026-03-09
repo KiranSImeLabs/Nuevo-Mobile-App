@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../providers/auth_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import 'widgets/logout_bottom_sheet.dart';
@@ -70,7 +69,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 data: (user) {
                   final name = user?.name ?? 'Warren I. Ford';
                   final email = user?.email ?? 'sarah.johnson@email.com';
-                  
+                  print(user);
                   return Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),
@@ -86,20 +85,34 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                             Container(
                               width: 80,
                               height: 80,
-                              decoration: BoxDecoration(
+                              decoration: const BoxDecoration(
                                 shape: BoxShape.circle,
                                 color: Colors.grey,
-                                image: DecorationImage(
-                                  image: _selectedImage != null
-                                      ? FileImage(_selectedImage!) as ImageProvider
-                                      : const AssetImage('assets/images/details_image.png'),
-                                  fit: BoxFit.cover,
-                                ),
                               ),
-                              // Fallback if asset missing (won't show if image provider works)
-                              child: _selectedImage == null 
-                                  ? const SizedBox() // Assume asset exists or logic handles it
-                                  : null, 
+                              clipBehavior: Clip.antiAlias,
+                              child: _selectedImage != null
+                                  ? Image.file(
+                                      _selectedImage!,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : (user?.profileImageUrl != null && user!.profileImageUrl!.isNotEmpty)
+                                      ? (user.profileImageUrl!.toLowerCase().endsWith('.svg')
+                                          ? Image.asset(
+                                              'assets/images/details_image.png',
+                                              fit: BoxFit.cover,
+                                            ) // Svg failed to parse from backend due to '100%' width/height
+                                          : Image.network(
+                                              user.profileImageUrl!,
+                                              fit: BoxFit.cover,
+                                              errorBuilder: (context, error, stackTrace) => Image.asset(
+                                                'assets/images/details_image.png',
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ))
+                                      : Image.asset(
+                                          'assets/images/details_image.png',
+                                          fit: BoxFit.cover,
+                                        ),
                             ),
                             Positioned(
                               bottom: 0,
@@ -146,7 +159,8 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                   );
                 },
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (_, __) => const SizedBox(),
+                error: (error, stackTrace) => const SizedBox(),
+
               ),
               
               const SizedBox(height: 32),

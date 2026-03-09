@@ -12,7 +12,7 @@ UserModel _$UserModelFromJson(Map<String, dynamic> json) => UserModel(
       firstName: json['firstName'] as String?,
       lastName: json['lastName'] as String?,
       phoneNumber: json['phone_number'] as String?,
-      profileImageUrl: json['profile_image_url'] as String?,
+      profileImageUrl: json['profileImage'] as String?,
       subscription: json['subscription'] == null
           ? null
           : SubscriptionModel.fromJson(
@@ -27,7 +27,7 @@ Map<String, dynamic> _$UserModelToJson(UserModel instance) => <String, dynamic>{
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'phone_number': instance.phoneNumber,
-      'profile_image_url': instance.profileImageUrl,
+      'profileImage': instance.profileImageUrl,
       'subscription': instance.subscription,
       'created_at': instance.createdAt,
       'last_login_at': instance.lastLoginAt,
