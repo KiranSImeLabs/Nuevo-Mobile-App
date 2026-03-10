@@ -7,23 +7,24 @@ import 'dart:async' as _i5;
 
 import 'package:mockito/mockito.dart' as _i1;
 import 'package:nuevo_app/data/datasources/local/local_data_source.dart'
-    as _i19;
+    as _i20;
 import 'package:nuevo_app/data/datasources/remote/api_client.dart' as _i4;
-import 'package:nuevo_app/data/models/active_progress_model.dart' as _i15;
+import 'package:nuevo_app/data/models/active_progress_model.dart' as _i16;
 import 'package:nuevo_app/data/models/api_response.dart' as _i2;
 import 'package:nuevo_app/data/models/auth_response_model.dart' as _i6;
-import 'package:nuevo_app/data/models/billing_response_model.dart' as _i18;
-import 'package:nuevo_app/data/models/daily_exercise_model.dart' as _i12;
-import 'package:nuevo_app/data/models/diet_plan_model.dart' as _i11;
+import 'package:nuevo_app/data/models/billing_response_model.dart' as _i19;
+import 'package:nuevo_app/data/models/daily_exercise_model.dart' as _i13;
+import 'package:nuevo_app/data/models/diet_plan_model.dart' as _i12;
 import 'package:nuevo_app/data/models/goal_model.dart' as _i10;
 import 'package:nuevo_app/data/models/lab_request_model.dart' as _i9;
-import 'package:nuevo_app/data/models/payment_integration_models.dart' as _i17;
+import 'package:nuevo_app/data/models/payment_integration_models.dart' as _i18;
+import 'package:nuevo_app/data/models/phase_model.dart' as _i11;
 import 'package:nuevo_app/data/models/preferences_model.dart' as _i8;
-import 'package:nuevo_app/data/models/session_progress_model.dart' as _i14;
-import 'package:nuevo_app/data/models/specialist_model.dart' as _i16;
+import 'package:nuevo_app/data/models/session_progress_model.dart' as _i15;
+import 'package:nuevo_app/data/models/specialist_model.dart' as _i17;
 import 'package:nuevo_app/data/models/subscription_model.dart' as _i3;
 import 'package:nuevo_app/data/models/user_model.dart' as _i7;
-import 'package:nuevo_app/data/models/weekly_schedule_model.dart' as _i13;
+import 'package:nuevo_app/data/models/weekly_schedule_model.dart' as _i14;
 
 // ignore_for_file: type=lint
 // ignore_for_file: avoid_redundant_argument_values
@@ -210,8 +211,7 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
       ) as _i5.Future<_i2.ApiResponse<_i7.UserModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i7.UserModel>> updateProfile(
-          Map<String, dynamic>? data) =>
+  _i5.Future<_i2.ApiResponse<_i7.UserModel>> updateProfile(dynamic data) =>
       (super.noSuchMethod(
         Invocation.method(
           #updateProfile,
@@ -463,77 +463,94 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
       ) as _i5.Future<_i2.ApiResponse<void>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>> getDietPlan() =>
+  _i5.Future<_i2.ApiResponse<List<_i11.PhaseModel>>> getPhases() =>
+      (super.noSuchMethod(
+        Invocation.method(
+          #getPhases,
+          [],
+        ),
+        returnValue: _i5.Future<_i2.ApiResponse<List<_i11.PhaseModel>>>.value(
+            _FakeApiResponse_0<List<_i11.PhaseModel>>(
+          this,
+          Invocation.method(
+            #getPhases,
+            [],
+          ),
+        )),
+      ) as _i5.Future<_i2.ApiResponse<List<_i11.PhaseModel>>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i12.DietPlanModel>> getDietPlan() =>
       (super.noSuchMethod(
         Invocation.method(
           #getDietPlan,
           [],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>>.value(
-            _FakeApiResponse_0<_i11.DietPlanModel>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i12.DietPlanModel>>.value(
+            _FakeApiResponse_0<_i12.DietPlanModel>(
           this,
           Invocation.method(
             #getDietPlan,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i11.DietPlanModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i12.DietPlanModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i12.DailyExerciseModel>> getTodayExercise() =>
+  _i5.Future<_i2.ApiResponse<_i13.DailyExerciseModel>> getTodayExercise() =>
       (super.noSuchMethod(
         Invocation.method(
           #getTodayExercise,
           [],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i12.DailyExerciseModel>>.value(
-            _FakeApiResponse_0<_i12.DailyExerciseModel>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i13.DailyExerciseModel>>.value(
+            _FakeApiResponse_0<_i13.DailyExerciseModel>(
           this,
           Invocation.method(
             #getTodayExercise,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i12.DailyExerciseModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i13.DailyExerciseModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i13.WeeklyScheduleModel>> getWeeklySchedule() =>
+  _i5.Future<_i2.ApiResponse<_i14.WeeklyScheduleModel>> getWeeklySchedule() =>
       (super.noSuchMethod(
         Invocation.method(
           #getWeeklySchedule,
           [],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i13.WeeklyScheduleModel>>.value(
-                _FakeApiResponse_0<_i13.WeeklyScheduleModel>(
+            _i5.Future<_i2.ApiResponse<_i14.WeeklyScheduleModel>>.value(
+                _FakeApiResponse_0<_i14.WeeklyScheduleModel>(
           this,
           Invocation.method(
             #getWeeklySchedule,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i13.WeeklyScheduleModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i14.WeeklyScheduleModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i12.GuidedSessionModel>> getSessionDetails(
+  _i5.Future<_i2.ApiResponse<_i13.GuidedSessionModel>> getSessionDetails(
           String? id) =>
       (super.noSuchMethod(
         Invocation.method(
           #getSessionDetails,
           [id],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i12.GuidedSessionModel>>.value(
-            _FakeApiResponse_0<_i12.GuidedSessionModel>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i13.GuidedSessionModel>>.value(
+            _FakeApiResponse_0<_i13.GuidedSessionModel>(
           this,
           Invocation.method(
             #getSessionDetails,
             [id],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i12.GuidedSessionModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i13.GuidedSessionModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>> startSession(
+  _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel>> startSession(
           String? id) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -541,18 +558,18 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           [id],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>>.value(
-                _FakeApiResponse_0<_i14.SessionProgressModel>(
+            _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel>>.value(
+                _FakeApiResponse_0<_i15.SessionProgressModel>(
           this,
           Invocation.method(
             #startSession,
             [id],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>> completeSession(
+  _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel>> completeSession(
           String? id) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -560,18 +577,18 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           [id],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>>.value(
-                _FakeApiResponse_0<_i14.SessionProgressModel>(
+            _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel>>.value(
+                _FakeApiResponse_0<_i15.SessionProgressModel>(
           this,
           Invocation.method(
             #completeSession,
             [id],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel?>> syncSessionProgress(
+  _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel?>> syncSessionProgress(
     String? id,
     Map<String, dynamic>? data,
   ) =>
@@ -584,8 +601,8 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           ],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel?>>.value(
-                _FakeApiResponse_0<_i14.SessionProgressModel?>(
+            _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel?>>.value(
+                _FakeApiResponse_0<_i15.SessionProgressModel?>(
           this,
           Invocation.method(
             #syncSessionProgress,
@@ -595,100 +612,100 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
             ],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i14.SessionProgressModel?>>);
+      ) as _i5.Future<_i2.ApiResponse<_i15.SessionProgressModel?>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i15.ActiveProgressModel?>> getActiveProgress() =>
+  _i5.Future<_i2.ApiResponse<_i16.ActiveProgressModel?>> getActiveProgress() =>
       (super.noSuchMethod(
         Invocation.method(
           #getActiveProgress,
           [],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i15.ActiveProgressModel?>>.value(
-                _FakeApiResponse_0<_i15.ActiveProgressModel?>(
+            _i5.Future<_i2.ApiResponse<_i16.ActiveProgressModel?>>.value(
+                _FakeApiResponse_0<_i16.ActiveProgressModel?>(
           this,
           Invocation.method(
             #getActiveProgress,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i15.ActiveProgressModel?>>);
+      ) as _i5.Future<_i2.ApiResponse<_i16.ActiveProgressModel?>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<List<_i16.SpecialistModel>>> getMySpecialists() =>
+  _i5.Future<_i2.ApiResponse<List<_i17.SpecialistModel>>> getMySpecialists() =>
       (super.noSuchMethod(
         Invocation.method(
           #getMySpecialists,
           [],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<List<_i16.SpecialistModel>>>.value(
-                _FakeApiResponse_0<List<_i16.SpecialistModel>>(
+            _i5.Future<_i2.ApiResponse<List<_i17.SpecialistModel>>>.value(
+                _FakeApiResponse_0<List<_i17.SpecialistModel>>(
           this,
           Invocation.method(
             #getMySpecialists,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<List<_i16.SpecialistModel>>>);
+      ) as _i5.Future<_i2.ApiResponse<List<_i17.SpecialistModel>>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i16.SpecialistModel>> getSpecialistDetails(
+  _i5.Future<_i2.ApiResponse<_i17.SpecialistModel>> getSpecialistDetails(
           String? id) =>
       (super.noSuchMethod(
         Invocation.method(
           #getSpecialistDetails,
           [id],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i16.SpecialistModel>>.value(
-            _FakeApiResponse_0<_i16.SpecialistModel>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i17.SpecialistModel>>.value(
+            _FakeApiResponse_0<_i17.SpecialistModel>(
           this,
           Invocation.method(
             #getSpecialistDetails,
             [id],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i16.SpecialistModel>>);
+      ) as _i5.Future<_i2.ApiResponse<_i17.SpecialistModel>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i17.SubscriptionPaywayDetails>>
+  _i5.Future<_i2.ApiResponse<_i18.SubscriptionPaywayDetails>>
       getSubscriptionPaywayDetails() => (super.noSuchMethod(
             Invocation.method(
               #getSubscriptionPaywayDetails,
               [],
             ),
             returnValue: _i5
-                .Future<_i2.ApiResponse<_i17.SubscriptionPaywayDetails>>.value(
-                _FakeApiResponse_0<_i17.SubscriptionPaywayDetails>(
+                .Future<_i2.ApiResponse<_i18.SubscriptionPaywayDetails>>.value(
+                _FakeApiResponse_0<_i18.SubscriptionPaywayDetails>(
               this,
               Invocation.method(
                 #getSubscriptionPaywayDetails,
                 [],
               ),
             )),
-          ) as _i5.Future<_i2.ApiResponse<_i17.SubscriptionPaywayDetails>>);
+          ) as _i5.Future<_i2.ApiResponse<_i18.SubscriptionPaywayDetails>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i17.PaymentCustomerDetails>> getSavedCards() =>
+  _i5.Future<_i2.ApiResponse<_i18.PaymentCustomerDetails>> getSavedCards() =>
       (super.noSuchMethod(
         Invocation.method(
           #getSavedCards,
           [],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i17.PaymentCustomerDetails>>.value(
-                _FakeApiResponse_0<_i17.PaymentCustomerDetails>(
+            _i5.Future<_i2.ApiResponse<_i18.PaymentCustomerDetails>>.value(
+                _FakeApiResponse_0<_i18.PaymentCustomerDetails>(
           this,
           Invocation.method(
             #getSavedCards,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i17.PaymentCustomerDetails>>);
+      ) as _i5.Future<_i2.ApiResponse<_i18.PaymentCustomerDetails>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i17.SingleUseTokenResponse>> tokenizeCard(
+  _i5.Future<_i2.ApiResponse<_i18.SingleUseTokenResponse>> tokenizeCard(
           Map<String, dynamic>? cardDetails) =>
       (super.noSuchMethod(
         Invocation.method(
@@ -696,57 +713,57 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           [cardDetails],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i17.SingleUseTokenResponse>>.value(
-                _FakeApiResponse_0<_i17.SingleUseTokenResponse>(
+            _i5.Future<_i2.ApiResponse<_i18.SingleUseTokenResponse>>.value(
+                _FakeApiResponse_0<_i18.SingleUseTokenResponse>(
           this,
           Invocation.method(
             #tokenizeCard,
             [cardDetails],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i17.SingleUseTokenResponse>>);
+      ) as _i5.Future<_i2.ApiResponse<_i18.SingleUseTokenResponse>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i17.SaveCardResponse>> saveCard(
+  _i5.Future<_i2.ApiResponse<_i18.SaveCardResponse>> saveCard(
           String? singleUseTokenId) =>
       (super.noSuchMethod(
         Invocation.method(
           #saveCard,
           [singleUseTokenId],
         ),
-        returnValue: _i5.Future<_i2.ApiResponse<_i17.SaveCardResponse>>.value(
-            _FakeApiResponse_0<_i17.SaveCardResponse>(
+        returnValue: _i5.Future<_i2.ApiResponse<_i18.SaveCardResponse>>.value(
+            _FakeApiResponse_0<_i18.SaveCardResponse>(
           this,
           Invocation.method(
             #saveCard,
             [singleUseTokenId],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i17.SaveCardResponse>>);
+      ) as _i5.Future<_i2.ApiResponse<_i18.SaveCardResponse>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i18.BillingResponseData>> getBillingDetails() =>
+  _i5.Future<_i2.ApiResponse<_i19.BillingResponseData>> getBillingDetails() =>
       (super.noSuchMethod(
         Invocation.method(
           #getBillingDetails,
           [],
         ),
         returnValue:
-            _i5.Future<_i2.ApiResponse<_i18.BillingResponseData>>.value(
-                _FakeApiResponse_0<_i18.BillingResponseData>(
+            _i5.Future<_i2.ApiResponse<_i19.BillingResponseData>>.value(
+                _FakeApiResponse_0<_i19.BillingResponseData>(
           this,
           Invocation.method(
             #getBillingDetails,
             [],
           ),
         )),
-      ) as _i5.Future<_i2.ApiResponse<_i18.BillingResponseData>>);
+      ) as _i5.Future<_i2.ApiResponse<_i19.BillingResponseData>>);
 }
 
 /// A class which mocks [LocalDataSource].
 ///
 /// See the documentation for Mockito's code generation for more information.
-class MockLocalDataSource extends _i1.Mock implements _i19.LocalDataSource {
+class MockLocalDataSource extends _i1.Mock implements _i20.LocalDataSource {
   MockLocalDataSource() {
     _i1.throwOnMissingStub(this);
   }
