@@ -164,6 +164,7 @@ class AppStrings {
   static const String addNew = 'Add New';
   static const String primary = 'Primary';
   static const String billingHistory = 'Billing History';
+  static const String visa = 'Visa';
   static const String monthlySubscription = 'Monthly Subscription';
   static const String paid = 'Paid';
   static const String addCard = 'Add Card';
@@ -175,5 +176,102 @@ class AppStrings {
   static const String mmYy = 'MM/YY';
   static const String cvv = 'CVV';
   static const String saveCard = 'Save Card';
-  static const String visa = 'Visa';
+  // Health
+  static const String healthTitle = 'Health';
+  static const String tabExercise = 'Exercise';
+  static const String tabDiet = 'Diet';
+  static const String tabResults = 'Results';
+  static const String tabInsights = 'Insights';
+  static const String contentComingSoon = 'Content for %s coming soon';
+  static const String weeklyPreview = 'Weekly Preview';
+  static const String noScheduleAvailable = 'No schedule available';
+  static const String todaysExercise = "Today's Exercise";
+  static const String exercisePreview = 'Exercise Preview';
+  static const String noExerciseToday = 'No exercise scheduled for today.';
+  static const String noExerciseThisDate = 'No exercise scheduled for this date.';
+  static const String yourWeeklyScheduleWillAppear = 'Your weekly schedule will appear here once it is available';
+  static const String unableToLoadExercise = 'Unable to load the exercise. Please try again.';
+  static const String planOverview = 'Plan Overview';
+  static const String program = 'PROGRAM';
+  static const String weekOf = 'Week %s of %s'; // e.g. Week 3 of 12
+  static const String progress = 'Progress';
+  static const String currentFocus = 'CURRENT FOCUS';
+  static const String mobilityAndFlex = 'Mobility & Flex'; // Example
+  static const String activeSession = 'Active';
+  static const String plusSessions = '+%s sessions'; // e.g. +2 sessions
+  static const String noCareTeamAssigned = 'No care team has been assigned yet.';
+  static const String exerciseSession = 'Exercise Session';
+  static const String mins = 'mins';
+  static const String startSession = 'Start Session';
+  static const String noNutritionPlan = 'No nutrition plan assigned.';
+  static const String unableToLoadDietPlan = 'Unable to load diet plan';
+  static const String todaysNutrition = "Today's Nutrition";
+  static const String calories = 'Calories';
+  static const String protein = 'Protein';
+  static const String glasses = 'Glasses';
+  static const String todaysMeals = "Today's Meals";
+  static const String keyGuidance = 'Key Guidance';
+  static const String unknownMeal = 'Unknown Meal';
+  static const String kcal = 'kcal';
+  static const String guidance = 'Guidance';
+  static const String tapForDetails = 'Tap for details';
+  
+  // Results
+  static const String noLabReportsFound = 'No lab reports found.';
+  static const String unableToLoadLabReports = 'Unable to load lab reports';
+  static const String unknownDate = 'Unknown Date';
+  static const String labReport = 'Lab Report';
+  static const String bookNewTest = 'Book a New Test';
+  static const String bookNewTestDesc = 'Keep track of your health markers by\nscheduling your next lab visit.';
+  
+  // Insights
+  static const String yourNuevoAge = 'Your Nuevo Age';
+  static const String years = ' Years';
+  static const String biologicalAgeDiff = '5 years younger than your biological age';
+  static const String recentInsights = 'Recent Insights';
+  static const String sleepQualityImproved = 'Sleep Quality Improved';
+  static const String sleepQualityDesc = 'Your average sleep time increased by 45 minutes this week';
+  static const String activityGoalMet = 'Activity Goal Met';
+  static const String activityGoalDesc = "You've hit your daily step goal 5 days in a row!";
+  static const String stressLevels = 'Stress Levels';
+  static const String stressLevelsDesc = 'Consider adding relaxation techniques to your routine';
+
+  // Session Overview
+  static const String sessionOverview = 'Session Overview';
+  static const String failedToLoadSession = 'Failed to load session details: ';
+  static const String sessionNotFound = 'Session not found';
+  static const String guidedSession = 'Guided Session';
+  static const String stepPrefix = 'Step ';
+  static const String failedToSyncProgress = 'Failed to sync progress: ';
+  static const String beginSession = 'Begin Session';
+  static const String stepOf = 'Step %s of %s';
+  static const String duration = 'Duration';
+  static const String min = 'min';
+  static const String purpose = 'Purpose';
+  static const String intensity = 'Intensity';
+
+  // Guided Session
+  static const String exerciseStep = 'Exercise Step';
+  static const String failedToLoadActiveProgress = 'Failed to load active progress: ';
+  static const String sessionStartedBackend = 'Session started successfully on backend';
+  static const String failedToStartBackend = 'Failed to start session on backend: ';
+  static const String progressSyncedSuccessfully = 'Progress synced successfully for step ';
+  static const String failedToCompleteSession = 'Failed to complete session: ';
+  static const String noSessionSteps = 'No session steps available.';
+  static const String timeRemaining = 'TIME REMAINING';
+  static const String endSession = 'End Session';
+
+  // Active Session
+  static const String sessionInProgress = 'Session in Progress';
+  static const String lowerBodyStrength = 'Lower Body Strength';
+
+  // Result Details
+  static const String resultDetails = 'Result Details';
+  static const String greatProgress = 'Great Progress!';
+  static const String healthScoreImprovementDesc = 'Your overall health score improved by 12% compared to last month. 3 key markers are trending positively.';
+  static const String keyImprovements = 'Key Improvements';
+  static const String totalCholesterol = 'Total Cholesterol';
+  static const String ngMl = 'ng/mL';
+  static const String vitaminD = 'Vitamin D';
+  static const String ironFerritin = 'Iron (Ferritin)';
 }

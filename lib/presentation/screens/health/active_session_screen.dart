@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_strings.dart';
 
 class ActiveSessionScreen extends StatefulWidget {
   const ActiveSessionScreen({super.key});
@@ -55,7 +56,7 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         title: const Text(
-          'Session in Progress',
+          AppStrings.sessionInProgress,
           style: TextStyle(color: Colors.white, fontSize: 16),
         ),
         backgroundColor: Colors.transparent,
@@ -103,7 +104,7 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen> {
                 ),
                 const SizedBox(height: 8),
                 const Text(
-                  'Lower Body Strength',
+                  AppStrings.lowerBodyStrength,
                   style: TextStyle(
                     fontSize: 18,
                     color: Colors.white70,
@@ -173,7 +174,7 @@ class _ActiveSessionScreenState extends State<ActiveSessionScreen> {
                      context.pop(); // End session logic here
                   },
                   child: const Text(
-                    'End Session',
+                    AppStrings.endSession,
                     style: TextStyle(
                       color: Colors.white54,
                       fontSize: 16,

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/constants/app_strings.dart';
 import '../../../data/models/lab_report_model.dart';
 import 'widgets/metric_result_card.dart';
 
@@ -38,7 +39,7 @@ class ResultDetailsScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'Result Details',
+          AppStrings.resultDetails,
           style: TextStyle(
             color: Color(0xFF1E1E1E),
             fontSize: 18,
@@ -78,7 +79,7 @@ class ResultDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 16),
                   const Text(
-                    'Great Progress!',
+                    AppStrings.greatProgress,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -87,7 +88,7 @@ class ResultDetailsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Your overall health score improved by 12% compared to last month. 3 key markers are trending positively.',
+                    AppStrings.healthScoreImprovementDesc,
                     style: TextStyle(
                       fontSize: 14,
                       color: Color(0xFF757575),
@@ -110,7 +111,7 @@ class ResultDetailsScreen extends StatelessWidget {
             
             // Key Improvements Title
             const Text(
-               'Key Improvements',
+               AppStrings.keyImprovements,
                style: TextStyle(
                  fontSize: 18,
                  fontWeight: FontWeight.w500,
@@ -121,26 +122,26 @@ class ResultDetailsScreen extends StatelessWidget {
 
             // Metrics List (Mocked data perfectly matching the UI design)
             const MetricResultCard(
-              title: 'Total Cholesterol',
+              title: AppStrings.totalCholesterol,
               status: MetricStatus.optimal,
               value: '180',
-              unit: 'ng/mL',
+              unit: AppStrings.ngMl,
               scoreFraction: 0.85, // Position in the center green optimal band
             ),
             const SizedBox(height: AppSpacing.md),
             const MetricResultCard(
-              title: 'Vitamin D',
+              title: AppStrings.vitaminD,
               status: MetricStatus.suboptimal,
               value: '45',
-              unit: 'ng/mL',
+              unit: AppStrings.ngMl,
               scoreFraction: 0.8, // Position in the right red suboptimal band
             ),
             const SizedBox(height: AppSpacing.md),
             const MetricResultCard(
-              title: 'Iron (Ferritin)',
+              title: AppStrings.ironFerritin,
               status: MetricStatus.stable,
               value: '92',
-              unit: 'ng/mL',
+              unit: AppStrings.ngMl,
               scoreFraction: 0.35, // Position in the left yellow-ish band border
             ),
           ],
