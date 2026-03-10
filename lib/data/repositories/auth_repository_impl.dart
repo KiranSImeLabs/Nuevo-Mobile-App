@@ -196,38 +196,41 @@ class AuthRepositoryImpl implements AuthRepository {
       }
       
       final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final String? idToken = googleAuth.idToken;
       final String? accessToken = googleAuth.accessToken;
       
-      if (idToken == null) {
-         return const Left(AuthFailure(message: 'Failed to retrieve Google ID Token'));
+      if (accessToken == null) {
+         return const Left(AuthFailure(message: 'Failed to retrieve Google Access Token'));
       }
 
-      // TODO: Send idToken (and optionally accessToken) to your backend
-      // final response = await _apiClient.googleLogin(idToken);
+      // Send accessToken to the backend
+      final response = await _apiClient.googleLogin(accessToken);
       
-      // MOCK IMPLEMENTATION FOR NOW (until backend endpoint is ready)
-      // We'll simulate a successful login
-      
-      // Simulate API delay
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Create a mock user based on Google profile
-      final user = User(
-        id: 'google_${googleUser.id}',
-        email: googleUser.email,
-        name: googleUser.displayName ?? 'Google User',
-        // Add other fields as necessary
-      );
-      
-      // Save dummy token
-      await _localDataSource.saveAccessToken('mock_google_token_$idToken');
-      await _localDataSource.saveUserId(user.id);
-      
-      return Right(user);
+      if (response.success && response.data != null) {
+        final data = response.data!;
+        
+        // Save tokens securely
+        await _localDataSource.saveAccessToken(data.token);
+        await _localDataSource.saveUserId(data.user.id);
+        
+        // Convert to domain entity and return
+        return Right(data.user.toEntity());
+      } else {
+        return Left(ServerFailure(response.message ?? 'Google Sign-In failed'));
+      }
 
+    } on DioException catch (e) {
+      final exception = DioClient.handleDioError(e);
+      if (exception is AuthException) {
+        return Left(AuthFailure(message: exception.message, code: exception.code));
+      } else if (exception is NetworkException) {
+        return Left(NetworkFailure(message: exception.message, code: exception.code));
+      } else if (exception is ServerException) {
+        return Left(ServerFailure(exception.message, exception.code));
+      } else {
+        return Left(UnknownFailure(message: exception.toString()));
+      }
     } catch (e) {
-      return Left(AuthFailure(message: e.toString()));
+      return Left(UnknownFailure(message: e.toString()));
     }
   }
 
@@ -239,36 +242,57 @@ class AuthRepositoryImpl implements AuthRepository {
           AppleIDAuthorizationScopes.email,
           AppleIDAuthorizationScopes.fullName,
         ],
-        // Implement webAuthenticationOptions if native flow handles Android too, 
-        // but typically this package handles iOS natively and Android via web fallback.
-        // For Android, you need redirect URI.
       );
 
-      // credential.identityToken is the JWT to send to backend
-      if (credential.identityToken == null) {
-         return const Left(AuthFailure(message: 'Failed to retrieve Apple Identity Token'));
+      // For Apple, the backend typically expects the authorizationCode in place of an access token
+      // as Apple does not provide a direct access token to the client.
+      // final String appleToken = credential.authorizationCode;
+      final String appleToken = credential.identityToken ?? '';
+      if (appleToken.isEmpty) {
+         return const Left(AuthFailure(message: 'Failed to retrieve Apple Authorization Code'));
+      }
+      //credential.identityToken
+      //credential.authorizationCode
+
+      // Send authorizationCode to backend
+      final response = await _apiClient.appleLogin(
+        token: appleToken,
+        firstName: credential.givenName,
+        lastName: credential.familyName,
+        email: credential.email,
+      );
+
+      if (response.success && response.data != null) {
+        final data = response.data!;
+        
+        // Save tokens securely
+        await _localDataSource.saveAccessToken(data.token);
+        await _localDataSource.saveUserId(data.user.id);
+        
+        // Convert to domain entity and return
+        return Right(data.user.toEntity());
+      } else {
+        return Left(ServerFailure(response.message ?? 'Apple Sign-In failed'));
       }
 
-      // TODO: Send identityToken to backend
-      // final response = await _apiClient.appleLogin(credential.identityToken!);
-
-      // MOCK IMPLEMENTATION
-      
-      final user = User(
-        id: 'apple_${credential.userIdentifier}',
-         // Email/Name are only available on FIRST sign in with Apple. 
-         // Subsequent sign-ins might not return them, so you rely on the backend decoding the ID token.
-        email: credential.email ?? 'apple_hidden@email.com', 
-        name: [credential.givenName, credential.familyName].where((e) => e != null).join(' '),
-      );
-      
-      await _localDataSource.saveAccessToken('mock_apple_token_${credential.identityToken}');
-      await _localDataSource.saveUserId(user.id);
-      
-      return Right(user);
-
+    } on DioException catch (e) {
+       final exception = DioClient.handleDioError(e);
+       if (exception is AuthException) {
+        return Left(AuthFailure(message: exception.message, code: exception.code));
+      } else if (exception is NetworkException) {
+        return Left(NetworkFailure(message: exception.message, code: exception.code));
+      } else if (exception is ServerException) {
+        return Left(ServerFailure(exception.message, exception.code));
+      } else if (exception is ValidationException) {
+         final msg = exception.errors != null && exception.errors!.isNotEmpty
+            ? exception.errors!.join(', ')
+            : exception.message;
+        return Left(ValidationFailure(message: msg, code: exception.code));
+      } else {
+        return Left(UnknownFailure(message: exception.toString()));
+      }
     } catch (e) {
-      return Left(AuthFailure(message: e.toString()));
+      return Left(UnknownFailure(message: e.toString()));
     }
   }
 

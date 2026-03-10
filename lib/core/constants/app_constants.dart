@@ -10,6 +10,8 @@ class ApiConstants {
   // Auth
   static const String login = '/auth/login';
   static const String register = '/auth/register';
+  static const String googleLogin = '/auth/register-or-login-google';
+  static const String appleLogin = '/auth/register-or-login-apple';
   static const String forgotPassword = '/auth/forgot-password';
   static const String resendResetCode = '/auth/resend-reset-code';
   static const String verifyResetCode = '/auth/verify-reset-code';

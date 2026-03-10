@@ -57,6 +57,44 @@ class ApiClient {
       (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
     );
   }
+
+  /// Google Sign-In backend verification
+  Future<ApiResponse<AuthResponseData>> googleLogin(String token) async {
+    final response = await _dioClient.post(
+      ApiConstants.googleLogin,
+      data: {'token': token},
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Apple Sign-In backend verification
+  Future<ApiResponse<AuthResponseData>> appleLogin({
+    required String token,
+    String? firstName,
+    String? lastName,
+    String? email,
+  }) async {
+    final Map<String, dynamic> data = {'token': token};
+    
+    // Only add these fields if they are non-null and not empty strings
+    if (firstName != null && firstName.isNotEmpty) data['firstName'] = firstName;
+    if (lastName != null && lastName.isNotEmpty) data['lastName'] = lastName;
+    // According to the document, Apple SDK returns empty strings or null on subsequent logins, 
+    // we should safely pass them or omit them entirely.
+    if (email != null && email.isNotEmpty) data['email'] = email;
+
+    final response = await _dioClient.post(
+      ApiConstants.appleLogin,
+      data: data,
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
   
   /// Logout current user
   Future<ApiResponse<void>> logout() async {
