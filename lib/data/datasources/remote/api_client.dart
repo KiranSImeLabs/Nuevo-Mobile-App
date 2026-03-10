@@ -7,6 +7,7 @@ import '../../models/subscription_model.dart';
 import '../../models/program_model.dart';
 import '../../models/booking_model.dart';
 import '../../models/lab_request_model.dart';
+import '../../models/lab_report_model.dart';
 import '../../models/diet_plan_model.dart';
 import '../../models/preferences_model.dart';
 import '../../models/daily_exercise_model.dart';
@@ -215,6 +216,20 @@ class ApiClient {
     return ApiResponse.fromJson(
       response.data,
       (json) => LabRequestData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  // ============================================
+  // Lab Reports Endpoints
+  // ============================================
+
+  /// Get Lab Reports List
+  Future<ApiResponse<LabReportListData>> getLabReports() async {
+    final response = await _dioClient.get(ApiConstants.labReports);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) =>
+          LabReportListData.fromJson(json as Map<String, dynamic>),
     );
   }
 

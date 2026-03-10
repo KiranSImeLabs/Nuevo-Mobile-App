@@ -12,7 +12,9 @@ import '../screens/health/health_screen.dart';
 import '../screens/health/session_overview_screen.dart';
 import '../screens/health/active_session_screen.dart';
 import '../screens/health/guided_session_screen.dart';
+import '../screens/health/result_details_screen.dart';
 import '../../data/models/daily_exercise_model.dart';
+import '../../data/models/lab_report_model.dart';
 import '../screens/appointments/appointments_screen.dart';
 import '../screens/profile/profile_screen.dart';
 import '../screens/my_plan/edit_goals_screen.dart';
@@ -276,6 +278,13 @@ final routerProvider = Provider<GoRouter>((ref) {
                 steps: steps,
                 initialStepIndex: initialStepIndex,
               );
+            },
+          ),
+          GoRoute(
+            path: '/health/result-details',
+            builder: (context, state) {
+              final report = state.extra as LabReportModel;
+              return ResultDetailsScreen(report: report);
             },
           ),
           GoRoute(

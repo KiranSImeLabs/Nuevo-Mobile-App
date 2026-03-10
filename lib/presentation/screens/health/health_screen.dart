@@ -10,8 +10,10 @@ import '../../providers/health_provider.dart';
 import '../../../data/models/diet_plan_model.dart';
 import '../../../data/models/daily_exercise_model.dart';
 import '../../../data/models/weekly_schedule_model.dart';
+import '../../../data/models/lab_report_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../providers/specialist_provider.dart';
+import '../../providers/lab_reports_provider.dart';
 import 'widgets/guidance_detail_bottom_sheet.dart';
 import '../../../core/constants/app_constants.dart';
 
@@ -454,7 +456,16 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: GestureDetector(
                         onTap: () {
-                          context.push('/specialist-details/${specialist.id}');
+                          context.push(
+                            '/clinician-profile',
+                            extra: {
+                              'id': specialist.id,
+                              'name': specialist.fullName,
+                              'role': specialist.role,
+                              'imageUrl': specialist.profileImage,
+                              'bio': specialist.biography,
+                            },
+                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.all(12),
@@ -1027,28 +1038,69 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
 
 
   Widget _buildResultsContent() {
+    final labReportsAsync = ref.watch(labReportsProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildResultCard(
-          icon: Icons.science_outlined,
-          title: 'Metabolic Panel',
-          date: 'Oct 24, 2023',
-          iconColor: const Color(0xFFA05E44),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _buildResultCard(
-          icon: Icons.grid_on_outlined, // Placeholder for cells/lipid
-          title: 'Lipid Profile',
-          date: 'Aug 12, 2023',
-          iconColor: const Color(0xFFA05E44),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _buildResultCard(
-          icon: Icons.coronavirus_outlined, // Placeholder for molecule/vitamin D
-          title: 'Vitamin D Panel',
-          date: 'Collected Yesterday',
-          iconColor: const Color(0xFFA05E44),
+        labReportsAsync.when(
+          data: (labReportsData) {
+            if (labReportsData == null || labReportsData.reports == null || labReportsData.reports!.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: Center(child: Text("No lab reports found.")),
+              );
+            }
+
+            return Column(
+              children: labReportsData.reports!.map((report) {
+                // Determine icon based on some logic or default
+                IconData icon = Icons.science_outlined;
+                if (report.testType != null) {
+                  final type = report.testType!.toLowerCase();
+                  if (type.contains('lipid')) {
+                    icon = Icons.grid_on_outlined;
+                  } else if (type.contains('vitamin')) {
+                    icon = Icons.coronavirus_outlined;
+                  }
+                }
+
+                // Format Date
+                String displayDate = 'Unknown Date';
+                if (report.testDate != null) {
+                  try {
+                    final date = DateTime.parse(report.testDate!);
+                    displayDate = DateFormat('MMM dd, yyyy').format(date);
+                  } catch (e) {
+                    displayDate = report.testDate!;
+                  }
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: _buildResultCard(
+                    icon: icon,
+                    title: report.testType ?? 'Lab Report',
+                    date: displayDate,
+                    iconColor: const Color(0xFFA05E44),
+                    onTap: () {
+                      context.push('/health/result-details', extra: report);
+                    },
+                  ),
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: CircularProgressIndicator(color: Color(0xFFA05E44)),
+            ),
+          ),
+          error: (error, stack) {
+            debugPrint('Error loading lab reports: $error');
+            return const Center(child: Text("Unable to load lab reports"));
+          },
         ),
         const SizedBox(height: AppSpacing.xl),
         
@@ -1202,58 +1254,62 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     required String title,
     required String date,
     required Color iconColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5EAE8),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: iconColor,
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5EAE8),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF1E1E1E),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF1E1E1E),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  date,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF8C8C8C),
+                  const SizedBox(height: 4),
+                  Text(
+                    date,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF8C8C8C),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(
-            Icons.arrow_forward,
-            color: Color(0xFFA05E44),
-            size: 20,
-          ),
-        ],
+            const Icon(
+              Icons.arrow_forward,
+              color: Color(0xFFA05E44),
+              size: 20,
+            ),
+          ],
+        ),
       ),
     );
   }
