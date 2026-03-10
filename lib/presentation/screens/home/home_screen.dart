@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../providers/home_provider.dart';
+import '../../providers/user_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../domain/entities/task.dart' as entities;
+import '../../../domain/entities/user.dart' as entities;
 import '../../../domain/entities/wellness_program.dart';
 import '../../../domain/entities/home/home_dashboard.dart';
 import '../../utils/responsive_utils.dart';
@@ -16,6 +18,7 @@ import '../../widgets/home/program_card.dart';
 import '../../widgets/home/quick_access_grid.dart';
 import '../../widgets/home/quick_access_card.dart';
 import '../../widgets/home/dietitian_session_card.dart';
+import '../../providers/user_provider.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -23,6 +26,12 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboardState = ref.watch(homeDashboardProvider);
+    final userState = ref.watch(userProvider);
+    
+    // Call user details if not available
+    if (userState.value == null && !userState.isLoading) {
+      Future.microtask(() => ref.read(userProvider.notifier).fetchProfile());
+    }
 
     return Scaffold(
       backgroundColor: const Color(0xFFFDF9F8),
@@ -45,7 +54,7 @@ class HomeScreen extends ConsumerWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       // 1. Header with profile and notification
-                      _buildHeader(context, dashboard.welcome),
+                      _buildHeader(context, dashboard.welcome, userState),
                       SizedBox(
                         height: ResponsiveUtils.spacing(context, base: 24),
                       ),
@@ -64,8 +73,27 @@ class HomeScreen extends ConsumerWidget {
                       SizedBox(
                         height: ResponsiveUtils.spacing(context, base: 24),
                       ),
-
+                      // 5. Task Completed
+                      //context.go('/my-plan')
+                      if (dashboard.tasksCompleted.isNotEmpty) ...[
+                        _buildSectionHeader(
+                          context,
+                          'Task Completed',
+                          onActionTap: () {
+                            context.push('/completed-tasks');
+                          },
+                          actionLabel: 'See All',
+                          showArrow: false,
+                        )
+                      ],
+                      SizedBox(
+                                height: ResponsiveUtils.spacing(
+                                  context,
+                                  base: 24,
+                                ),
+                              ),
                       // 4. Action Required
+                      
                       // Force show section per request
                       Builder(
                         builder: (context) {
@@ -82,6 +110,14 @@ class HomeScreen extends ConsumerWidget {
                                 actionLabel: 'Complete Now',
                                 showArrow: true,
                               ),
+                              SizedBox(
+                          height: ResponsiveUtils.spacing(context, base: 16),
+                        ),
+                        _buildTasksList(context, dashboard.tasksCompleted),
+                        SizedBox(
+                          height: ResponsiveUtils.spacing(context, base: 24),
+                        ),
+
                               // Widget below removed per user request "remove the pression quesioner widget completly"
                               // if (actions.isNotEmpty) ...[
                               //   SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
@@ -98,25 +134,6 @@ class HomeScreen extends ConsumerWidget {
                         },
                       ),
 
-                      // 5. Task Completed
-                      if (dashboard.tasksCompleted.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          context,
-                          'Task Completed',
-                          onActionTap: () {
-                            context.push('/completed-tasks');
-                          },
-                          actionLabel: 'See All',
-                          showArrow: false,
-                        ),
-                        SizedBox(
-                          height: ResponsiveUtils.spacing(context, base: 16),
-                        ),
-                        _buildTasksList(context, dashboard.tasksCompleted),
-                        SizedBox(
-                          height: ResponsiveUtils.spacing(context, base: 24),
-                        ),
-                      ],
 
                       // 6. Program Card
                       // "Your Program" header removed per request
@@ -170,17 +187,40 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHeader(BuildContext context, WelcomeData welcome) {
+  Widget _buildHeader(BuildContext context, WelcomeData welcome, AsyncValue<entities.User?> userState) {
+    final userImageUrl = userState.value?.profileImageUrl;
+    
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Row(
           children: [
-            CircleAvatar(
-              radius: ResponsiveUtils.iconSize(context, base: 24),
-              backgroundImage: const NetworkImage(
-                'https://i.pravatar.cc/150?u=a042581f4e29026704d',
-              ), // Placeholder
+            Container(
+              width: ResponsiveUtils.iconSize(context, base: 48),
+              height: ResponsiveUtils.iconSize(context, base: 48),
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.grey,
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: (userImageUrl != null && userImageUrl.isNotEmpty)
+                  ? (userImageUrl.toLowerCase().endsWith('.svg')
+                      ? Image.asset(
+                          'assets/images/details_image.png',
+                          fit: BoxFit.cover,
+                        )
+                      : Image.network(
+                          userImageUrl,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => Image.asset(
+                            'assets/images/details_image.png',
+                            fit: BoxFit.cover,
+                          ),
+                        ))
+                  : Image.asset(
+                      'assets/images/details_image.png',
+                      fit: BoxFit.cover,
+                    ),
             ),
             SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
             Column(

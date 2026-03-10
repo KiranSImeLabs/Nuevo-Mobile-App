@@ -18,6 +18,7 @@ import '../../models/specialist_model.dart';
 import '../../models/payment_integration_models.dart';
 import '../../models/billing_response_model.dart';
 import '../../models/goal_model.dart';
+import '../../models/phase_model.dart';
 
 import 'dart:convert';
 import 'package:dio/dio.dart';
@@ -51,6 +52,44 @@ class ApiClient {
     final response = await _dioClient.post(
       ApiConstants.register,
       data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Google Sign-In backend verification
+  Future<ApiResponse<AuthResponseData>> googleLogin(String token) async {
+    final response = await _dioClient.post(
+      ApiConstants.googleLogin,
+      data: {'token': token},
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Apple Sign-In backend verification
+  Future<ApiResponse<AuthResponseData>> appleLogin({
+    required String token,
+    String? firstName,
+    String? lastName,
+    String? email,
+  }) async {
+    final Map<String, dynamic> data = {'token': token};
+    
+    // Only add these fields if they are non-null and not empty strings
+    if (firstName != null && firstName.isNotEmpty) data['firstName'] = firstName;
+    if (lastName != null && lastName.isNotEmpty) data['lastName'] = lastName;
+    // According to the document, Apple SDK returns empty strings or null on subsequent logins, 
+    // we should safely pass them or omit them entirely.
+    if (email != null && email.isNotEmpty) data['email'] = email;
+
+    final response = await _dioClient.post(
+      ApiConstants.appleLogin,
+      data: data,
     );
     return ApiResponse.fromJson(
       response.data,
@@ -126,7 +165,7 @@ class ApiClient {
   }
   
   /// Update user profile
-  Future<ApiResponse<UserModel>> updateProfile(Map<String, dynamic> data) async {
+  Future<ApiResponse<UserModel>> updateProfile(dynamic data) async {
      final response = await _dioClient.dio.patch(
        ApiConstants.updateProfile,
        data: data,
@@ -290,6 +329,21 @@ class ApiClient {
     return ApiResponse.fromJson(
       response.data,
       (json) => null,
+    );
+  }
+
+  // ============================================
+  // Phase Endpoints
+  // ============================================
+
+  /// Get All Phases
+  Future<ApiResponse<List<PhaseModel>>> getPhases() async {
+    final response = await _dioClient.get(ApiConstants.phases);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => (json as List<dynamic>)
+          .map((item) => PhaseModel.fromJson(item as Map<String, dynamic>))
+          .toList(),
     );
   }
 

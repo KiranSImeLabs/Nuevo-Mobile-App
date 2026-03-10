@@ -9,7 +9,8 @@ import '../../domain/entities/preferences.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/user_repository.dart';
 import '../models/preferences_model.dart';
-
+import 'package:nuevo_app/data/models/api_response.dart';
+import 'package:nuevo_app/data/models/user_model.dart';
 /// User Repository Implementation (Data Layer)
 /// Implements the UserRepository interface
 class UserRepositoryImpl implements UserRepository {
@@ -56,24 +57,40 @@ class UserRepositoryImpl implements UserRepository {
   }) async {
     try {
       final nameParts = name?.trim().split(' ');
-      final firstName = nameParts != null && nameParts.isNotEmpty ? nameParts.first : '';
-      final lastName = nameParts != null && nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
+      final firstName = nameParts != null && nameParts.isNotEmpty ? nameParts.first : null;
+      final lastName = nameParts != null && nameParts.length > 1 ? nameParts.sublist(1).join(' ') : null;
+      final formData = FormData();
       
-      final data = {
-        "firstName": firstName,
-        "lastName": lastName,
-        "profileImage": profileImageUrl ?? "",
-        "dateOfBirth": dateOfBirth ?? "",
-      };
-      
-      final response = await _apiClient.updateProfile(data);
+      if (firstName != null && firstName.isNotEmpty) {
+        formData.fields.add(MapEntry('firstName', firstName));
+      }
+      if (lastName != null && lastName.isNotEmpty) {
+        formData.fields.add(MapEntry('lastName', lastName));
+      }
+      if (dateOfBirth != null && dateOfBirth.isNotEmpty) {
+        formData.fields.add(MapEntry('dateOfBirth', dateOfBirth));
+      }
+      if (profileImageUrl != null && profileImageUrl.isNotEmpty && !profileImageUrl.startsWith('http')) {
+        formData.files.add(MapEntry(
+          'profileImage',
+          await MultipartFile.fromFile(
+            profileImageUrl,
+            filename: profileImageUrl.split('/').last,
+          ),
+        ));
+      }
+
+      final response = await _apiClient.updateProfile(formData);
+
       if (response.success && response.data != null) {
         return Right(response.data!.toEntity());
       } else {
-        return Left(ServerFailure(response.message ?? 'Failed to update profile'));
+        return Left(ServerFailure('Failed to update profile'));
       }
     } on DioException catch (e) {
+      
       final exception = DioClient.handleDioError(e);
+      print(exception);
       if (exception is AuthException) {
         return Left(AuthFailure(message: exception.message, code: exception.code));
       } else if (exception is NetworkException) {

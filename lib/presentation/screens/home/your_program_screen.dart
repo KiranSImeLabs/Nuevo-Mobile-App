@@ -10,6 +10,7 @@ import '../../providers/goal_provider.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../domain/entities/wellness_program.dart';
 import '../../widgets/common/care_team_member_card.dart';
+import '../../providers/phase_provider.dart';
 
 class YourProgramScreen extends  ConsumerStatefulWidget {
   const YourProgramScreen({super.key});
@@ -24,6 +25,7 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(specialistListProvider.notifier).fetchSpecialists();
+      ref.read(phaseListProvider.notifier).fetchPhases();
     });
   }
 
@@ -31,6 +33,7 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
   Widget build(BuildContext context) {
     final dashboardState = ref.watch(homeDashboardProvider);
     final specialistState = ref.watch(specialistListProvider);
+    final phaseState = ref.watch(phaseListProvider);
     
     return Scaffold(
       backgroundColor: const Color(0xFFFCF9F8),
@@ -74,40 +77,79 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
               ),
             ),
             SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-            _buildPhaseCard(
-              context,
-              phase: 'Phase 1',
-              title: 'Assess',
-              iconData: Icons.assignment_outlined,
-              isActive: false,
-              isLocked: false,
-            ),
-            SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-            _buildPhaseCard(
-              context,
-              phase: 'Reset',
-              title: 'Focus: Metabolic flexibility',
-              iconData: Icons.autorenew,
-              isActive: true,
-              isLocked: false,
-            ),
-            SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-            _buildPhaseCard(
-              context,
-              phase: 'Phase 3',
-              title: 'Elevate',
-              iconData: Icons.lock_outline,
-              isActive: false,
-              isLocked: true,
-            ),
-            SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-            _buildPhaseCard(
-              context,
-              phase: 'Phase 4',
-              title: 'Sustain',
-              iconData: Icons.lock_outline,
-              isActive: false,
-              isLocked: true,
+            phaseState.when(
+              loading: () => Column(
+                children: [
+                  _buildPhaseCard(
+                    context,
+                    phase: 'Phase 1',
+                    title: 'Assess',
+                    iconData: Icons.assignment_outlined,
+                    isActive: false,
+                    isLocked: false,
+                  ),
+                  SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
+                  _buildPhaseCard(
+                    context,
+                    phase: 'Phase 2',
+                    title: 'Reset',
+                    iconData: Icons.autorenew,
+                    isActive: true,
+                    isLocked: false,
+                  ),
+                  SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
+                  _buildPhaseCard(
+                    context,
+                    phase: 'Phase 3',
+                    title: 'Elevate',
+                    iconData: Icons.lock_outline,
+                    isActive: false,
+                    isLocked: true,
+                  ),
+                  SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
+                  _buildPhaseCard(
+                    context,
+                    phase: 'Phase 4',
+                    title: 'Sustain',
+                    iconData: Icons.lock_outline,
+                    isActive: false,
+                    isLocked: true,
+                  ),
+                ],
+              ),
+              error: (err, stack) => const Text('Failed to load phases'),
+              data: (phases) {
+                if (phases.isEmpty) return const Text('No phases available');
+                return Column(
+                  children: phases.map((phase) {
+                    // Replicating original dummy logic for active/locked status based on orderIndex
+                    final isLocked = phase.orderIndex > 2;
+                    final isActive = phase.orderIndex == 2;
+                    final isPast = phase.orderIndex < 2;
+                    
+                    IconData iconData = Icons.assignment_outlined;
+                    if (isLocked) {
+                      iconData = Icons.lock_outline;
+                    } else if (isActive) {
+                      iconData = Icons.autorenew;
+                    } else if (isPast) {
+                      iconData = Icons.check_circle_outline;
+                    }
+
+                    return Padding(
+                      padding: EdgeInsets.only(bottom: ResponsiveUtils.spacing(context, base: 12)),
+                      child: _buildPhaseCard(
+                        context,
+                        phase: 'Phase ${phase.orderIndex}',
+                        title: phase.name,
+                        iconData: iconData,
+                        isActive: isActive,
+                        isLocked: isLocked,
+                      ),
+                    );
+                  }).toList(),
+                );
+              },
             ),
             
             SizedBox(height: ResponsiveUtils.spacing(context, base: 32)),

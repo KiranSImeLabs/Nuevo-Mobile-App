@@ -7,6 +7,7 @@ import '../../widgets/common/care_team_member_card.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/specialist_provider.dart';
 import '../../providers/goal_provider.dart';
+import '../../providers/phase_provider.dart';
 import 'diet_plan_detail_screen.dart';
 
 class MyPlanScreen extends ConsumerStatefulWidget {
@@ -23,6 +24,7 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(specialistListProvider.notifier).fetchSpecialists();
       ref.read(goalListProvider.notifier).fetchGoals();
+      ref.read(phaseListProvider.notifier).fetchPhases();
     });
   }
 
@@ -175,13 +177,41 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
   }
 
   Widget _buildPhaseTimeline() {
-    return Column(
-      children: [
-        _buildTimelineItem(AppStrings.assess, isCompleted: true, isFirst: true),
-        _buildTimelineItem(AppStrings.reset, isCompleted: true, isActive: true),
-        _buildTimelineItem(AppStrings.elevate, isActive: false),
-        _buildTimelineItem(AppStrings.sustain, isActive: false, isLast: true),
-      ],
+    final phaseState = ref.watch(phaseListProvider);
+
+    return phaseState.when(
+      loading: () => Column(
+        children: [
+          _buildTimelineItem(AppStrings.assess, isCompleted: true, isFirst: true),
+          _buildTimelineItem(AppStrings.reset, isCompleted: true, isActive: true),
+          _buildTimelineItem(AppStrings.elevate, isActive: false),
+          _buildTimelineItem(AppStrings.sustain, isActive: false, isLast: true),
+        ],
+      ),
+      error: (err, stack) => const Text('Failed to load phase timeline'),
+      data: (phases) {
+        if (phases.isEmpty) return const Text('No timeline phases available');
+        return Column(
+          children: phases.asMap().entries.map((entry) {
+            final index = entry.key;
+            final phase = entry.value;
+            final isFirst = index == 0;
+            final isLast = index == phases.length - 1;
+
+            // Simple active/completed logic based on orderIndex for UI correctness till backend supplies statuses
+            final isCompleted = phase.orderIndex < 3;
+            final isActive = phase.orderIndex == 2;
+
+            return _buildTimelineItem(
+              phase.name,
+              isActive: isActive,
+              isCompleted: isCompleted,
+              isFirst: isFirst,
+              isLast: isLast,
+            );
+          }).toList(),
+        );
+      },
     );
   }
 

@@ -3,11 +3,15 @@
 class ApiConstants {
   // Base URLs
   static const String baseUrl = 'https://nuevo-medical-be.simelabs.in/api/v1';
+  //'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';
+  //'https://nuevo-medical-be.simelabs.in/api/v1';
   
   // Endpoints
   // Auth
   static const String login = '/auth/login';
   static const String register = '/auth/register';
+  static const String googleLogin = '/auth/register-or-login-google';
+  static const String appleLogin = '/auth/register-or-login-apple';
   static const String forgotPassword = '/auth/forgot-password';
   static const String resendResetCode = '/auth/resend-reset-code';
   static const String verifyResetCode = '/auth/verify-reset-code';
@@ -71,6 +75,9 @@ class ApiConstants {
 
   // Home
   static const String home = '/mobile/home';
+  
+  // Phases
+  static const String phases = '/phases';
   
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);
