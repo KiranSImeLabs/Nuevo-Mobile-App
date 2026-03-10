@@ -274,7 +274,8 @@ class HomeScreen extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Expanded(
-            child: InfoCard(value: stats.nuevoAge ?? '--', label: 'Nuevo Age'),
+            //child: InfoCard(value: stats.nuevoAge ?? '--', label: 'Nuevo Age'),
+            child: InfoCard(value:'--', label: 'Nuevo Age'),
           ),
           SizedBox(width: ResponsiveUtils.spacing(context, base: 8)),
           Expanded(

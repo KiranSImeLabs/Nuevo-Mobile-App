@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import '../../core/errors/failures.dart';
 import '../../data/models/lab_request_model.dart';
+import '../../data/models/lab_report_model.dart';
 
 /// Lab Request Repository Interface
 abstract class LabRepository {
@@ -13,4 +14,7 @@ abstract class LabRepository {
 
   /// Get lab request details by ID
   Future<Either<Failure, LabRequestData>> getLabRequestById(String id);
+
+  /// Get list of lab reports
+  Future<Either<Failure, LabReportListData>> getLabReports();
 }

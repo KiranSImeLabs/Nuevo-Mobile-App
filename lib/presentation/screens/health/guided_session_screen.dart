@@ -10,6 +10,7 @@ import '../../../data/models/daily_exercise_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/health_provider.dart';
 import '../../../data/models/active_progress_model.dart';
+import '../../../core/constants/app_strings.dart';
 
 class GuidedSessionScreen extends ConsumerStatefulWidget {
   final List<ExerciseStepModel>? steps;
@@ -59,7 +60,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
       _sessionSteps = widget.steps!
           .map(
             (step) => {
-              'title': step.title ?? 'Exercise Step',
+              'title': step.title ?? AppStrings.exerciseStep,
               'instruction': step.description ?? '',
               'image': (step.videoUrl != null && step.videoUrl!.isNotEmpty)
                   ? step.videoUrl!
@@ -124,7 +125,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
         });
       }
     } catch (e) {
-      debugPrint('Failed to load active progress: $e');
+      debugPrint('${AppStrings.failedToLoadActiveProgress}$e');
     }
   }
 
@@ -132,9 +133,9 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
     try {
       // Call the API to start the session immediately when the screen loads
       await ref.read(startSessionProvider(widget.sessionId).future);
-      debugPrint('Session started successfully on backend');
+      debugPrint(AppStrings.sessionStartedBackend);
     } catch (e) {
-      debugPrint('Failed to start session on backend: $e');
+      debugPrint('${AppStrings.failedToStartBackend}$e');
       // We don't block the UI if this fails, we just log it
     }
   }
@@ -156,13 +157,13 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
       'id': widget.sessionId,
       'data': data,
     }).future).then((_) {
-      debugPrint('Progress synced successfully for step $stepOrder');
+      debugPrint('${AppStrings.progressSyncedSuccessfully}$stepOrder');
     }).catchError((e) {
       if (e.toString().contains('404')) {
         // Suppress 404 if the backend route isn't deployed yet
         return;
       }
-      debugPrint('Failed to sync progress: $e');
+      debugPrint('${AppStrings.failedToSyncProgress}$e');
     });
   }
 
@@ -269,7 +270,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
       if (!mounted) return;
       // If it fails, we fall back to popping the screen since the user wanted to end it anyway
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to complete session: $e')),
+        SnackBar(content: Text('${AppStrings.failedToCompleteSession}$e')),
       );
       context.pop();
     } finally {
@@ -412,7 +413,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
             onPressed: () => context.pop(),
           ),
           title: const Text(
-            'Guided Session',
+            AppStrings.guidedSession,
             style: TextStyle(
               color: Color(0xFF5D4037),
               fontSize: 18,
@@ -425,7 +426,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
         ),
         body: const Center(
           child: Text(
-            'No session steps available.',
+            AppStrings.noSessionSteps,
             style: TextStyle(
               color: Color(0xFF5D4037),
               fontSize: 16,
@@ -445,7 +446,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          'Guided Session',
+          AppStrings.guidedSession,
           style: TextStyle(
             color: Color(0xFF5D4037),
             fontSize: 18,
@@ -620,7 +621,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                                             mainAxisSize: MainAxisSize.min,
                                             children: [
                                               const Text(
-                                                'TIME REMAINING',
+                                                AppStrings.timeRemaining,
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12,
@@ -659,7 +660,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       const Text(
-                                        'TIME REMAINING',
+                                        AppStrings.timeRemaining,
                                         style: TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -857,7 +858,7 @@ class _GuidedSessionScreenState extends ConsumerState<GuidedSessionScreen> {
                           ),
                         )
                       : const Text(
-                          'End Session',
+                          AppStrings.endSession,
                           style: TextStyle(
                             color: Color(0xFFA35940),
                             fontSize: 16,

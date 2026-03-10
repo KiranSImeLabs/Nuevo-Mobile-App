@@ -7,6 +7,7 @@ import '../../providers/health_provider.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../data/models/daily_exercise_model.dart';
 import '../../../data/models/active_progress_model.dart';
+import '../../../core/constants/app_strings.dart';
 
 class SessionOverviewScreen extends ConsumerStatefulWidget {
   final String sessionId;
@@ -86,7 +87,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
           onPressed: () => context.pop(),
         ),
         title: const Text(
-          "Session Overview",
+          AppStrings.sessionOverview,
           style: TextStyle(
             color: AppColors.textPrimary,
             fontSize: 16,
@@ -97,10 +98,10 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
       ),
       body: sessionAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFA05E44))),
-        error: (error, stackTrace) => Center(child: Text('Failed to load session details: $error')),
+        error: (error, stackTrace) => Center(child: Text('${AppStrings.failedToLoadSession}$error')),
         data: (session) {
           if (session == null) {
-            return const Center(child: Text("Session not found"));
+            return const Center(child: Text(AppStrings.sessionNotFound));
           }
 
           final steps = session.steps ?? [];
@@ -110,7 +111,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
               Expanded(
                 child: steps.isEmpty 
                     ? _buildSingleView(
-                        title: session.title ?? "Guided Session",
+                        title: session.title ?? AppStrings.guidedSession,
                         description: session.description,
                         duration: session.duration,
                         imageUrl: session.imageUrl,
@@ -129,7 +130,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
                         itemBuilder: (context, index) {
                           final step = steps[index];
                           return _buildSingleView(
-                            title: step.title ?? "Step ${index + 1}",
+                            title: step.title ?? "${AppStrings.stepPrefix}${index + 1}",
                             description: step.description,
                             duration: step.duration,
                             // Step image if available and not empty, else session image
@@ -235,7 +236,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
                       } catch (e) {
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Failed to sync progress: $e')),
+                            SnackBar(content: Text('${AppStrings.failedToSyncProgress}$e')),
                           );
                         }
                       }
@@ -253,7 +254,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
                         Icon(Icons.play_circle_outline, color: Colors.white, size: 24),
                         SizedBox(width: 8),
                         Text(
-                          "Begin Session",
+                          AppStrings.beginSession,
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w500,
@@ -331,7 +332,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
                       borderRadius: BorderRadius.circular(20),
                     ),
                     child: Text(
-                      "Step $stepIndex of $totalSteps",
+                      AppStrings.stepOf.replaceFirst('%s', '$stepIndex').replaceFirst('%s', '$totalSteps'),
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 12,
@@ -372,8 +373,8 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
           // Stats Cards
           _buildStatCard(
             iconWidget: const Icon(Icons.schedule_outlined, color: Color(0xFFA05E44), size: 24),
-            label: "Duration",
-            value: "${duration != null ? (duration / 60).ceil() : 0} min",
+            label: AppStrings.duration,
+            value: "${duration != null ? (duration / 60).ceil() : 0} ${AppStrings.min}",
           ),
           if (purpose != null) ...[
             const SizedBox(height: AppSpacing.md),
@@ -384,7 +385,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
                 height: 24,
                 width: 24,
               ),
-              label: "Purpose",
+              label: AppStrings.purpose,
               value: purpose,
             ),
           ],
@@ -397,7 +398,7 @@ class _SessionOverviewScreenState extends ConsumerState<SessionOverviewScreen> {
                 height: 24,
                 width: 24,
               ),
-              label: "Intensity",
+              label: AppStrings.intensity,
               value: intensity,
             ),
           ],

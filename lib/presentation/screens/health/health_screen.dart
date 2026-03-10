@@ -10,10 +10,13 @@ import '../../providers/health_provider.dart';
 import '../../../data/models/diet_plan_model.dart';
 import '../../../data/models/daily_exercise_model.dart';
 import '../../../data/models/weekly_schedule_model.dart';
+import '../../../data/models/lab_report_model.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../providers/specialist_provider.dart';
+import '../../providers/lab_reports_provider.dart';
 import 'widgets/guidance_detail_bottom_sheet.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/constants/app_strings.dart';
 
 class HealthScreen extends ConsumerStatefulWidget {
   final int initialTabIndex;
@@ -29,7 +32,7 @@ class HealthScreen extends ConsumerStatefulWidget {
 
 class _HealthScreenState extends ConsumerState<HealthScreen> {
   late int _selectedTabIndex;
-  final List<String> _tabs = ['Exercise', 'Diet', 'Results', 'Insights'];
+  final List<String> _tabs = [AppStrings.tabExercise, AppStrings.tabDiet, AppStrings.tabResults, AppStrings.tabInsights];
   DateTime _selectedDate = DateTime.now(); // Always land on current date
 
   @override
@@ -84,7 +87,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   const Align(
                     alignment: Alignment.center,
                     child: Text(
-                      'Health',
+                      AppStrings.healthTitle,
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w500,
@@ -153,7 +156,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               else if (_selectedTabIndex == 3)
                 _buildInsightsContent()
               else
-                Center(child: Text("Content for ${_tabs[_selectedTabIndex]} coming soon"))
+                Center(child: Text(AppStrings.contentComingSoon.replaceFirst('%s', _tabs[_selectedTabIndex])))
             ],
           ),
         ),
@@ -173,7 +176,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "Weekly Preview",
+              AppStrings.weeklyPreview,
               style: AppTextStyles.bodyLarge.copyWith(
                 color: const Color(0xFF4A4A4A),
                 fontSize: 16,
@@ -194,7 +197,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           child: weeklyScheduleAsync.when(
             data: (weeklyData) {
               if (weeklyData == null || weeklyData.schedules == null || weeklyData.schedules!.isEmpty) {
-                 return const Center(child: Text('No schedule available'));
+                 return const Center(child: Text(AppStrings.noScheduleAvailable));
               }
               
               final schedules = weeklyData.schedules!;
@@ -249,7 +252,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator(color: Color(0xFFA05E44))),
-            error: (err, stack) => const Center(child: Text('Failed to load schedule')),
+            error: (err, stack) => const Center(child: Text(AppStrings.yourWeeklyScheduleWillAppear)),
           ),
         ),
         
@@ -264,7 +267,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                  _selectedDate.year == now.year;
 
             return Text(
-              isToday ? "Today's Exercise" : "Exercise Preview",
+              isToday ? AppStrings.todaysExercise : AppStrings.exercisePreview,
               style: AppTextStyles.bodyLarge.copyWith(
                 color: const Color(0xFF4A4A4A),
                 fontSize: 16,
@@ -288,7 +291,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   if (exerciseData == null || exerciseData.session == null) {
                     return const Center(child: Padding(
                       padding: EdgeInsets.all(20.0),
-                      child: Text("No exercise scheduled for today."),
+                      child: Text(AppStrings.noExerciseToday),
                     ));
                   }
                   return _buildTodayExerciseCard(exerciseData);
@@ -297,7 +300,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   padding: EdgeInsets.all(20.0),
                   child: CircularProgressIndicator(color: Color(0xFFA05E44))),
                 ),
-                error: (err, stack) => const Center(child: Text('Failed to load exercise')),
+                error: (err, stack) => const Center(child: Text(AppStrings.unableToLoadExercise)),
               );
             } else {
               return weeklyScheduleAsync.when(
@@ -305,7 +308,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   if (weeklyData == null || weeklyData.schedules == null) {
                       return const Center(child: Padding(
                         padding: EdgeInsets.all(20.0),
-                        child: Text("No schedule available."),
+                        child: Text(AppStrings.noScheduleAvailable),
                       ));
                   }
                   
@@ -327,7 +330,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   if (selectedExercise == null || selectedExercise.session == null) {
                       return const Center(child: Padding(
                         padding: EdgeInsets.all(20.0),
-                        child: Text("No exercise scheduled for this date."),
+                        child: Text(AppStrings.noExerciseThisDate),
                       ));
                   }
                   
@@ -337,7 +340,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   padding: EdgeInsets.all(20.0),
                   child: CircularProgressIndicator(color: Color(0xFFA05E44))),
                 ),
-                error: (err, stack) => const Center(child: Text('Failed to load exercise')),
+                error: (err, stack) => const Center(child: Text(AppStrings.unableToLoadExercise)),
               );
             }
           },
@@ -347,7 +350,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
 
         // Plan Overview
         Text(
-          "Plan Overview",
+          AppStrings.planOverview,
           style: AppTextStyles.bodyLarge.copyWith(
             color: const Color(0xFF4A4A4A),
             fontSize: 16,
@@ -366,14 +369,14 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
-                     const Text('PROGRAM', style: TextStyle(fontSize: 10, color: Color(0xFF735B4D))),
+                     const Text(AppStrings.program, style: TextStyle(fontSize: 10, color: Color(0xFF735B4D))),
                      const SizedBox(height: 8),
-                     const Text('Week 3 of 12', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                     Text(AppStrings.weekOf.replaceFirst('%s', '3').replaceFirst('%s', '12'), style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                      const SizedBox(height: 16),
                      const Row(
                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                        children: [
-                         Text('Progress', style: TextStyle(fontSize: 12, color: Color(0xFF8C8C8C))),
+                         Text(AppStrings.progress, style: TextStyle(fontSize: 12, color: Color(0xFF8C8C8C))),
                          Text('25%', style: TextStyle(fontSize: 12, color: Color(0xFF1E1E1E))),
                        ],
                      ),
@@ -399,9 +402,9 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                  child: Column(
                    crossAxisAlignment: CrossAxisAlignment.start,
                    children: [
-                     const Text('CURRENT FOCUS', style: TextStyle(fontSize: 10, color: Color(0xFF735B4D))),
+                     const Text(AppStrings.currentFocus, style: TextStyle(fontSize: 10, color: Color(0xFF735B4D))),
                      const SizedBox(height: 8),
-                     const Text('Mobility & Flex', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                     const Text(AppStrings.mobilityAndFlex, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
                      const SizedBox(height: 16),
                      Row(
                         children: [
@@ -411,10 +414,10 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                                     color: const Color(0xFFFFE0E0),
                                     borderRadius: BorderRadius.circular(4),
                                 ),
-                                child: const Text('Active', style: TextStyle(color: Color(0xFFA05E44), fontSize: 10)),
+                                child: const Text(AppStrings.activeSession, style: TextStyle(color: Color(0xFFA05E44), fontSize: 10)),
                             ),
                             const SizedBox(width: 8),
-                            const Text('+2 sessions', style: TextStyle(fontSize: 10, color: Color(0xFF735B4D))),
+                            Text(AppStrings.plusSessions.replaceFirst('%s', '2'), style: const TextStyle(fontSize: 10, color: Color(0xFF735B4D))),
                         ],
                      ),
                    ],
@@ -427,7 +430,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
 
         // Your Care Team
         Text(
-          "Your Care Team",
+          AppStrings.yourCareTeam,
           style: AppTextStyles.bodyLarge.copyWith(
             color: const Color(0xFF4A4A4A),
             fontSize: 16,
@@ -443,7 +446,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               data: (specialists) {
                 if (specialists.isEmpty) {
                   return const Text(
-                    "You don't have any specialists assigned yet.",
+                    AppStrings.noCareTeamAssigned,
                     style: TextStyle(color: Color(0xFF757575), fontSize: 14),
                   );
                 }
@@ -454,7 +457,16 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       padding: const EdgeInsets.only(bottom: 12.0),
                       child: GestureDetector(
                         onTap: () {
-                          context.push('/specialist-details/${specialist.id}');
+                          context.push(
+                            '/clinician-profile',
+                            extra: {
+                              'id': specialist.id,
+                              'name': specialist.fullName,
+                              'role': specialist.role,
+                              'imageUrl': specialist.profileImage,
+                              'bio': specialist.biography,
+                            },
+                          );
                         },
                         child: Container(
                           padding: const EdgeInsets.all(12),
@@ -500,7 +512,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                 ),
               ),
               error: (err, stack) => const Text(
-                "Failed to load your care team.",
+                AppStrings.noCareTeamAssigned,
                 style: TextStyle(color: Color(0xFF757575), fontSize: 14),
               ),
             );
@@ -600,7 +612,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                   
                   // Title
                   Text(
-                    session.title ?? 'Exercise Session',
+                    session.title ?? AppStrings.exerciseSession,
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 24,
@@ -619,7 +631,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       const Icon(Icons.schedule_outlined, color: Colors.white, size: 16),
                       const SizedBox(width: 6),
                       Text(
-                        '${session.duration ?? 0} mins',
+                        '${session.duration ?? 0} ${AppStrings.mins}',
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -662,7 +674,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Start Session',
+                          AppStrings.startSession,
                           style: TextStyle(
                             color: Colors.white,
                             fontSize: 16,
@@ -764,7 +776,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         if (dietPlan == null) {
           return const SizedBox(
             height: 100,
-            child: Center(child: Text("No nutrition plan assigned.")),
+            child: Center(child: Text(AppStrings.noNutritionPlan)),
           );
         }
         return _buildDietUI(dietPlan);
@@ -779,7 +791,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         debugPrint('Error loading diet plan: $error');
         // Return empty UI on error, or you could show a retry button. 
         // For now, adhering to "remove static data", we show empty or basic structure.
-        return const Center(child: Text("Unable to load diet plan"));
+        return const Center(child: Text(AppStrings.unableToLoadDietPlan));
       },
     );
   }
@@ -800,7 +812,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
       children: [
         // Today's Nutrition Section
         Text(
-          "Today's Nutrition",
+          AppStrings.todaysNutrition,
           style: AppTextStyles.bodyLarge.copyWith(
             color: const Color(0xFF4A4A4A),
             fontSize: 16,
@@ -809,11 +821,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         const SizedBox(height: AppSpacing.md),
         Row(
           children: [
-            _buildNutritionCard('$totalCalories', 'Calories', const Color(0xFFF5EAE8)),
+            _buildNutritionCard('$totalCalories', AppStrings.calories, const Color(0xFFF5EAE8)),
             const SizedBox(width: AppSpacing.md),
-            _buildNutritionCard('${protein}g', 'Protein', const Color(0xFFF5EAE8)),
+            _buildNutritionCard('${protein}g', AppStrings.protein, const Color(0xFFF5EAE8)),
             const SizedBox(width: AppSpacing.md),
-            _buildNutritionCard(waterGlasses.toString().padLeft(2, '0'), 'Glasses', const Color(0xFFF5EAE8)),
+            _buildNutritionCard(waterGlasses.toString().padLeft(2, '0'), AppStrings.glasses, const Color(0xFFF5EAE8)),
           ],
         ),
         const SizedBox(height: AppSpacing.xl),
@@ -821,7 +833,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         // Meals Section
         if (dietPlan.meals != null && dietPlan.meals!.isNotEmpty) ...[
           Text(
-            "Today's Meals",
+            AppStrings.todaysMeals,
             style: AppTextStyles.bodyLarge.copyWith(
               color: const Color(0xFF4A4A4A),
               fontSize: 16,
@@ -835,7 +847,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         // Key Guidance Section
         if (displayGuidance.isNotEmpty) ...[
           Text(
-            "Key Guidance",
+            AppStrings.keyGuidance,
             style: AppTextStyles.bodyLarge.copyWith(
               color: const Color(0xFF4A4A4A),
               fontSize: 16,
@@ -856,8 +868,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               child: _buildGuidanceCard(
                 icon: Icons.lightbulb_outline, // Fallback icon if image fails loading
                 iconUrl: guidance.iconUrl,
-                title: guidance.title ?? 'Guidance',
-                subtitle: guidance.subtitle ?? 'Tap for details',
+                title: guidance.title ?? AppStrings.guidance,
+                subtitle: guidance.subtitle ?? AppStrings.tapForDetails,
                 iconColor: const Color(0xFFA05E44),
               ),
             ),
@@ -910,7 +922,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  meal.name ?? 'Unknown Meal',
+                  meal.name ?? AppStrings.unknownMeal,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -930,7 +942,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                 if (meal.calories != null) ...[
                   const SizedBox(height: 4),
                   Text(
-                    '${meal.calories} kcal',
+                    '${meal.calories} ${AppStrings.kcal}',
                     style: const TextStyle(
                       fontSize: 12,
                       color: Color(0xFFA05E44),
@@ -1027,28 +1039,69 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
 
 
   Widget _buildResultsContent() {
+    final labReportsAsync = ref.watch(labReportsProvider);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildResultCard(
-          icon: Icons.science_outlined,
-          title: 'Metabolic Panel',
-          date: 'Oct 24, 2023',
-          iconColor: const Color(0xFFA05E44),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _buildResultCard(
-          icon: Icons.grid_on_outlined, // Placeholder for cells/lipid
-          title: 'Lipid Profile',
-          date: 'Aug 12, 2023',
-          iconColor: const Color(0xFFA05E44),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        _buildResultCard(
-          icon: Icons.coronavirus_outlined, // Placeholder for molecule/vitamin D
-          title: 'Vitamin D Panel',
-          date: 'Collected Yesterday',
-          iconColor: const Color(0xFFA05E44),
+        labReportsAsync.when(
+          data: (labReportsData) {
+            if (labReportsData == null || labReportsData.reports == null || labReportsData.reports!.isEmpty) {
+              return const Padding(
+                padding: EdgeInsets.symmetric(vertical: 20.0),
+                child: Center(child: Text(AppStrings.noLabReportsFound)),
+              );
+            }
+
+            return Column(
+              children: labReportsData.reports!.map((report) {
+                // Determine icon based on some logic or default
+                IconData icon = Icons.science_outlined;
+                if (report.testType != null) {
+                  final type = report.testType!.toLowerCase();
+                  if (type.contains('lipid')) {
+                    icon = Icons.grid_on_outlined;
+                  } else if (type.contains('vitamin')) {
+                    icon = Icons.coronavirus_outlined;
+                  }
+                }
+
+                // Format Date
+                String displayDate = AppStrings.unknownDate;
+                if (report.testDate != null) {
+                  try {
+                    final date = DateTime.parse(report.testDate!);
+                    displayDate = DateFormat('MMM dd, yyyy').format(date);
+                  } catch (e) {
+                    displayDate = report.testDate!;
+                  }
+                }
+
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                  child: _buildResultCard(
+                    icon: icon,
+                    title: report.testType ?? AppStrings.labReport,
+                    date: displayDate,
+                    iconColor: const Color(0xFFA05E44),
+                    onTap: () {
+                      context.push('/health/result-details', extra: report);
+                    },
+                  ),
+                );
+              }).toList(),
+            );
+          },
+          loading: () => const Center(
+            child: Padding(
+              padding: EdgeInsets.all(20.0),
+              child: CircularProgressIndicator(color: Color(0xFFA05E44)),
+            ),
+          ),
+          error: (error, stack) {
+            debugPrint('Error loading lab reports: $error');
+            return const Center(child: Text(AppStrings.unableToLoadLabReports));
+          },
         ),
         const SizedBox(height: AppSpacing.xl),
         
@@ -1081,7 +1134,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               ),
               const SizedBox(height: AppSpacing.lg),
               const Text(
-                'Book a New Test',
+                AppStrings.bookNewTest,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w500,
@@ -1090,7 +1143,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               const Text(
-                'Keep track of your health markers by\nscheduling your next lab visit.',
+                AppStrings.bookNewTestDesc,
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
@@ -1111,7 +1164,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
       children: [
         // Your Nuevo Age Section
         Text(
-          "Your Nuevo Age",
+          AppStrings.yourNuevoAge,
           style: AppTextStyles.bodyLarge.copyWith(
             color: const Color(0xFF4A4A4A),
             fontSize: 16,
@@ -1140,8 +1193,8 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                         fontFamily: 'Inter',
                       ),
                     ),
-                    TextSpan(
-                      text: " Years",
+                    const TextSpan(
+                      text: AppStrings.years,
                       style: TextStyle(
                         fontSize: 14,
                         color: Color(0xFF1E1E1E),
@@ -1153,7 +1206,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               ),
               const SizedBox(height: 8),
               const Text(
-                "5 years younger than your biological age",
+                AppStrings.biologicalAgeDiff,
                 style: TextStyle(
                   fontSize: 14,
                   color: Color(0xFF8C8C8C),
@@ -1166,7 +1219,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
 
         // Recent Insights Section
         Text(
-          "Recent Insights",
+          AppStrings.recentInsights,
           style: AppTextStyles.bodyLarge.copyWith(
             color: const Color(0xFF4A4A4A),
             fontSize: 16,
@@ -1175,22 +1228,22 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         const SizedBox(height: AppSpacing.md),
         _buildGuidanceCard(
           icon: Icons.bed_outlined, // Sleep icon
-          title: 'Sleep Quality Improved',
-          subtitle: 'Your average sleep time increased by 45 minutes this week',
+          title: AppStrings.sleepQualityImproved,
+          subtitle: AppStrings.sleepQualityDesc,
           iconColor: const Color(0xFFA05E44),
         ),
         const SizedBox(height: AppSpacing.md),
         _buildGuidanceCard(
           icon: Icons.track_changes_outlined, // Activity/Target icon
-          title: 'Activity Goal Met',
-          subtitle: "You've hit your daily step goal 5 days in a row!",
+          title: AppStrings.activityGoalMet,
+          subtitle: AppStrings.activityGoalDesc,
           iconColor: const Color(0xFFA05E44),
         ),
         const SizedBox(height: AppSpacing.md),
         _buildGuidanceCard(
           icon: Icons.psychology_outlined, // Stress/Mind icon
-          title: 'Stress Levels',
-          subtitle: 'Consider adding relaxation techniques to your routine',
+          title: AppStrings.stressLevels,
+          subtitle: AppStrings.stressLevelsDesc,
           iconColor: const Color(0xFFA05E44),
         ),
       ],
@@ -1202,58 +1255,62 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     required String title,
     required String date,
     required Color iconColor,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5EAE8),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: iconColor,
-              borderRadius: BorderRadius.circular(12),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5EAE8),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: iconColor,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                icon,
+                color: Colors.white,
+                size: 24,
+              ),
             ),
-            child: Icon(
-              icon,
-              color: Colors.white,
-              size: 24,
-            ),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF1E1E1E),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                      color: Color(0xFF1E1E1E),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  date,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF8C8C8C),
+                  const SizedBox(height: 4),
+                  Text(
+                    date,
+                    style: const TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF8C8C8C),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          const Icon(
-            Icons.arrow_forward,
-            color: Color(0xFFA05E44),
-            size: 20,
-          ),
-        ],
+            const Icon(
+              Icons.arrow_forward,
+              color: Color(0xFFA05E44),
+              size: 20,
+            ),
+          ],
+        ),
       ),
     );
   }

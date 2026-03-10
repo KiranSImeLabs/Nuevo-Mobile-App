@@ -6,6 +6,7 @@ import '../../core/network/dio_client.dart';
 import '../../domain/repositories/lab_repository.dart';
 import '../datasources/remote/api_client.dart';
 import '../models/lab_request_model.dart';
+import '../models/lab_report_model.dart';
 
 /// Implementation of [LabRepository]
 class LabRepositoryImpl implements LabRepository {
@@ -80,6 +81,25 @@ class LabRepositoryImpl implements LabRepository {
       } else {
         return Left(ServerFailure(
           response.message ?? 'Failed to retrieve lab request details',
+        ));
+      }
+    } on DioException catch (e) {
+      return Left(_handleDioException(e));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, LabReportListData>> getLabReports() async {
+    try {
+      final response = await _apiClient.getLabReports();
+
+      if (response.success == true && response.data != null) {
+        return Right(response.data!);
+      } else {
+        return Left(ServerFailure(
+          response.message ?? 'Failed to retrieve lab reports',
         ));
       }
     } on DioException catch (e) {
