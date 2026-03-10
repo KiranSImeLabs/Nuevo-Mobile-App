@@ -71,7 +71,6 @@ class UserRepositoryImpl implements UserRepository {
         formData.fields.add(MapEntry('dateOfBirth', dateOfBirth));
       }
       if (profileImageUrl != null && profileImageUrl.isNotEmpty && !profileImageUrl.startsWith('http')) {
-        print('profileImageUrl.split.last: ${profileImageUrl.split('/').last}');
         formData.files.add(MapEntry(
           'profileImage',
           await MultipartFile.fromFile(
@@ -81,46 +80,7 @@ class UserRepositoryImpl implements UserRepository {
         ));
       }
 
-      print('formData: ${formData.files.length}');
-      print('form fields ${formData.fields}');
-      print('firstName:$firstName, lastName:$lastName, profileImageUrl:$profileImageUrl, dateOfBirth:$dateOfBirth');
-
       final response = await _apiClient.updateProfile(formData);
-
-      /*
-      var headers = {
-        'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImQ0M2FhODRlLWE2M2YtNGIxYS1hOTA1LTEzYjA0NDU1OTQ0NCIsImVtYWlsIjoiam9obi5zbWl0aEBleGFtcGxlLmNvbSIsImlhdCI6MTc3Mjc4OTc2NCwiZXhwIjoxNzczMzk0NTY0fQ.vf532kb5uM0Mwmz-GwjMyepddCLB-WDYFJyrwftZbR4'
-      };
-      var data = FormData.fromMap({
-        'files': [
-          await MultipartFile.fromFile(
-            profileImageUrl ?? '',
-            filename: profileImageUrl!.split('/').last,
-          )
-        ],
-        'firstName': firstName ?? '',
-        'lastName': lastName ?? '',
-        'dateOfBirth': dateOfBirth ?? ''
-      });
-
-      var dio = Dio();
-      var res = await dio.request(
-        'https://nuevo-medical-be.simelabs.in/api/v1/auth/profile',
-        options: Options(
-          method: 'PATCH',
-          headers: headers,
-        ),
-        data: data,
-      );
-      print(res.data);
-      print(res.statusCode);
-      print(res.statusMessage);
-      print(res.requestOptions);
-      final response = ApiResponse.fromJson(
-      res.data,
-      (json) => UserModel.fromJson(json as Map<String, dynamic>),
-    );
-    */
 
       if (response.success && response.data != null) {
         return Right(response.data!.toEntity());

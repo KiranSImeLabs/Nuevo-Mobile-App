@@ -126,7 +126,7 @@ class ApiClient {
   }
   
   /// Update user profile
-  Future<ApiResponse<UserModel>> updateProfile(Map<String, dynamic> data) async {
+  Future<ApiResponse<UserModel>> updateProfile(dynamic data) async {
      final response = await _dioClient.dio.patch(
        ApiConstants.updateProfile,
        data: data,
