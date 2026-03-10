@@ -1,5 +1,7 @@
 # Google and Apple Sign-In Integration Summary
 
+**Created / Updated:** March 10, 2026
+
 This document serves as a historical context and reference for the integration of Google and Apple Sign-In within the `nuevo_app` Flutter application.
 
 ## 🎯 Goal
