@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/diet_plan_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_strings.dart';
+import '../../widgets/common/app_error_widget.dart';
 
 class DietPlanDetailScreen extends ConsumerWidget {
   const DietPlanDetailScreen({super.key});
@@ -102,7 +103,7 @@ class DietPlanDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (error, stack) => Center(child: Text('Error: $error')),
+        error: (error, _) => AppErrorWidget(message: error.toString()),
       ),
     );
   }

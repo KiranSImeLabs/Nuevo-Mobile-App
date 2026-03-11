@@ -11,7 +11,7 @@ final subscriptionProvider = FutureProvider<Subscription>((ref) async {
   final getStatus = ref.watch(getSubscriptionStatusUseCaseProvider);
   final result = await getStatus(const NoParams());
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (subscription) => subscription,
   );
 });

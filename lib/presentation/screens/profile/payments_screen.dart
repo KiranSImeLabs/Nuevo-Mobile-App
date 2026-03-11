@@ -6,6 +6,7 @@ import '../../../data/models/api_response.dart';
 import '../../../data/models/payment_integration_models.dart';
 import '../../../data/models/billing_response_model.dart';
 import '../../providers/core_providers.dart';
+import '../../widgets/common/app_error_widget.dart';
 import 'widgets/add_card_bottom_sheet.dart';
 
 class PaymentsScreen extends ConsumerStatefulWidget {
@@ -66,7 +67,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                    return Text('Error: ${snapshot.error}');
+                    return AppErrorWidget(
+                      message: snapshot.error.toString(),
+                      onRetry: () => setState(() => _fetchData()),
+                    );
                   } else if (snapshot.hasData && snapshot.data!.success) {
                     return FutureBuilder<ApiResponse<BillingResponseData>>(
                       future: _billingDetailsFuture,
@@ -110,7 +114,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                      return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                     return Text('Error: ${snapshot.error}');
+                     return AppErrorWidget(
+                       message: snapshot.error.toString(),
+                       onRetry: () => setState(() => _fetchData()),
+                     );
                   } else if (snapshot.hasData && snapshot.data!.success) {
                      final details = snapshot.data!.data;
                      if (details?.paymentSetup?.creditCard != null || details?.creditCard != null) {
@@ -134,7 +141,10 @@ class _PaymentsScreenState extends ConsumerState<PaymentsScreen> {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                      return const Center(child: CircularProgressIndicator());
                   } else if (snapshot.hasError) {
-                     return Text('Error: ${snapshot.error}');
+                     return AppErrorWidget(
+                       message: snapshot.error.toString(),
+                       onRetry: () => setState(() => _fetchData()),
+                     );
                   } else if (snapshot.hasData && snapshot.data!.success) {
                      final history = snapshot.data!.data?.billingHistory;
                      if (history != null && history.isNotEmpty) {

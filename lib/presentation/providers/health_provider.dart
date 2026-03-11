@@ -23,7 +23,7 @@ final todayExerciseProvider = FutureProvider<DailyExerciseModel?>((ref) async {
   final result = await repository.getTodayExercise();
   
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });
@@ -34,7 +34,7 @@ final weeklyScheduleProvider = FutureProvider<WeeklyScheduleModel?>((ref) async 
   final result = await repository.getWeeklySchedule();
   
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });
@@ -45,7 +45,7 @@ final sessionDetailsProvider = FutureProvider.family<GuidedSessionModel?, String
   final result = await repository.getSessionDetails(id);
   
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });
@@ -56,7 +56,7 @@ final startSessionProvider = FutureProvider.family<SessionProgressModel?, String
   final result = await repository.startSession(id);
   
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });
@@ -67,7 +67,7 @@ final completeSessionProvider = FutureProvider.family<ApiResponse<SessionProgres
   final result = await repository.completeSession(id);
 
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });
@@ -80,7 +80,7 @@ final syncSessionProgressProvider = FutureProvider.family<SessionProgressModel?,
   final result = await repository.syncSessionProgress(id, data);
 
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });
@@ -91,7 +91,7 @@ final activeProgressProvider = FutureProvider.autoDispose<ActiveProgressModel?>(
   final result = await repository.getActiveProgress();
   
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });

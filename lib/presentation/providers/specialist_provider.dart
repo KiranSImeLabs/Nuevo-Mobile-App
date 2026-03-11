@@ -46,7 +46,7 @@ final specialistDetailsProvider = FutureProvider.family<Specialist, String>((ref
   final result = await getSpecialistDetails(id);
   print('result $result');
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (specialist) => specialist,
   );
 });

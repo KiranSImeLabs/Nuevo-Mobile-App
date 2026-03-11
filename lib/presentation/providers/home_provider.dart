@@ -25,7 +25,7 @@ final homeDashboardProvider = FutureProvider<HomeDashboard>((ref) async {
   final result = await getHomeDashboard(const NoParams());
   
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (dashboard) => dashboard,
   );
 });

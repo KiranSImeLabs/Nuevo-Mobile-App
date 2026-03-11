@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/user_provider.dart';
+import '../../widgets/common/app_error_widget.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../domain/entities/task.dart' as entities;
@@ -19,6 +20,7 @@ import '../../widgets/home/quick_access_grid.dart';
 import '../../widgets/home/quick_access_card.dart';
 import '../../widgets/home/dietitian_session_card.dart';
 import '../../providers/user_provider.dart';
+import '../../widgets/common/app_error_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -171,18 +173,7 @@ class HomeScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: $err'),
-              ElevatedButton(
-                onPressed: () => ref.refresh(homeDashboardProvider),
-                child: const Text('Retry'),
-              ),
-            ],
-          ),
-        ),
+        error: (err, stack) => AppErrorWidget(message: err.toString(), onRetry: () => ref.refresh(homeDashboardProvider)),
       ),
     );
   }
