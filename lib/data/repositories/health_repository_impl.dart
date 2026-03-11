@@ -1,3 +1,4 @@
+import '../../core/errors/exceptions.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import '../../core/errors/failures.dart';
@@ -23,8 +24,8 @@ class HealthRepositoryImpl implements HealthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -39,8 +40,8 @@ class HealthRepositoryImpl implements HealthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -55,8 +56,8 @@ class HealthRepositoryImpl implements HealthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -71,8 +72,8 @@ class HealthRepositoryImpl implements HealthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -87,8 +88,8 @@ class HealthRepositoryImpl implements HealthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -103,8 +104,8 @@ class HealthRepositoryImpl implements HealthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
@@ -119,8 +120,8 @@ class HealthRepositoryImpl implements HealthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }

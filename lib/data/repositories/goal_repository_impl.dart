@@ -1,3 +1,4 @@
+import '../../core/errors/exceptions.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import '../../core/errors/failures.dart';
@@ -19,8 +20,8 @@ class GoalRepositoryImpl implements GoalRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Server error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioException(e));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -35,8 +36,8 @@ class GoalRepositoryImpl implements GoalRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Server error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioException(e));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -51,8 +52,8 @@ class GoalRepositoryImpl implements GoalRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Server error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioException(e));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -67,8 +68,8 @@ class GoalRepositoryImpl implements GoalRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Server error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioException(e));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }
@@ -83,8 +84,8 @@ class GoalRepositoryImpl implements GoalRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Server error'));
       }
-    } on DioException catch (e) {
-      return Left(ServerFailure.fromDioException(e));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

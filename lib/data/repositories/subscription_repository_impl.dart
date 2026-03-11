@@ -42,8 +42,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Failed to get subscription status'));
       }
-    } on DioException catch (e) {
-      final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
       if (exception is AuthException) {
         return Left(AuthFailure(message: exception.message, code: exception.code));
       } else if (exception is NetworkException) {
@@ -51,7 +50,7 @@ class SubscriptionRepositoryImpl implements SubscriptionRepository {
       } else if (exception is ServerException) {
         return Left(ServerFailure(exception.message, exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));

@@ -98,6 +98,11 @@ class DioClient {
             message: ErrorMessages.serverError,
             code: statusCode,
           );
+        } else if (statusCode == 404) {
+          return ServerException(
+            message: ErrorMessages.serviceUnavailable,
+            code: statusCode,
+          );
         } else if (statusCode == 400) {
           // Check for validation errors
           
@@ -176,10 +181,10 @@ class DioClient {
         queryParameters: queryParameters,
         options: options,
       );
-       print("response: ${response.data} ====================");
+     //  print("response: ${response.data} ====================");
       return response;
     } on DioException catch (e) {
-      print("handleDioError(e): ${handleDioError(e)} ===================");
+      //print("handleDioError(e): ${handleDioError(e)} ===================");
       throw handleDioError(e);
     }
   }

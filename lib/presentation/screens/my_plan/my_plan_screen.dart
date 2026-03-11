@@ -9,6 +9,7 @@ import '../../providers/specialist_provider.dart';
 import '../../providers/goal_provider.dart';
 import '../../providers/phase_provider.dart';
 import 'diet_plan_detail_screen.dart';
+import '../../widgets/common/app_error_widget.dart';
 
 class MyPlanScreen extends ConsumerStatefulWidget {
   const MyPlanScreen({super.key});
@@ -172,7 +173,7 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(child: Text('Error: $error')),
+      error: (error, _) => AppErrorWidget(message: error.toString()),
     );
   }
 
@@ -316,7 +317,7 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
         );
       },
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Center(child: Text('Error: $error')),
+      error: (error, _) => AppErrorWidget(message: error.toString()),
     );
   }
 
@@ -371,7 +372,7 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (error, _) => Center(child: Text('Error: $error')),
+            error: (error, _) => AppErrorWidget(message: error.toString()),
           ),
         ],
       ),

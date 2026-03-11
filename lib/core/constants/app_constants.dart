@@ -135,6 +135,7 @@ class ErrorMessages {
   // Network Errors
   static const String noInternet = 'No internet connection. Please check your network.';
   static const String serverError = 'Server error. Please try again later.';
+  static const String serviceUnavailable = 'The service is currently unavailable. Please try again later.';
   static const String timeout = 'Request timeout. Please try again.';
   
   // Auth Errors

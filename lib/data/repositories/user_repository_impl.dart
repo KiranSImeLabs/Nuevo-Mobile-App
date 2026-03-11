@@ -32,8 +32,7 @@ class UserRepositoryImpl implements UserRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Failed to get user profile'));
       }
-    } on DioException catch (e) {
-      final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
       if (exception is AuthException) {
         return Left(AuthFailure(message: exception.message, code: exception.code));
       } else if (exception is NetworkException) {
@@ -41,7 +40,7 @@ class UserRepositoryImpl implements UserRepository {
       } else if (exception is ServerException) {
         return Left(ServerFailure(exception.message, exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -87,9 +86,7 @@ class UserRepositoryImpl implements UserRepository {
       } else {
         return Left(ServerFailure('Failed to update profile'));
       }
-    } on DioException catch (e) {
-      
-      final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
       print(exception);
       if (exception is AuthException) {
         return Left(AuthFailure(message: exception.message, code: exception.code));
@@ -98,7 +95,7 @@ class UserRepositoryImpl implements UserRepository {
       } else if (exception is ServerException) {
         return Left(ServerFailure(exception.message, exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -118,8 +115,7 @@ class UserRepositoryImpl implements UserRepository {
         return Left(ServerFailure(
             response.message ?? 'Failed to update preferences'));
       }
-    } on DioException catch (e) {
-      final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
       if (exception is AuthException) {
         return Left(
             AuthFailure(message: exception.message, code: exception.code));
@@ -130,7 +126,7 @@ class UserRepositoryImpl implements UserRepository {
         return Left(
             ServerFailure(exception.message, exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -148,8 +144,7 @@ class UserRepositoryImpl implements UserRepository {
         return Left(ServerFailure(
             response.message ?? 'Failed to get preferences'));
       }
-    } on DioException catch (e) {
-      final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
       if (exception is AuthException) {
         return Left(
             AuthFailure(message: exception.message, code: exception.code));
@@ -160,7 +155,7 @@ class UserRepositoryImpl implements UserRepository {
         return Left(
             ServerFailure(exception.message, exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));

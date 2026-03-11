@@ -28,8 +28,7 @@ class LabRepositoryImpl implements LabRepository {
           response.message ?? 'Failed to create lab request',
         ));
       }
-    } on DioException catch (e) {
-      final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
       if (exception is AuthException) {
         return Left(AuthFailure(
             message: exception.message, code: exception.code));
@@ -45,7 +44,7 @@ class LabRepositoryImpl implements LabRepository {
             : exception.message;
         return Left(ValidationFailure(message: msg, code: exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -64,7 +63,7 @@ class LabRepositoryImpl implements LabRepository {
           response.message ?? 'Failed to retrieve lab requests',
         ));
       }
-    } on DioException catch (e) {
+    } on AppException catch (e) {
       return Left(_handleDioException(e));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -83,7 +82,7 @@ class LabRepositoryImpl implements LabRepository {
           response.message ?? 'Failed to retrieve lab request details',
         ));
       }
-    } on DioException catch (e) {
+    } on AppException catch (e) {
       return Left(_handleDioException(e));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -102,15 +101,14 @@ class LabRepositoryImpl implements LabRepository {
           response.message ?? 'Failed to retrieve lab reports',
         ));
       }
-    } on DioException catch (e) {
+    } on AppException catch (e) {
       return Left(_handleDioException(e));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }
   }
 
-  Failure _handleDioException(DioException e) {
-    final exception = DioClient.handleDioError(e);
+  Failure _handleDioException(AppException exception) {
     if (exception is AuthException) {
       return AuthFailure(message: exception.message, code: exception.code);
     } else if (exception is NetworkException) {
@@ -123,7 +121,7 @@ class LabRepositoryImpl implements LabRepository {
           : exception.message;
       return ValidationFailure(message: msg, code: exception.code);
     } else {
-      return UnknownFailure(message: exception.toString());
+      return UnknownFailure(message: exception.message);
     }
   }
 }

@@ -5,6 +5,7 @@ import '../../providers/home_provider.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/home/task_card.dart';
+import '../../widgets/common/app_error_widget.dart';
 
 class CompletedTasksScreen extends ConsumerWidget {
   const CompletedTasksScreen({super.key});
@@ -77,10 +78,7 @@ class CompletedTasksScreen extends ConsumerWidget {
 
           return const Center(child: CircularProgressIndicator());
         },
-        error: (err, stack) {
-
-          return Center(child: Text('Error: $err'));
-        },
+        error: (err, _) => AppErrorWidget(message: err.toString()),
       ),
     );
   }

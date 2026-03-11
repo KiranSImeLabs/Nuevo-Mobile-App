@@ -1,3 +1,4 @@
+import '../../core/errors/exceptions.dart';
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import '../../core/errors/failures.dart';
@@ -29,9 +30,8 @@ class HomeRepositoryImpl implements HomeRepository {
       } else {
         return Left(ServerFailure(response.data['message'] ?? 'Failed to load dashboard'));
       }
-    } on DioException catch (e) {
-
-      return Left(ServerFailure(e.message ?? 'Network Error'));
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
     } catch (e, s) {
 
       return Left(UnknownFailure(message: e.toString()));

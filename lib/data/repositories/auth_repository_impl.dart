@@ -66,17 +66,15 @@ class AuthRepositoryImpl implements AuthRepository {
 
         return Left(ServerFailure(response.message ?? 'Login failed'));
       }
-    } on DioException catch (e) {
-      // Map DioException to domain Failure
-      final exception = DioClient.handleDioError(e);
-       if (exception is AuthException) {
-        return Left(AuthFailure(message: exception.message, code: exception.code));
-      } else if (exception is NetworkException) {
-        return Left(NetworkFailure(message: exception.message, code: exception.code));
-      } else if (exception is ServerException) {
-        return Left(ServerFailure(exception.message, exception.code));
+    } on AppException catch (e) {
+      if (e is AuthException) {
+        return Left(AuthFailure(message: e.message, code: e.code));
+      } else if (e is NetworkException) {
+        return Left(NetworkFailure(message: e.message, code: e.code));
+      } else if (e is ServerException) {
+        return Left(ServerFailure(e.message, e.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: e.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -123,21 +121,20 @@ class AuthRepositoryImpl implements AuthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Signup failed'));
       }
-    } on DioException catch (e) {
-       final exception = DioClient.handleDioError(e);
-       if (exception is AuthException) {
-        return Left(AuthFailure(message: exception.message, code: exception.code));
-      } else if (exception is NetworkException) {
-        return Left(NetworkFailure(message: exception.message, code: exception.code));
-      } else if (exception is ServerException) {
-        return Left(ServerFailure(exception.message, exception.code));
-      } else if (exception is ValidationException) {
-        final msg = exception.errors != null && exception.errors!.isNotEmpty
-            ? exception.errors!.join(', ')
-            : exception.message;
-        return Left(ValidationFailure(message: msg, code: exception.code));
+    } on AppException catch (e) {
+       if (e is AuthException) {
+        return Left(AuthFailure(message: e.message, code: e.code));
+      } else if (e is NetworkException) {
+        return Left(NetworkFailure(message: e.message, code: e.code));
+      } else if (e is ServerException) {
+        return Left(ServerFailure(e.message, e.code));
+      } else if (e is ValidationException) {
+        final msg = e.errors != null && e.errors!.isNotEmpty
+            ? e.errors!.join(', ')
+            : e.message;
+        return Left(ValidationFailure(message: msg, code: e.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: e.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -218,8 +215,7 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(ServerFailure(response.message ?? 'Google Sign-In failed'));
       }
 
-    } on DioException catch (e) {
-      final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
       if (exception is AuthException) {
         return Left(AuthFailure(message: exception.message, code: exception.code));
       } else if (exception is NetworkException) {
@@ -227,7 +223,7 @@ class AuthRepositoryImpl implements AuthRepository {
       } else if (exception is ServerException) {
         return Left(ServerFailure(exception.message, exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -275,8 +271,7 @@ class AuthRepositoryImpl implements AuthRepository {
         return Left(ServerFailure(response.message ?? 'Apple Sign-In failed'));
       }
 
-    } on DioException catch (e) {
-       final exception = DioClient.handleDioError(e);
+    } on AppException catch (exception) {
        if (exception is AuthException) {
         return Left(AuthFailure(message: exception.message, code: exception.code));
       } else if (exception is NetworkException) {
@@ -289,7 +284,7 @@ class AuthRepositoryImpl implements AuthRepository {
             : exception.message;
         return Left(ValidationFailure(message: msg, code: exception.code));
       } else {
-        return Left(UnknownFailure(message: exception.toString()));
+        return Left(UnknownFailure(message: exception.message));
       }
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
@@ -320,15 +315,14 @@ class AuthRepositoryImpl implements AuthRepository {
       } else {
         return Left(ServerFailure(response.message ?? 'Failed to send reset email'));
       }
-    } on DioException catch (e) {
-      final exception = DioClient.handleDioError(e);
-      if (exception is ValidationException) {
-         final msg = exception.errors != null && exception.errors!.isNotEmpty
-            ? exception.errors!.join(', ')
-            : exception.message;
-        return Left(ValidationFailure(message: msg, code: exception.code));
+    } on AppException catch (e) {
+      if (e is ValidationException) {
+         final msg = e.errors != null && e.errors!.isNotEmpty
+            ? e.errors!.join(', ')
+            : e.message;
+        return Left(ValidationFailure(message: msg, code: e.code));
       }
-      return Left(ServerFailure(exception.message));
+      return Left(ServerFailure(e.message));
     } catch (e) {
       return Left(UnknownFailure(message: e.toString()));
     }

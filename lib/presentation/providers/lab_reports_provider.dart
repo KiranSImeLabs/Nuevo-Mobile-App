@@ -19,7 +19,7 @@ final labReportsProvider = FutureProvider<LabReportListData?>((ref) async {
   final result = await repository.getLabReports();
   
   return result.fold(
-    (failure) => throw Exception(failure.message),
+    (failure) => throw failure.message,
     (data) => data,
   );
 });

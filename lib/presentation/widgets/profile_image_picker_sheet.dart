@@ -47,7 +47,7 @@ class ProfileImagePickerSheet extends ConsumerWidget {
                   } catch (e) {
                      if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
+                        SnackBar(content: Text(e.toString())),
                       );
                       Navigator.pop(context);
                     }
@@ -68,7 +68,7 @@ class ProfileImagePickerSheet extends ConsumerWidget {
                   } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: $e')),
+                        SnackBar(content: Text(e.toString())),
                       );
                       Navigator.pop(context);
                     }

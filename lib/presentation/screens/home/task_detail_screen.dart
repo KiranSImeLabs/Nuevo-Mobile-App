@@ -5,6 +5,7 @@ import '../../providers/home_provider.dart';
 import '../../../domain/entities/task.dart';
 import '../../utils/responsive_utils.dart';
 import '../../../core/theme/app_theme.dart';
+import '../../widgets/common/app_error_widget.dart';
 
 class TaskDetailScreen extends ConsumerWidget {
   final String taskId;
@@ -132,7 +133,7 @@ class TaskDetailScreen extends ConsumerWidget {
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, stack) => Center(child: Text('Error: $err')),
+        error: (err, _) => AppErrorWidget(message: err.toString()),
       ),
     );
   }
