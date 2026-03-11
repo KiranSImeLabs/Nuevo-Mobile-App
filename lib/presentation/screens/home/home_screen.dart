@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/common/app_error_widget.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../domain/entities/task.dart' as entities;
 import '../../../domain/entities/user.dart' as entities;
 import '../../../domain/entities/wellness_program.dart';
@@ -19,8 +16,6 @@ import '../../widgets/home/program_card.dart';
 import '../../widgets/home/quick_access_grid.dart';
 import '../../widgets/home/quick_access_card.dart';
 import '../../widgets/home/dietitian_session_card.dart';
-import '../../providers/user_provider.dart';
-import '../../widgets/common/app_error_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -82,7 +77,8 @@ class HomeScreen extends ConsumerWidget {
                           context,
                           'Task Completed',
                           onActionTap: () {
-                            context.push('/completed-tasks');
+                            context.push('/completed-tasks',
+                                extra: {'showCompleted': true});
                           },
                           actionLabel: 'See All',
                           showArrow: false,
@@ -108,7 +104,10 @@ class HomeScreen extends ConsumerWidget {
                               _buildSectionHeader(
                                 context,
                                 'Action required',
-                                onActionTap: () => context.go('/my-plan'),
+                                onActionTap: () => context.push(
+                                  '/completed-tasks',
+                                  extra: {'showCompleted': false},
+                                ),
                                 actionLabel: 'Complete Now',
                                 showArrow: true,
                               ),
