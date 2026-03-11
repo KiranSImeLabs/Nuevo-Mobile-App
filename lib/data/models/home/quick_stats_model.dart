@@ -1,5 +1,23 @@
 import '../../../domain/entities/home/quick_stats.dart';
 
+class SessionInfoModel extends SessionInfo {
+  const SessionInfoModel({
+    required super.time,
+    required super.date,
+    required super.label,
+    required super.bookingId,
+  });
+
+  factory SessionInfoModel.fromJson(Map<String, dynamic> json) {
+    return SessionInfoModel(
+      time: json['time']?.toString() ?? '',
+      date: json['date']?.toString() ?? '',
+      label: json['label']?.toString() ?? '',
+      bookingId: json['bookingId']?.toString() ?? '',
+    );
+  }
+}
+
 class QuickStatsModel extends QuickStats {
   const QuickStatsModel({
     super.nuevoAge,
@@ -7,21 +25,11 @@ class QuickStatsModel extends QuickStats {
   });
 
   factory QuickStatsModel.fromJson(Map<String, dynamic> json) {
-    SessionInfo? sessionInfo;
-    
-    if (json['nextSession'] is Map) {
-      final session = json['nextSession'] as Map<String, dynamic>;
-      sessionInfo = SessionInfo(
-        time: session['time'] as String? ?? '',
-        date: session['date'] as String? ?? '',
-        label: session['label'] as String? ?? 'Consultation',
-        bookingId: session['bookingId'] as String? ?? '',
-      );
-    }
-
     return QuickStatsModel(
       nuevoAge: json['nuevoAge']?.toString(),
-      nextSession: sessionInfo,
+      nextSession: json['nextSession'] != null
+          ? SessionInfoModel.fromJson(json['nextSession'] as Map<String, dynamic>)
+          : null,
     );
   }
 }

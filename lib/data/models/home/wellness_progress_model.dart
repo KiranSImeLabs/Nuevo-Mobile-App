@@ -9,7 +9,6 @@ class WellnessProgressModelResponse extends WellnessProgress {
   });
 
   factory WellnessProgressModelResponse.fromJson(Map<String, dynamic> json) {
-
     return WellnessProgressModelResponse(
       phaseName: json['phaseName'] ?? 'Wellness Phase',
       subtitle: json['subtitle'] ?? 'Keep going!',
