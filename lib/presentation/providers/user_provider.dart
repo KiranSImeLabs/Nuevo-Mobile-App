@@ -24,8 +24,10 @@ class UserNotifier extends StateNotifier<AsyncValue<User?>> {
         super(initialUser != null ? AsyncValue.data(initialUser) : const AsyncValue.loading());
 
   /// Fetch User Profile
-  Future<void> fetchProfile() async {
-    state = const AsyncValue.loading();
+  Future<void> fetchProfile({bool isBackground = false}) async {
+    if (!isBackground || state.value == null) {
+       state = const AsyncValue.loading();
+    }
     final result = await _getUserProfileUseCase(const NoParams());
 
     result.fold(
@@ -77,8 +79,10 @@ final userProvider = StateNotifierProvider<UserNotifier, AsyncValue<User?>>((ref
   if (authState.status == AuthStatus.authenticated) {
      if (authState.user == null) {
         Future.microtask(() => notifier.fetchProfile());
-     } 
-     // Optional: You could allow background refresh even if user exists
+     } else {
+        // Background refresh to get latest profile image and data without flickering
+        Future.microtask(() => notifier.fetchProfile(isBackground: true));
+     }
   } else if (authState.status == AuthStatus.unauthenticated) {
     // Determine if we should clear state? UserNotifier is recreated anyway if authProvider changes
   }

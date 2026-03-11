@@ -166,7 +166,7 @@ class ApiClient {
   
   /// Update user profile
   Future<ApiResponse<UserModel>> updateProfile(dynamic data) async {
-     final response = await _dioClient.dio.patch(
+     final response = await _dioClient.patch(
        ApiConstants.updateProfile,
        data: data,
     );
@@ -175,7 +175,7 @@ class ApiClient {
       (json) => UserModel.fromJson(json as Map<String, dynamic>),
     );
   }
-  
+
   /// Check Email
   Future<ApiResponse<void>> checkEmail(String email) async {
     final response = await _dioClient.get(
@@ -355,8 +355,6 @@ class ApiClient {
   Future<ApiResponse<DietPlanModel>> getDietPlan() async {
     final response = await _dioClient.get(ApiConstants.dietPlans);
     
-
-    
     return ApiResponse.fromJson(
       response.data,
       (json) => DietPlanModel.fromJson(json as Map<String, dynamic>),
@@ -416,7 +414,7 @@ class ApiClient {
   /// Sync Session Progress
   Future<ApiResponse<SessionProgressModel?>> syncSessionProgress(String id, Map<String, dynamic> data) async {
     // Note: The backend expects a PATCH request for updating progress
-    final response = await _dioClient.dio.patch(
+    final response = await _dioClient.patch(
       '${ApiConstants.sessionDetails}/$id${ApiConstants.sessionProgressUpdate}',
       data: data,
     );

@@ -31,7 +31,7 @@ class HomeScreen extends ConsumerWidget {
     final userState = ref.watch(userProvider);
     
     // Call user details if not available
-    if (userState.value == null && !userState.isLoading) {
+    if (userState.valueOrNull == null && !userState.isLoading && !userState.hasError) {
       Future.microtask(() => ref.read(userProvider.notifier).fetchProfile());
     }
 
@@ -203,6 +203,18 @@ class HomeScreen extends ConsumerWidget {
                       : Image.network(
                           userImageUrl,
                           fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
                           errorBuilder: (context, error, stackTrace) => Image.asset(
                             'assets/images/details_image.png',
                             fit: BoxFit.cover,
