@@ -289,7 +289,11 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
           GoRoute(
             path: '/completed-tasks',
-            builder: (context, state) => const CompletedTasksScreen(),
+            builder: (context, state) {
+              final extra = state.extra as Map<String, dynamic>?;
+              final showCompleted = extra?['showCompleted'] as bool? ?? true;
+              return CompletedTasksScreen(showCompleted: showCompleted);
+            },
           ),
           GoRoute(
             path: '/task/:id',

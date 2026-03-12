@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../providers/user_provider.dart';
+import '../../providers/home_provider.dart';
 import '../../widgets/profile_image_picker_sheet.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../../../core/constants/app_icons.dart';
@@ -93,15 +94,16 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       _nameController.text = user.name;
       _emailController.text = user.email;
       _initialName = user.name;
-      _initialDob = ''; // Defaulting as DOB is not in the model yet
+      // Populate DOB from user entity
+      if (user.dateOfBirth != null) {
+        final formattedDob = DateFormat('dd/MM/yyyy').format(user.dateOfBirth!);
+        _dobController.text = formattedDob;
+        _initialDob = formattedDob;
+        _selectedDate = user.dateOfBirth;
+      } else {
+        _initialDob = '';
+      }
       _isInitialized = true;
-    } else if (!_isInitialized) {
-       // Fallback defaults if user provider is empty or loading for dev
-       _nameController.text = "Warren I. Ford";
-       _emailController.text = "sarah.johnson@email.com";
-       _initialName = "Warren I. Ford";
-       _initialDob = '';
-       _isInitialized = true;
     }
 
     return Scaffold(
@@ -159,6 +161,18 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
                                     : Image.network(
                                         userState.value!.profileImageUrl!,
                                         fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              value: loadingProgress.expectedTotalBytes != null
+                                                  ? loadingProgress.cumulativeBytesLoaded /
+                                                      loadingProgress.expectedTotalBytes!
+                                                  : null,
+                                            ),
+                                          );
+                                        },
                                         errorBuilder: (context, error, stackTrace) => Image.asset(
                                           'assets/images/details_image.png',
                                           fit: BoxFit.cover,
@@ -405,8 +419,10 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
             SnackBar(content: Text(userState.error.toString())),
           );
         } else {
-          // Refresh user data (acting as getUserdetails())
+          // Refresh user profile data
           ref.read(userProvider.notifier).fetchProfile();
+          // Also refresh home dashboard so the name updates on the Home Screen
+          ref.invalidate(homeDashboardProvider);
           
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Profile saved successfully!')),

@@ -16,6 +16,8 @@ class UserModel {
   final String? phoneNumber;
   @JsonKey(name: 'profileImage')
   final String? profileImageUrl;
+  @JsonKey(name: 'dateOfBirth')
+  final String? dateOfBirth;
   final SubscriptionModel? subscription;
   @JsonKey(name: 'created_at')
   final String? createdAt;
@@ -29,6 +31,7 @@ class UserModel {
     this.lastName,
     this.phoneNumber,
     this.profileImageUrl,
+    this.dateOfBirth,
     this.subscription,
     this.createdAt,
     this.lastLoginAt,
@@ -55,6 +58,7 @@ class UserModel {
       name: '${firstName ?? ''} ${lastName ?? ''}'.trim(),
       phoneNumber: phoneNumber,
       profileImageUrl: profileImageUrl,
+      dateOfBirth: dateOfBirth != null ? DateTime.tryParse(dateOfBirth!) : null,
       subscription: subscription?.toEntity(),
       createdAt: createdAt != null ? DateTime.tryParse(createdAt!) : null,
       lastLoginAt: lastLoginAt != null ? DateTime.tryParse(lastLoginAt!) : null,
@@ -74,6 +78,7 @@ class UserModel {
       lastName: lastName,
       phoneNumber: user.phoneNumber,
       profileImageUrl: user.profileImageUrl,
+      dateOfBirth: user.dateOfBirth?.toIso8601String(),
       subscription: user.subscription != null
           ? SubscriptionModel.fromEntity(user.subscription!)
           : null,

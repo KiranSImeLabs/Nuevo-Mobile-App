@@ -228,4 +228,24 @@ class DioClient {
       throw handleDioError(e);
     }
   }
+
+  /// PATCH Request
+  Future<Response> patch(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    try {
+      final response = await _dio.patch(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: options,
+      );
+      return response;
+    } on DioException catch (e) {
+      throw handleDioError(e);
+    }
+  }
 }

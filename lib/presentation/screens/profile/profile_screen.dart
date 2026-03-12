@@ -104,6 +104,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                                           : Image.network(
                                               user.profileImageUrl!,
                                               fit: BoxFit.cover,
+                                              loadingBuilder: (context, child, loadingProgress) {
+                                                if (loadingProgress == null) return child;
+                                                return Center(
+                                                  child: CircularProgressIndicator(
+                                                    strokeWidth: 2,
+                                                    value: loadingProgress.expectedTotalBytes != null
+                                                        ? loadingProgress.cumulativeBytesLoaded /
+                                                            loadingProgress.expectedTotalBytes!
+                                                        : null,
+                                                  ),
+                                                );
+                                              },
                                               errorBuilder: (context, error, stackTrace) => Image.asset(
                                                 'assets/images/details_image.png',
                                                 fit: BoxFit.cover,

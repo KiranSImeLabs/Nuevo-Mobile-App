@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../widgets/common/app_error_widget.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../domain/entities/task.dart' as entities;
 import '../../../domain/entities/user.dart' as entities;
 import '../../../domain/entities/wellness_program.dart';
@@ -19,8 +16,6 @@ import '../../widgets/home/program_card.dart';
 import '../../widgets/home/quick_access_grid.dart';
 import '../../widgets/home/quick_access_card.dart';
 import '../../widgets/home/dietitian_session_card.dart';
-import '../../providers/user_provider.dart';
-import '../../widgets/common/app_error_widget.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -31,7 +26,7 @@ class HomeScreen extends ConsumerWidget {
     final userState = ref.watch(userProvider);
     
     // Call user details if not available
-    if (userState.value == null && !userState.isLoading) {
+    if (userState.valueOrNull == null && !userState.isLoading && !userState.hasError) {
       Future.microtask(() => ref.read(userProvider.notifier).fetchProfile());
     }
 
@@ -82,7 +77,8 @@ class HomeScreen extends ConsumerWidget {
                           context,
                           'Task Completed',
                           onActionTap: () {
-                            context.push('/completed-tasks');
+                            context.push('/completed-tasks',
+                                extra: {'showCompleted': true});
                           },
                           actionLabel: 'See All',
                           showArrow: false,
@@ -108,7 +104,10 @@ class HomeScreen extends ConsumerWidget {
                               _buildSectionHeader(
                                 context,
                                 'Action required',
-                                onActionTap: () => context.go('/my-plan'),
+                                onActionTap: () => context.push(
+                                  '/completed-tasks',
+                                  extra: {'showCompleted': false},
+                                ),
                                 actionLabel: 'Complete Now',
                                 showArrow: true,
                               ),
@@ -203,6 +202,18 @@ class HomeScreen extends ConsumerWidget {
                       : Image.network(
                           userImageUrl,
                           fit: BoxFit.cover,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                value: loadingProgress.expectedTotalBytes != null
+                                    ? loadingProgress.cumulativeBytesLoaded /
+                                        loadingProgress.expectedTotalBytes!
+                                    : null,
+                              ),
+                            );
+                          },
                           errorBuilder: (context, error, stackTrace) => Image.asset(
                             'assets/images/details_image.png',
                             fit: BoxFit.cover,

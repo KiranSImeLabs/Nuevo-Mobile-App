@@ -2,10 +2,10 @@
 /// IMPORTANT: Update these with actual backend URLs before deployment
 class ApiConstants {
   // Base URLs
-  static const String baseUrl = 'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';
-  //'https://nuevo-medical-be.simelabs.in/api/v1';
+  static const String baseUrl = 'https://nuevo-medical-be.simelabs.in/api/v1';//'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';//'http://192.168.0.220:3000/api/v1';
   //'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';
   //'https://nuevo-medical-be.simelabs.in/api/v1';
+  //http://192.168.0.220:3000/api/v1
   
   // Endpoints
   // Auth
@@ -29,6 +29,7 @@ class ApiConstants {
   // Bookings
   static const String bookings = '/bookings';
   static const String timeSlots = '/timeslots/day';
+  static const String createAppointment = '/bookings/appointment';
   
   // Payments
   static const String paymentCustomer = '/payments/customer';

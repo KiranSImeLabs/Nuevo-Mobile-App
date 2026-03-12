@@ -181,6 +181,7 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
     final phaseState = ref.watch(phaseListProvider);
 
     return phaseState.when(
+      //Loading State :-  Staic value or dummy
       loading: () => Column(
         children: [
           _buildTimelineItem(AppStrings.assess, isCompleted: true, isFirst: true),
@@ -189,7 +190,9 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
           _buildTimelineItem(AppStrings.sustain, isActive: false, isLast: true),
         ],
       ),
+      //Error State :-  Show error UI
       error: (err, stack) => const Text('Failed to load phase timeline'),
+      //Data State :-  Here we show the orginal value fetched.
       data: (phases) {
         if (phases.isEmpty) return const Text('No timeline phases available');
         return Column(

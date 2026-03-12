@@ -9,6 +9,7 @@ class User extends Equatable {
   final String name;
   final String? phoneNumber;
   final String? profileImageUrl;
+  final DateTime? dateOfBirth;
   final Subscription? subscription;
   final DateTime? createdAt;
   final DateTime? lastLoginAt;
@@ -19,6 +20,7 @@ class User extends Equatable {
     required this.name,
     this.phoneNumber,
     this.profileImageUrl,
+    this.dateOfBirth,
     this.subscription,
     this.createdAt,
     this.lastLoginAt,
@@ -48,6 +50,7 @@ class User extends Equatable {
     String? name,
     String? phoneNumber,
     String? profileImageUrl,
+    DateTime? dateOfBirth,
     Subscription? subscription,
     DateTime? createdAt,
     DateTime? lastLoginAt,
@@ -58,6 +61,7 @@ class User extends Equatable {
       name: name ?? this.name,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       profileImageUrl: profileImageUrl ?? this.profileImageUrl,
+      dateOfBirth: dateOfBirth ?? this.dateOfBirth,
       subscription: subscription ?? this.subscription,
       createdAt: createdAt ?? this.createdAt,
       lastLoginAt: lastLoginAt ?? this.lastLoginAt,
@@ -71,6 +75,7 @@ class User extends Equatable {
     name,
     phoneNumber,
     profileImageUrl,
+    dateOfBirth,
     subscription,
     createdAt,
     lastLoginAt,
