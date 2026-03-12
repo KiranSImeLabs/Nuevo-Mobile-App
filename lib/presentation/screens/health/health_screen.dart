@@ -1106,52 +1106,58 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
         const SizedBox(height: AppSpacing.xl),
         
         // Book New Test Section
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
-          decoration: BoxDecoration(
-            color: Colors.transparent,
-            borderRadius: BorderRadius.circular(16),
-            border: _DashedBorder.all(
-              color: const Color(0xFFE0E0E0),
-              width: 1,
+        InkWell(
+          onTap: () {
+            _showBookNewTestDialog(context);
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+              border: _DashedBorder.all(
+                color: const Color(0xFFE0E0E0),
+                width: 1,
+              ),
             ),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: 56,
-                height: 56,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFA05E44),
-                  shape: BoxShape.circle,
+            child: Column(
+              children: [
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFA05E44),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.add,
+                    color: Colors.white,
+                    size: 32,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.add,
-                  color: Colors.white,
-                  size: 32,
+                const SizedBox(height: AppSpacing.lg),
+                const Text(
+                  AppStrings.bookNewTest,
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w500,
+                    color: Color(0xFF1E1E1E),
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              const Text(
-                AppStrings.bookNewTest,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF1E1E1E),
+                const SizedBox(height: AppSpacing.sm),
+                const Text(
+                  AppStrings.bookNewTestDesc,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: Color(0xFF757575),
+                    height: 1.5,
+                  ),
                 ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              const Text(
-                AppStrings.bookNewTestDesc,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF757575),
-                  height: 1.5,
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
@@ -1348,6 +1354,158 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     );
   }
 
+  void _showBookNewTestDialog(BuildContext context) {
+    final TextEditingController notesController = TextEditingController();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          AppStrings.bookNewTest,
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E1E1E),
+                          ),
+                        ),
+                        IconButton(
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          icon: const Icon(Icons.close, color: Color(0xFF757575)),
+                          onPressed: () {
+                            if (!isLoading) Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    const Text(
+                      'Please provide some details or notes for your new lab test request.',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF757575),
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    TextField(
+                      controller: notesController,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: 'Enter your message...',
+                        hintStyle: const TextStyle(color: Color(0xFFBDBDBD)),
+                        filled: true,
+                        fillColor: const Color(0xFFF9F9F9),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFFE5D5D0)),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFFE5D5D0)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: Color(0xFFA05E44)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: isLoading ? null : () async {
+                          final notes = notesController.text.trim();
+                          if (notes.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Please enter a message.')),
+                            );
+                            return;
+                          }
+
+                          setState(() { isLoading = true; });
+
+                          try {
+                            // Call the provider to dispatch request.
+                            // We manually read the FutureProvider to execute it.
+                            final result = await ref.read(createLabRequestProvider(notes).future);
+                            
+                            if (context.mounted) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('Lab request submitted successfully!'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Failed to submit request: $e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          } finally {
+                            if (context.mounted) {
+                              setState(() { isLoading = false; });
+                            }
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFFA05E44),
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
+                        ),
+                        child: isLoading 
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2, 
+                                  color: Colors.white,
+                                ),
+                              )
+                            : const Text(
+                                'Submit Request',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
 }
 

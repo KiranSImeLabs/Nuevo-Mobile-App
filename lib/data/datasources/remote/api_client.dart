@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:dio/dio.dart';
 import '../../../core/network/dio_client.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../models/api_response.dart';
@@ -270,6 +272,18 @@ class ApiClient {
     );
   }
 
+  /// Get Lab Report Details / Comparison
+  Future<ApiResponse<LabReportDetailData>> getLabReportDetails(String id) async {
+    final response = await _dioClient.get('${ApiConstants.labReports}/$id');
+    
+
+
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => LabReportDetailData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
   // Add other methods (Programs, Bookings) as needed if they were in the previous attempt
   // For brevity and to fix the immediate error, ensuring register/login/updateProfile exist.
   
@@ -406,6 +420,8 @@ class ApiClient {
   /// Get Today's Exercise
   Future<ApiResponse<DailyExerciseModel>> getTodayExercise() async {
     final response = await _dioClient.get(ApiConstants.todayExercise);
+    
+
 
     return ApiResponse.fromJson(
       response.data,

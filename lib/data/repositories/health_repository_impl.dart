@@ -9,6 +9,8 @@ import '../models/weekly_schedule_model.dart';
 import '../models/session_progress_model.dart';
 import '../models/active_progress_model.dart';
 import '../models/api_response.dart';
+import '../models/lab_report_model.dart';
+import '../models/lab_request_model.dart';
 
 class HealthRepositoryImpl implements HealthRepository {
   final ApiClient apiClient;
@@ -117,6 +119,38 @@ class HealthRepositoryImpl implements HealthRepository {
       final response = await apiClient.getActiveProgress();
       if (response.success) {
         return Right(response.data);
+      } else {
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
+      }
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+  @override
+  Future<Either<Failure, LabReportDetailData>> getLabReportDetails(String id) async {
+    try {
+      final response = await apiClient.getLabReportDetails(id);
+      if (response.success && response.data != null) {
+        return Right(response.data!);
+      } else {
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
+      }
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, LabRequestData>> createLabRequest(String notes) async {
+    try {
+      final request = CreateLabRequest(notes: notes);
+      final response = await apiClient.createLabRequest(request);
+      if (response.success && response.data != null) {
+        return Right(response.data!);
       } else {
         return Left(ServerFailure(response.message ?? 'Unknown Error'));
       }
