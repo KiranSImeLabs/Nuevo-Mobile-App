@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../data/models/lab_report_model.dart';
+import '../../../widgets/health/health_parameter_meter.dart';
 
 enum MetricStatus { optimal, suboptimal, stable }
 
@@ -9,6 +11,8 @@ class MetricResultCard extends StatelessWidget {
   final String value;
   final String unit;
   final double scoreFraction; // 0.0 to 1.0 (left to right position of the marker on the bars)
+  final double? numericValue;
+  final ReferenceRange? referenceRange;
 
   const MetricResultCard({
     super.key,
@@ -17,6 +21,8 @@ class MetricResultCard extends StatelessWidget {
     required this.value,
     required this.unit,
     required this.scoreFraction,
+    this.numericValue,
+    this.referenceRange,
   });
 
   @override
@@ -111,66 +117,80 @@ class MetricResultCard extends StatelessWidget {
           // Indicator Bar Map (Low, Optimal, High Sections)
           LayoutBuilder(
             builder: (context, constraints) {
-              // We divide the bar into 3 segments matching the design.
-              // Roughly: 35% Light orange (Low), 40% Green (Optimal), 25% Pinkish (High)
-              // Actually, looking at the design, it's 3 distinct colored bars with gaps.
-              
-              final totalWidth = constraints.maxWidth;
-              const gap = 6.0;
-              final lightOrangeWidth = totalWidth * 0.35 - gap;
-              final greenWidth = totalWidth * 0.40 - gap;
-              final pinkWidth = totalWidth * 0.25; // Last one doesn't need gap subtraction
-
-              // Calculate marker position based on fraction
-              final markerPos = totalWidth * scoreFraction;
+              final double totalWidth = constraints.maxWidth;
 
               return Stack(
-                clipBehavior: Clip.none, // Allow marker to slightly overflow vertically
                 alignment: Alignment.centerLeft,
+                clipBehavior: Clip.none,
                 children: [
+                  // Bar
                   Row(
                     children: [
-                      // Section 1: Low (Pale Orange)
-                      Container(
-                        height: 6,
-                        width: lightOrangeWidth,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF7DAC0),
-                          borderRadius: BorderRadius.circular(3),
+                      Expanded(
+                        child: Container(
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF4C7A1),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: gap),
-                      // Section 2: Optimal (Bright Green)
-                      Container(
-                        height: 6,
-                        width: greenWidth,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1BE196),
-                          borderRadius: BorderRadius.circular(3),
+                      const SizedBox(width: 4),
+
+                      Expanded(
+                        child: Container(
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF2ECC71),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
                         ),
                       ),
-                      const SizedBox(width: gap),
-                      // Section 3: High (Pale Pink)
-                      Container(
-                        height: 6,
-                        width: pinkWidth,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF7D1D4),
-                          borderRadius: BorderRadius.circular(3),
+                      const SizedBox(width: 4),
+
+                      Expanded(
+                        child: Container(
+                          height: 6,
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFF5B7B1),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  
-                  // The positioned Value Marker (Vertical Black tick)
+
+                  // Indicator
                   Positioned(
-                    left: markerPos - 1.5, // Center the marker
-                    child: Container(
-                      height: 18,
-                      width: 3,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1E1E1E),
-                        borderRadius: BorderRadius.circular(1.5),
+                    left: (scoreFraction * totalWidth).clamp(0.0, totalWidth) - 4, // 8px total width, shift by half to center precisely 
+                    top: -12, // Indicator height 20, bar height 6. Shift up by 12 to center the 8px base bulb on the 6px line exactly
+                    child: SizedBox(
+                      width: 8,
+                      height: 20,
+                      child: Stack(
+                        alignment: Alignment.bottomCenter,
+                        clipBehavior: Clip.none,
+                        children: [
+                          Align(
+                            alignment: Alignment.topCenter,
+                            child: Container(
+                              width: 4,
+                              height: 16, // Elongated stem overlapping into the bulb
+                              decoration: BoxDecoration(
+                                color: const Color(0xFF1E1E1E),
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                          ),
+                          Container(
+                            width: 8,
+                            height: 8, // Rounded bulb base
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF1E1E1E),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),

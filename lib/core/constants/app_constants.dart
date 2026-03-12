@@ -2,7 +2,8 @@
 /// IMPORTANT: Update these with actual backend URLs before deployment
 class ApiConstants {
   // Base URLs
-  static const String baseUrl = 'https://nuevo-medical-be.simelabs.in/api/v1';
+  static const String baseUrl = 'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';
+  //'https://nuevo-medical-be.simelabs.in/api/v1';
   //'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';
   //'https://nuevo-medical-be.simelabs.in/api/v1';
   
