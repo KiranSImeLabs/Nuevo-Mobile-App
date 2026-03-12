@@ -4,8 +4,6 @@ import '../../models/api_response.dart';
 import '../../models/auth_response_model.dart';
 import '../../models/user_model.dart';
 import '../../models/subscription_model.dart';
-import '../../models/program_model.dart';
-import '../../models/booking_model.dart';
 import '../../models/lab_request_model.dart';
 import '../../models/lab_report_model.dart';
 import '../../models/diet_plan_model.dart';
@@ -19,8 +17,8 @@ import '../../models/payment_integration_models.dart';
 import '../../models/billing_response_model.dart';
 import '../../models/goal_model.dart';
 import '../../models/phase_model.dart';
+import '../../models/appointment_model.dart';
 
-import 'dart:convert';
 import 'package:dio/dio.dart';
 
 /// API Client (Data Layer)
@@ -274,6 +272,46 @@ class ApiClient {
 
   // Add other methods (Programs, Bookings) as needed if they were in the previous attempt
   // For brevity and to fix the immediate error, ensuring register/login/updateProfile exist.
+  
+  // ============================================
+  // Appointment/Booking Endpoints
+  // ============================================
+
+  /// Create Appointment
+  Future<ApiResponse<AppointmentResponseData>> createAppointment(
+      CreateAppointmentRequest request) async {
+    final response = await _dioClient.post(
+      ApiConstants.createAppointment,
+      data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AppointmentResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Update Appointment
+  Future<ApiResponse<AppointmentResponseData>> updateAppointment(
+      String bookingId, UpdateAppointmentRequest request) async {
+    final response = await _dioClient.patch(
+      '${ApiConstants.createAppointment}/$bookingId',
+      data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AppointmentResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Cancel Appointment
+  Future<ApiResponse<CancelAppointmentResponseData>> cancelAppointment(
+      String bookingId) async {
+    final response = await _dioClient.delete('${ApiConstants.bookings}/$bookingId');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => CancelAppointmentResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
   
   // ============================================
   // Goal Endpoints
