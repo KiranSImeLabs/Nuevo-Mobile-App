@@ -82,6 +82,10 @@ class ApiConstants {
   
   // Phases
   static const String phases = '/phases';
+  static const String myActivePhase = '/phases/my-active-phase';
+  static const String myActivePhaseWeekly = '/phases/my-active-phase/weekly';
+  static const String myActivePhaseProgress = '/phases/my-active-phase/progress';
+  static const String myActivePhaseTasks = '/phases/my-active-phase/tasks';
   
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);

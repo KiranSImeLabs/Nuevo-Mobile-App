@@ -43,6 +43,7 @@ import '../../domain/usecases/goal/get_goal_by_id_usecase.dart';
 import '../../domain/usecases/goal/update_goal_usecase.dart';
 import '../../domain/usecases/goal/delete_goal_usecase.dart';
 import '../../domain/usecases/phase/get_phases_usecase.dart';
+import '../../domain/usecases/phase/phase_usecases.dart';
 import '../../data/repositories/phase_repository_impl.dart';
 import '../../domain/repositories/phase_repository.dart';
 // import 'auth_provider.dart'; // Removing to break circularity
@@ -301,4 +302,50 @@ final deleteGoalUseCaseProvider = Provider<DeleteGoalUseCase>((ref) {
 final getPhasesUseCaseProvider = Provider<GetPhasesUseCase>((ref) {
   final repository = ref.watch(phaseRepositoryProvider);
   return GetPhasesUseCase(repository);
+});
+
+final getPhaseByIdUseCaseProvider = Provider<GetPhaseByIdUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return GetPhaseByIdUseCase(repository);
+});
+
+final getMyActivePhaseUseCaseProvider =
+    Provider<GetMyActivePhaseUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return GetMyActivePhaseUseCase(repository);
+});
+
+final getCurrentWeeklyViewUseCaseProvider =
+    Provider<GetCurrentWeeklyViewUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return GetCurrentWeeklyViewUseCase(repository);
+});
+
+final getPhaseProgressUseCaseProvider =
+    Provider<GetPhaseProgressUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return GetPhaseProgressUseCase(repository);
+});
+
+final getWeekByNumberUseCaseProvider =
+    Provider<GetWeekByNumberUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return GetWeekByNumberUseCase(repository);
+});
+
+final getTaskByIdUseCaseProvider = Provider<GetTaskByIdUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return GetTaskByIdUseCase(repository);
+});
+
+final markTaskCompletedUseCaseProvider =
+    Provider<MarkTaskCompletedUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return MarkTaskCompletedUseCase(repository);
+});
+
+final updateTaskStatusUseCaseProvider =
+    Provider<UpdateTaskStatusUseCase>((ref) {
+  final repository = ref.watch(phaseRepositoryProvider);
+  return UpdateTaskStatusUseCase(repository);
 });

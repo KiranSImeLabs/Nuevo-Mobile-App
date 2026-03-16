@@ -385,6 +385,87 @@ class ApiClient {
     );
   }
 
+  /// Get Phase By ID — GET /phases/{phaseId}
+  Future<ApiResponse<PhaseModel>> getPhaseById(String phaseId) async {
+    final response = await _dioClient.get('${ApiConstants.phases}/$phaseId');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PhaseModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get My Active Phase — GET /phases/my-active-phase
+  Future<ApiResponse<ActivePhaseResponseModel>> getMyActivePhase() async {
+    final response = await _dioClient.get(ApiConstants.myActivePhase);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) =>
+          ActivePhaseResponseModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Current Weekly View — GET /phases/my-active-phase/weekly
+  Future<ApiResponse<WeeklyViewModel>> getCurrentWeeklyView() async {
+    final response = await _dioClient.get(ApiConstants.myActivePhaseWeekly);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => WeeklyViewModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Phase Progress — GET /phases/my-active-phase/progress
+  Future<ApiResponse<PhaseProgressModel>> getPhaseProgress() async {
+    final response = await _dioClient.get(ApiConstants.myActivePhaseProgress);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PhaseProgressModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Week View By Number — GET /phases/my-active-phase/weeks/{weekNumber}
+  Future<ApiResponse<WeeklyViewModel>> getWeekByNumber(int weekNumber) async {
+    final response = await _dioClient
+        .get('${ApiConstants.myActivePhase}/weeks/$weekNumber');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => WeeklyViewModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Task By ID — GET /phases/my-active-phase/tasks/{taskId}
+  Future<ApiResponse<PatientTaskModel>> getTaskById(String taskId) async {
+    final response =
+        await _dioClient.get('${ApiConstants.myActivePhaseTasks}/$taskId');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PatientTaskModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Mark Task Completed — PATCH /phases/my-active-phase/tasks/{taskId}/complete
+  Future<ApiResponse<PatientTaskModel>> markTaskCompleted(
+      String taskId) async {
+    final response = await _dioClient
+        .patch('${ApiConstants.myActivePhaseTasks}/$taskId/complete');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PatientTaskModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Update Task Status — PATCH /phases/my-active-phase/tasks/{taskId}/status
+  Future<ApiResponse<PatientTaskModel>> updateTaskStatus(
+      String taskId, String statusValue) async {
+    final response = await _dioClient.patch(
+      '${ApiConstants.myActivePhaseTasks}/$taskId/status',
+      data: UpdateTaskStatusRequest(statusValue: statusValue).toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PatientTaskModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
   // ============================================
   // Diet Plan Endpoints
   // ============================================
