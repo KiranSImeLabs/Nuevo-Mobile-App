@@ -1,9 +1,10 @@
+import 'dart:convert';
+import 'dart:developer' as developer;
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/constants/app_strings.dart';
@@ -11,6 +12,7 @@ import '../../../data/models/lab_report_model.dart';
 import '../../providers/health_provider.dart';
 import '../../widgets/common/app_error_widget.dart';
 import 'widgets/metric_result_card.dart';
+import 'widgets/progress_summary_card.dart';
 
 class ResultDetailsScreen extends ConsumerWidget {
   final LabReportModel report;
@@ -62,12 +64,30 @@ class ResultDetailsScreen extends ConsumerWidget {
           onRetry: () => ref.refresh(labReportDetailsProvider(report.id!)),
         ),
         data: (detailData) {
-          if (detailData == null || detailData.comparison?.parameterComparisons == null) {
-            return const Center(child: Text("No comparison data available."));
+          if (detailData != null) {
+            String initialReportStr = const JsonEncoder.withIndent('  ').convert(report.toJson());
+            String fullDetailsStr = const JsonEncoder.withIndent('  ').convert(detailData.toJson());
+            developer.log('=== INITIAL LAB REPORT ===\n$initialReportStr\n==========================', name: 'LabReport');
+            developer.log('=== FULL RESULT DETAILS ===\n$fullDetailsStr\n===========================', name: 'LabReportDetails');
+          }
+
+          if (detailData == null) {
+            return const Center(child: Text("No data available."));
           }
           
-          final comparisonData = detailData.comparison!;
-          final parameters = comparisonData.parameterComparisons!;
+          bool hasComparison = detailData.comparison?.parameterComparisons != null && 
+                               detailData.comparison!.parameterComparisons!.isNotEmpty;
+          
+          bool hasParameters = detailData.parameters != null && 
+                               detailData.parameters!.isNotEmpty;
+
+          if (!hasComparison && !hasParameters) {
+            return const Center(child: Text("No result data available."));
+          }
+
+          final comparisonData = detailData.comparison;
+          final parameters = comparisonData?.parameterComparisons ?? [];
+          final basicParameters = detailData.parameters ?? [];
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(AppSpacing.lg),
@@ -75,106 +95,11 @@ class ResultDetailsScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Great Progress Card (Can be conditionally rendered based on improved parameters)
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFF5EAE8), // Matches design
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFA05E44),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: const Icon(
-                          Icons.insights_outlined, // Placeholder for the node graph icon
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Text(
-                        (comparisonData.overallProgress?.improved ?? 0) > 0 
-                            ? AppStrings.greatProgress 
-                            : 'Results Outlook',
-                        style: const TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
-                          color: Color(0xFF1E1E1E),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        '${comparisonData.overallProgress?.stable ?? 0} parameters remained stable since last test.',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF757575),
-                          height: 1.5,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            displayDate,
-                            style: const TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFF8C8C8C),
-                            ),
-                          ),
-                          if (detailData.reportUrl != null && detailData.reportUrl!.isNotEmpty)
-                            InkWell(
-                              onTap: () async {
-                                final url = Uri.parse(detailData.reportUrl!);
-                                if (await canLaunchUrl(url)) {
-                                  await launchUrl(
-                                    url, 
-                                    mode: LaunchMode.inAppBrowserView, // Opens as embedded web page with back button
-                                  );
-                                } else {
-                                  if (context.mounted) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Could not open the report')),
-                                    );
-                                  }
-                                }
-                              },
-                              borderRadius: BorderRadius.circular(20),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(20),
-                                  border: Border.all(color: const Color(0xFFE5D5D0)),
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.picture_as_pdf, size: 14, color: Color(0xFFA05E44)),
-                                    SizedBox(width: 6),
-                                    Text(
-                                      'View Report',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                        color: Color(0xFFA05E44),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ],
-                  ),
+                ProgressSummaryCard(
+                  improvedCount: comparisonData?.overallProgress?.improved ?? 0,
+                  stableCount: comparisonData?.overallProgress?.stable ?? 0,
+                  displayDate: displayDate,
+                  reportUrl: detailData.reportUrl,
                 ),
                 
                 const SizedBox(height: AppSpacing.xl),
@@ -190,8 +115,8 @@ class ResultDetailsScreen extends ConsumerWidget {
                 ),
                 const SizedBox(height: AppSpacing.md),
 
-                // Metrics List Mapped from API Data
-                ...parameters.map((param) {
+                // Metrics List Mapped from Comparison API Data
+                if (hasComparison) ...parameters.map((param) {
                   final statusString = param.current?.status?.toUpperCase() ?? 'STABLE';
                   
                   MetricStatus metricStatus;
@@ -208,8 +133,6 @@ class ResultDetailsScreen extends ConsumerWidget {
 
                   final val = param.current?.value?.toDouble() ?? 0;
 
-                  // Find matching parameter from comparisonData.parameters since it holds the raw array
-                  // We map from comparisonData mapped JSON since report.parameters doesn't exist on LabReportModel
                   var originalParamMax = 1.0;
                   ReferenceRange? originalReferenceRange;
                   
@@ -238,6 +161,59 @@ class ResultDetailsScreen extends ConsumerWidget {
                       status: metricStatus,
                       value: param.current?.value?.toString() ?? '--',
                       unit: param.current?.unit ?? '',
+                      scoreFraction: scoreFraction, 
+                      numericValue: val,
+                      referenceRange: originalReferenceRange,
+                    ),
+                  );
+                }),
+
+                // Fallback: Metrics List Mapped from Basic Parameters Data
+                if (!hasComparison && hasParameters) ...basicParameters.map((paramData) {
+                  if (paramData is! Map) return const SizedBox.shrink();
+                  
+                  final name = paramData['name'] ?? paramData['parameterName'] ?? 'Unknown Metric';
+                  final valRaw = paramData['value'];
+                  final val = valRaw is num ? valRaw.toDouble() : double.tryParse(valRaw?.toString() ?? '0') ?? 0.0;
+                  final unit = paramData['unit'] ?? '';
+                  final statusString = (paramData['status'] ?? paramData['resultStatus'] ?? 'STABLE').toString().toUpperCase();
+
+                  MetricStatus metricStatus;
+                  switch (statusString) {
+                    case 'OPTIMAL':
+                      metricStatus = MetricStatus.optimal;
+                      break;
+                    case 'SUBOPTIMAL':
+                    case 'ABNORMAL':
+                    case 'HIGH':
+                    case 'LOW':
+                      metricStatus = MetricStatus.suboptimal;
+                      break;
+                    default:
+                      metricStatus = MetricStatus.stable;
+                  }
+
+                  var originalParamMax = 1.0;
+                  ReferenceRange? originalReferenceRange;
+                  
+                  if (paramData['referenceRange'] != null) {
+                    try {
+                      originalReferenceRange = ReferenceRange.fromJson(paramData['referenceRange'] as Map<String, dynamic>);
+                      originalParamMax = originalReferenceRange.max?.toDouble() ?? 1.0;
+                    } catch (e) {
+                      // Ignore
+                    }
+                  }
+
+                  double scoreFraction = (val / originalParamMax).clamp(0.0, 1.0);
+
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: MetricResultCard(
+                      title: name.toString(),
+                      status: metricStatus,
+                      value: valRaw?.toString() ?? '--',
+                      unit: unit.toString(),
                       scoreFraction: scoreFraction, 
                       numericValue: val,
                       referenceRange: originalReferenceRange,
