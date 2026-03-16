@@ -229,7 +229,7 @@ class HomeScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  welcome.greeting,
+                  "Welcome",//welcome.greeting,
                   style: TextStyle(
                     fontSize: ResponsiveUtils.fontSize(context, base: 12),
                     color: const Color(0xFF3E160D).withOpacity(0.6),
