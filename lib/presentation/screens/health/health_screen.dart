@@ -17,6 +17,7 @@ import '../../providers/specialist_provider.dart';
 import '../../providers/lab_reports_provider.dart';
 import 'widgets/guidance_detail_bottom_sheet.dart';
 import 'widgets/health_results_tab.dart';
+import 'widgets/health_insights_tab.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/constants/app_strings.dart';
 
@@ -1082,61 +1083,6 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // Your Nuevo Age Section
-        Text(
-          AppStrings.yourNuevoAge,
-          style: AppTextStyles.bodyLarge.copyWith(
-            color: const Color(0xFF4A4A4A),
-            fontSize: 16,
-          ),
-        ),
-        const SizedBox(height: AppSpacing.md),
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            color: const Color(0xFFF5EAE8),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              RichText(
-                text: const TextSpan(
-                  children: [
-                    TextSpan(
-                      text: "32",
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFF1E1E1E),
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                    const TextSpan(
-                      text: AppStrings.years,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF1E1E1E),
-                        fontFamily: 'Inter',
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                AppStrings.biologicalAgeDiff,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF8C8C8C),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: AppSpacing.xl),
-
         // Recent Insights Section
         Text(
           AppStrings.recentInsights,
@@ -1166,6 +1112,18 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
           subtitle: AppStrings.stressLevelsDesc,
           iconColor: const Color(0xFFA05E44),
         ),
+        const SizedBox(height: AppSpacing.xl),
+        
+        // New Daily Logging UI
+        Text(
+          "Daily Log",
+          style: AppTextStyles.bodyLarge.copyWith(
+            color: const Color(0xFF4A4A4A),
+            fontSize: 16,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.md),
+        const HealthInsightsTab(),
       ],
     );
   }
