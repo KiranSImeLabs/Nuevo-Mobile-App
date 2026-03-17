@@ -87,7 +87,7 @@ class UserRepositoryImpl implements UserRepository {
         return Left(ServerFailure('Failed to update profile'));
       }
     } on AppException catch (exception) {
-      print(exception);
+//      print(exception);
       if (exception is AuthException) {
         return Left(AuthFailure(message: exception.message, code: exception.code));
       } else if (exception is NetworkException) {

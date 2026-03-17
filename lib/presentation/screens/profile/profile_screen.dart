@@ -69,7 +69,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
                 data: (user) {
                   final name = user?.name ?? 'Warren I. Ford';
                   final email = user?.email ?? 'sarah.johnson@email.com';
-                  print(user);
+//                  print(user);
                   return Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 32, horizontal: 16),

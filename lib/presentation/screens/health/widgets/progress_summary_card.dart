@@ -94,7 +94,7 @@ class ProgressSummaryCard extends StatelessWidget {
                       }
                     } catch (e, stack) {
                       developer.log('Error launching PDF', error: e, stackTrace: stack, name: 'PDF_Viewer_Exception');
-                      print('PDF LAUNCH ERROR: $e');
+//                      print('PDF LAUNCH ERROR: $e');
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Error opening report: $e')),
