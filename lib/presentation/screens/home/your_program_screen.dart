@@ -26,6 +26,7 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(specialistListProvider.notifier).fetchSpecialists();
       ref.read(phaseListProvider.notifier).fetchPhases();
+      ref.read(activePhaseProvider.notifier).fetchActivePhase();
     });
   }
 
@@ -34,6 +35,7 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
     final dashboardState = ref.watch(homeDashboardProvider);
     final specialistState = ref.watch(specialistListProvider);
     final phaseState = ref.watch(phaseListProvider);
+    final activePhaseState = ref.watch(activePhaseProvider);
     
     return Scaffold(
       backgroundColor: const Color(0xFFFCF9F8),
@@ -77,77 +79,61 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
               ),
             ),
             SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-            phaseState.when(
-              loading: () => Column(
-                children: [
-                  _buildPhaseCard(
-                    context,
-                    phase: 'Phase 1',
-                    title: 'Assess',
-                    iconData: Icons.assignment_outlined,
-                    isActive: false,
-                    isLocked: false,
-                  ),
-                  SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-                  _buildPhaseCard(
-                    context,
-                    phase: 'Phase 2',
-                    title: 'Reset',
-                    iconData: Icons.autorenew,
-                    isActive: true,
-                    isLocked: false,
-                  ),
-                  SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-                  _buildPhaseCard(
-                    context,
-                    phase: 'Phase 3',
-                    title: 'Elevate',
-                    iconData: Icons.lock_outline,
-                    isActive: false,
-                    isLocked: true,
-                  ),
-                  SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-                  _buildPhaseCard(
-                    context,
-                    phase: 'Phase 4',
-                    title: 'Sustain',
-                    iconData: Icons.lock_outline,
-                    isActive: false,
-                    isLocked: true,
-                  ),
-                ],
-              ),
-              error: (err, stack) => const Text('Failed to load phases'),
-              data: (phases) {
-                if (phases.isEmpty) return const Text('No phases available');
-                return Column(
-                  children: phases.map((phase) {
-                    // Replicating original dummy logic for active/locked status based on orderIndex
-                    final isLocked = phase.orderIndex > 2;
-                    final isActive = phase.orderIndex == 2;
-                    final isPast = phase.orderIndex < 2;
-                    
-                    IconData iconData = Icons.assignment_outlined;
-                    if (isLocked) {
-                      iconData = Icons.lock_outline;
-                    } else if (isActive) {
-                      iconData = Icons.autorenew;
-                    } else if (isPast) {
-                      iconData = Icons.check_circle_outline;
-                    }
+            activePhaseState.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, stack) => Text('Error: $err'),
+              data: (activePhaseData) {
+                final activeOrderIndex = activePhaseData.phase.phase?.orderIndex ?? 0;
 
-                    return Padding(
-                      padding: EdgeInsets.only(bottom: ResponsiveUtils.spacing(context, base: 12)),
-                      child: _buildPhaseCard(
-                        context,
-                        phase: 'Phase ${phase.orderIndex}',
-                        title: phase.name,
-                        iconData: iconData,
-                        isActive: isActive,
-                        isLocked: isLocked,
-                      ),
+                return phaseState.when(
+                  loading: () => const Center(child: CircularProgressIndicator()),
+                  error: (err, stack) => const Text('Failed to load phases'),
+                  data: (phases) {
+                    if (phases.isEmpty) return const Text('No phases available');
+                    return Column(
+                      children: phases.map((phase) {
+                        final isActive = phase.orderIndex == activeOrderIndex;
+                        final isLocked = phase.orderIndex > activeOrderIndex;
+                        final isPast = phase.orderIndex < activeOrderIndex;
+
+                        String subtitle = '${phase.name}';
+                        if (isActive) {
+                          try {
+                            final firstPendingTask = activePhaseData.tasks.firstWhere(
+                              (t) => t.status == 'PENDING',
+                            );
+                            if (firstPendingTask.phaseTask != null) {
+                              subtitle = 'Focus: ${firstPendingTask.phaseTask!.title}';
+                            }
+                          } catch (_) {
+                            // No pending task found, keep default subtitle
+                          }
+                        }
+
+                        IconData iconData = Icons.assignment_outlined;
+                        if (isLocked) {
+                          iconData = Icons.lock_outline;
+                        } else if (isActive) {
+                          iconData = Icons.autorenew;
+                        } else if (isPast) {
+                          iconData = Icons.check_circle_outline;
+                        }
+
+                        return Padding(
+                          padding: EdgeInsets.only(
+                              bottom: ResponsiveUtils.spacing(context, base: 12)),
+                          child: _buildPhaseCard(
+                            context,
+                            phase:'Phase ${phase.orderIndex}',
+                            title: subtitle,
+                            iconData: iconData,
+                            isActive: isActive,
+                            isLocked: isLocked,
+                          ),
+                        );
+                      }).toList(),
                     );
-                  }).toList(),
+                  },
                 );
               },
             ),
