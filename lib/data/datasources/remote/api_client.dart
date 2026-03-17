@@ -276,8 +276,6 @@ class ApiClient {
   Future<ApiResponse<LabReportDetailData>> getLabReportDetails(String id) async {
     final response = await _dioClient.get('${ApiConstants.labReports}/$id');
     
-
-
     return ApiResponse.fromJson(
       response.data,
       (json) => LabReportDetailData.fromJson(json as Map<String, dynamic>),

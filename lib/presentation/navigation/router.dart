@@ -13,6 +13,7 @@ import '../screens/health/session_overview_screen.dart';
 import '../screens/health/active_session_screen.dart';
 import '../screens/health/guided_session_screen.dart';
 import '../screens/health/result_details_screen.dart';
+import '../screens/health/lab_reports_list_screen.dart';
 import '../../data/models/daily_exercise_model.dart';
 import '../../data/models/lab_report_model.dart';
 import '../screens/appointments/appointments_screen.dart';
@@ -286,6 +287,10 @@ final routerProvider = Provider<GoRouter>((ref) {
               final report = state.extra as LabReportModel;
               return ResultDetailsScreen(report: report);
             },
+          ),
+          GoRoute(
+            path: '/health/lab-reports-list',
+            builder: (context, state) => const LabReportsListScreen(),
           ),
           GoRoute(
             path: '/completed-tasks',

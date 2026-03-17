@@ -44,7 +44,7 @@ final specialistListProvider = StateNotifierProvider<SpecialistListNotifier, Asy
 final specialistDetailsProvider = FutureProvider.family<Specialist, String>((ref, id) async {
   final getSpecialistDetails = ref.read(getSpecialistDetailsUseCaseProvider);
   final result = await getSpecialistDetails(id);
-  print('result $result');
+//  print('result $result');
   return result.fold(
     (failure) => throw failure.message,
     (specialist) => specialist,
