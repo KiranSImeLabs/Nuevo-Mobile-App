@@ -122,7 +122,7 @@ class LabReportsListScreen extends ConsumerWidget {
                         if (await canLaunchUrl(url)) {
                           await launchUrl(
                             url, 
-                            mode: LaunchMode.inAppBrowserView, 
+                            mode: LaunchMode.externalApplication, 
                           );
                         } else {
                           if (context.mounted) {

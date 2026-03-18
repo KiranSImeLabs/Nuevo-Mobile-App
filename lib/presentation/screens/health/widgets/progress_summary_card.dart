@@ -82,7 +82,7 @@ class ProgressSummaryCard extends StatelessWidget {
                       if (await canLaunchUrl(url)) {
                         await launchUrl(
                           url, 
-                          mode: LaunchMode.inAppBrowserView, 
+                          mode: LaunchMode.externalApplication, 
                         );
                       } else {
                         developer.log('canLaunchUrl returned false for: $urlString', name: 'PDF_Viewer_Error');
