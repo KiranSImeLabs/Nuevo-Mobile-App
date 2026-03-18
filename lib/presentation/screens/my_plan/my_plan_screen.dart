@@ -26,6 +26,7 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
       ref.read(specialistListProvider.notifier).fetchSpecialists();
       ref.read(goalListProvider.notifier).fetchGoals();
       ref.read(phaseListProvider.notifier).fetchPhases();
+      ref.read(activePhaseProvider.notifier).fetchActivePhase();
     });
   }
 
@@ -179,41 +180,39 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
 
   Widget _buildPhaseTimeline() {
     final phaseState = ref.watch(phaseListProvider);
+    final activePhaseState = ref.watch(activePhaseProvider);
 
-    return phaseState.when(
-      //Loading State :-  Staic value or dummy
-      loading: () => Column(
-        children: [
-          _buildTimelineItem(AppStrings.assess, isCompleted: true, isFirst: true),
-          _buildTimelineItem(AppStrings.reset, isCompleted: true, isActive: true),
-          _buildTimelineItem(AppStrings.elevate, isActive: false),
-          _buildTimelineItem(AppStrings.sustain, isActive: false, isLast: true),
-        ],
-      ),
-      //Error State :-  Show error UI
-      error: (err, stack) => const Text('Failed to load phase timeline'),
-      //Data State :-  Here we show the orginal value fetched.
-      data: (phases) {
-        if (phases.isEmpty) return const Text('No timeline phases available');
-        return Column(
-          children: phases.asMap().entries.map((entry) {
-            final index = entry.key;
-            final phase = entry.value;
-            final isFirst = index == 0;
-            final isLast = index == phases.length - 1;
+    return activePhaseState.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (error, _) => Text('Error loading active phase: $error'),
+      data: (activePhaseData) {
+        final activeOrderIndex = activePhaseData.phase.phase?.orderIndex ?? 0;
 
-            // Simple active/completed logic based on orderIndex for UI correctness till backend supplies statuses
-            final isCompleted = phase.orderIndex < 3;
-            final isActive = phase.orderIndex == 2;
+        return phaseState.when(
+          loading: () => const Center(child: CircularProgressIndicator()),
+          error: (err, stack) => const Text('Failed to load phase timeline'),
+          data: (phases) {
+            if (phases.isEmpty) return const Text('No timeline phases available');
+            return Column(
+              children: phases.asMap().entries.map((entry) {
+                final index = entry.key;
+                final phase = entry.value;
+                final isFirst = index == 0;
+                final isLast = index == phases.length - 1;
 
-            return _buildTimelineItem(
-              phase.name,
-              isActive: isActive,
-              isCompleted: isCompleted,
-              isFirst: isFirst,
-              isLast: isLast,
+                final isCompleted = phase.orderIndex < activeOrderIndex;
+                final isActive = phase.orderIndex == activeOrderIndex;
+
+                return _buildTimelineItem(
+                  phase.name,
+                  isActive: isActive,
+                  isCompleted: isCompleted,
+                  isFirst: isFirst,
+                  isLast: isLast,
+                );
+              }).toList(),
             );
-          }).toList(),
+          },
         );
       },
     );
@@ -234,33 +233,39 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
             width: 32,
             child: Column(
               children: [
-                 if (!isFirst)
+                  if (!isFirst)
                   Container(
                     width: 2,
-                    height: 12, // Reduced height for smoother connection
-                    // If previous was completed, use solid color, else dotted or light
-                     color: const Color(0xFF8D5B4C).withOpacity(0.3),
+                    height: 12,
+                    color: isCompleted || isActive 
+                        ? const Color(0xFF8D5B4C) 
+                        : const Color(0xFF8D5B4C).withOpacity(0.3),
                   ),
                 Container(
                   width: 24,
                   height: 24,
                   decoration: BoxDecoration(
-                    color: isCompleted
-                        ? const Color(0xFF8D5B4C) // Checkbox filled color
-                        : const Color(0xFFE5DCD8), // Inactive circle color
+                    color: isCompleted || isActive
+                        ? const Color(0xFF8D5B4C)
+                        : const Color(0xFFE5DCD8),
                     shape: BoxShape.circle,
                   ),
-                  child: isCompleted
+                  child: isCompleted || isActive
                       ? const Icon(Icons.check, size: 14, color: Colors.white)
                       : null,
                 ),
                 if (!isLast)
                    Expanded(
-                    child: CustomPaint(
-                      size: const Size(2, double.infinity),
-                      painter: _DottedLinePainter(
-                          color: const Color(0xFF8D5B4C).withOpacity(0.5)),
-                    ),
+                    child: isCompleted
+                        ? Container(
+                            width: 2,
+                            color: const Color(0xFF8D5B4C),
+                          )
+                        : CustomPaint(
+                            size: const Size(2, double.infinity),
+                            painter: _DottedLinePainter(
+                                color: const Color(0xFF8D5B4C).withOpacity(0.5)),
+                          ),
                   ),
               ],
             ),
