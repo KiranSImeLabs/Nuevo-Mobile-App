@@ -5,6 +5,8 @@ import '../../data/models/weekly_schedule_model.dart';
 import '../../data/models/session_progress_model.dart';
 import '../../data/models/active_progress_model.dart';
 import '../../data/models/api_response.dart';
+import '../../data/models/lab_report_model.dart';
+import '../../data/models/lab_request_model.dart';
 
 abstract class HealthRepository {
   Future<Either<Failure, DailyExerciseModel>> getTodayExercise();
@@ -14,4 +16,6 @@ abstract class HealthRepository {
   Future<Either<Failure, ApiResponse<SessionProgressModel>>> completeSession(String id);
   Future<Either<Failure, SessionProgressModel?>> syncSessionProgress(String id, Map<String, dynamic> data);
   Future<Either<Failure, ActiveProgressModel?>> getActiveProgress();
+  Future<Either<Failure, LabReportDetailData>> getLabReportDetails(String id);
+  Future<Either<Failure, LabRequestData>> createLabRequest(String notes);
 }

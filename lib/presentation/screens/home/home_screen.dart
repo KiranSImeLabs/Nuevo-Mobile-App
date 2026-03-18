@@ -183,69 +183,74 @@ class HomeScreen extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Row(
-          children: [
-            Container(
-              width: ResponsiveUtils.iconSize(context, base: 48),
-              height: ResponsiveUtils.iconSize(context, base: 48),
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.grey,
-              ),
-              clipBehavior: Clip.antiAlias,
-              child: (userImageUrl != null && userImageUrl.isNotEmpty)
-                  ? (userImageUrl.toLowerCase().endsWith('.svg')
-                      ? Image.asset(
-                          'assets/images/details_image.png',
-                          fit: BoxFit.cover,
-                        )
-                      : Image.network(
-                          userImageUrl,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Center(
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                value: loadingProgress.expectedTotalBytes != null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) => Image.asset(
+        Expanded(
+          child: Row(
+            children: [
+              Container(
+                width: ResponsiveUtils.iconSize(context, base: 48),
+                height: ResponsiveUtils.iconSize(context, base: 48),
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.grey,
+                ),
+                clipBehavior: Clip.antiAlias,
+                child: (userImageUrl != null && userImageUrl.isNotEmpty)
+                    ? (userImageUrl.toLowerCase().endsWith('.svg')
+                        ? Image.asset(
                             'assets/images/details_image.png',
                             fit: BoxFit.cover,
-                          ),
-                        ))
-                  : Image.asset(
-                      'assets/images/details_image.png',
-                      fit: BoxFit.cover,
+                          )
+                        : Image.network(
+                            userImageUrl,
+                            fit: BoxFit.cover,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Center(
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  value: loadingProgress.expectedTotalBytes != null
+                                      ? loadingProgress.cumulativeBytesLoaded /
+                                          loadingProgress.expectedTotalBytes!
+                                      : null,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) => Image.asset(
+                              'assets/images/details_image.png',
+                              fit: BoxFit.cover,
+                            ),
+                          ))
+                    : Image.asset(
+                        'assets/images/details_image.png',
+                        fit: BoxFit.cover,
+                      ),
+              ),
+              SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      welcome.greeting,
+                      style: TextStyle(
+                        fontSize: ResponsiveUtils.fontSize(context, base: 12),
+                        color: const Color(0xFF3E160D).withOpacity(0.6),
+                      ),
                     ),
-            ),
-            SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Welcome",//welcome.greeting,
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.fontSize(context, base: 12),
-                    color: const Color(0xFF3E160D).withOpacity(0.6),
-                  ),
+                    Text(
+                      '${welcome.firstName} ${welcome.lastName}'.trim(),
+                      style: TextStyle(
+                        fontSize: ResponsiveUtils.fontSize(context, base: 20),
+                        fontWeight: FontWeight.w600,
+                        height: 1.2,
+                        color: const Color(0xFF3E160D),
+                      ),
+                    ),
+                  ],
                 ),
-                Text(
-                  '${welcome.firstName} ${welcome.lastName}'.trim(),
-                  style: TextStyle(
-                    fontSize: ResponsiveUtils.fontSize(context, base: 20),
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF3E160D),
-                  ),
-                ),
-              ],
-            ),
-          ],
+              ),
+            ],
+          ),
         ),
         Container(
           padding: EdgeInsets.all(ResponsiveUtils.spacing(context, base: 8)),

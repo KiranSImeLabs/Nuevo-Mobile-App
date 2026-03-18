@@ -2,8 +2,7 @@
 /// IMPORTANT: Update these with actual backend URLs before deployment
 class ApiConstants {
   // Base URLs
-  static const String baseUrl = 'https://nuevo-dev-be.simelabs.in/api/v1';
-  //'http://192.168.0.220:3000/api/v1';
+  static const String baseUrl = 'https://nuevo-dev-be.simelabs.in/api/v1';//'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';//'http://192.168.0.220:3000/api/v1';
   //'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';
   //'https://nuevo-dev-be.simelabs.in/api/v1'
   //'https://nuevo-medical-be.simelabs.in/api/v1';
@@ -81,11 +80,7 @@ class ApiConstants {
   static const String home = '/mobile/home';
   
   // Phases
-  static const String phases = '/phases';
-  static const String myActivePhase = '/phases/my-active-phase';
-  static const String myActivePhaseWeekly = '/phases/my-active-phase/weekly';
-  static const String myActivePhaseProgress = '/phases/my-active-phase/progress';
-  static const String myActivePhaseTasks = '/phases/my-active-phase/tasks';
+  static const String phases = '/phases';          
   
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);

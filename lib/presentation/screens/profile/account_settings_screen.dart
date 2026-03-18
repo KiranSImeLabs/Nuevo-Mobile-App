@@ -405,7 +405,7 @@ class _AccountSettingsScreenState extends ConsumerState<AccountSettingsScreen> {
       if (_selectedImage != null) {
          updatedImage = _selectedImage!.path;
       }
-      print(updatedImage);
+//      print(updatedImage);
       await ref.read(userProvider.notifier).updateProfile(
         name: updatedName,
         dateOfBirth: updatedDob,
