@@ -40,6 +40,7 @@ import '../screens/profile/notification_settings_screen.dart';
 import '../screens/profile/doctor_list_screen.dart';
 import '../screens/profile/support_screen.dart';
 import '../../domain/entities/session.dart';
+import '../screens/questionnaire/questionnaire_screen.dart';
 import 'main_shell.dart';
 
 // Keys for navigation
@@ -340,6 +341,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             role: extras?['role'] ?? 'Specialist',
             imageUrl: extras?['imageUrl'],
             bio: extras?['bio'],
+          );
+        },
+      ),
+      GoRoute(
+        path: '/questionnaire/:id/:taskId',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final taskId = state.pathParameters['taskId'] ?? '';
+          return QuestionnaireScreen(
+            questionnaireId: id,
+            patientTaskId: taskId,
           );
         },
       ),

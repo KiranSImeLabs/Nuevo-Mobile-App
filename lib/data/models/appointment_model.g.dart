@@ -7,62 +7,58 @@ part of 'appointment_model.dart';
 // **************************************************************************
 
 CreateAppointmentRequest _$CreateAppointmentRequestFromJson(
-        Map<String, dynamic> json) =>
-    CreateAppointmentRequest(
-      locationId: json['locationId'] as String,
-      date: json['date'] as String,
-      time: json['time'] as String,
-      programId: json['programId'] as String,
-      patientId: json['patientId'] as String,
-    );
+  Map<String, dynamic> json,
+) => CreateAppointmentRequest(
+  locationId: json['locationId'] as String,
+  date: json['date'] as String,
+  time: json['time'] as String,
+  programId: json['programId'] as String,
+  patientId: json['patientId'] as String,
+);
 
 Map<String, dynamic> _$CreateAppointmentRequestToJson(
-        CreateAppointmentRequest instance) =>
-    <String, dynamic>{
-      'locationId': instance.locationId,
-      'date': instance.date,
-      'time': instance.time,
-      'programId': instance.programId,
-      'patientId': instance.patientId,
-    };
+  CreateAppointmentRequest instance,
+) => <String, dynamic>{
+  'locationId': instance.locationId,
+  'date': instance.date,
+  'time': instance.time,
+  'programId': instance.programId,
+  'patientId': instance.patientId,
+};
 
 UpdateAppointmentRequest _$UpdateAppointmentRequestFromJson(
-        Map<String, dynamic> json) =>
-    UpdateAppointmentRequest(
-      location: json['location'] as String,
-    );
+  Map<String, dynamic> json,
+) => UpdateAppointmentRequest(location: json['location'] as String);
 
 Map<String, dynamic> _$UpdateAppointmentRequestToJson(
-        UpdateAppointmentRequest instance) =>
-    <String, dynamic>{
-      'location': instance.location,
-    };
+  UpdateAppointmentRequest instance,
+) => <String, dynamic>{'location': instance.location};
 
 AppointmentResponseData _$AppointmentResponseDataFromJson(
-        Map<String, dynamic> json) =>
-    AppointmentResponseData(
-      bookingId: json['bookingId'] as String,
-      status: json['status'] as String,
-      consultationDateTime: json['consultationDateTime'] as String?,
-      location: json['location'],
-      locationId: json['locationId'] as String?,
-      program: json['program'],
-      programId: json['programId'] as String?,
-      patientId: json['patientId'] as String?,
-    );
+  Map<String, dynamic> json,
+) => AppointmentResponseData(
+  bookingId: json['bookingId'] as String,
+  status: json['status'] as String,
+  consultationDateTime: json['consultationDateTime'] as String?,
+  location: json['location'],
+  locationId: json['locationId'] as String?,
+  program: json['program'],
+  programId: json['programId'] as String?,
+  patientId: json['patientId'] as String?,
+);
 
 Map<String, dynamic> _$AppointmentResponseDataToJson(
-        AppointmentResponseData instance) =>
-    <String, dynamic>{
-      'bookingId': instance.bookingId,
-      'status': instance.status,
-      'consultationDateTime': instance.consultationDateTime,
-      'location': instance.location,
-      'locationId': instance.locationId,
-      'program': instance.program,
-      'programId': instance.programId,
-      'patientId': instance.patientId,
-    };
+  AppointmentResponseData instance,
+) => <String, dynamic>{
+  'bookingId': instance.bookingId,
+  'status': instance.status,
+  'consultationDateTime': instance.consultationDateTime,
+  'location': instance.location,
+  'locationId': instance.locationId,
+  'program': instance.program,
+  'programId': instance.programId,
+  'patientId': instance.patientId,
+};
 
 AppointmentLocation _$AppointmentLocationFromJson(Map<String, dynamic> json) =>
     AppointmentLocation(
@@ -73,13 +69,13 @@ AppointmentLocation _$AppointmentLocationFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$AppointmentLocationToJson(
-        AppointmentLocation instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'address': instance.address,
-      'city': instance.city,
-    };
+  AppointmentLocation instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'name': instance.name,
+  'address': instance.address,
+  'city': instance.city,
+};
 
 AppointmentProgram _$AppointmentProgramFromJson(Map<String, dynamic> json) =>
     AppointmentProgram(
@@ -96,13 +92,9 @@ Map<String, dynamic> _$AppointmentProgramToJson(AppointmentProgram instance) =>
     };
 
 CancelAppointmentResponseData _$CancelAppointmentResponseDataFromJson(
-        Map<String, dynamic> json) =>
-    CancelAppointmentResponseData(
-      bookingId: json['bookingId'] as String,
-    );
+  Map<String, dynamic> json,
+) => CancelAppointmentResponseData(bookingId: json['bookingId'] as String);
 
 Map<String, dynamic> _$CancelAppointmentResponseDataToJson(
-        CancelAppointmentResponseData instance) =>
-    <String, dynamic>{
-      'bookingId': instance.bookingId,
-    };
+  CancelAppointmentResponseData instance,
+) => <String, dynamic>{'bookingId': instance.bookingId};

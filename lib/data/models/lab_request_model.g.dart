@@ -45,27 +45,20 @@ Map<String, dynamic> _$LabRequestDataToJson(LabRequestData instance) =>
     };
 
 LabRequestListResponseData _$LabRequestListResponseDataFromJson(
-        Map<String, dynamic> json) =>
-    LabRequestListResponseData(
-      requests: (json['requests'] as List<dynamic>?)
-          ?.map((e) => LabRequestData.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      count: (json['count'] as num?)?.toInt(),
-    );
+  Map<String, dynamic> json,
+) => LabRequestListResponseData(
+  requests: (json['requests'] as List<dynamic>?)
+      ?.map((e) => LabRequestData.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  count: (json['count'] as num?)?.toInt(),
+);
 
 Map<String, dynamic> _$LabRequestListResponseDataToJson(
-        LabRequestListResponseData instance) =>
-    <String, dynamic>{
-      'requests': instance.requests,
-      'count': instance.count,
-    };
+  LabRequestListResponseData instance,
+) => <String, dynamic>{'requests': instance.requests, 'count': instance.count};
 
 CreateLabRequest _$CreateLabRequestFromJson(Map<String, dynamic> json) =>
-    CreateLabRequest(
-      notes: json['notes'] as String,
-    );
+    CreateLabRequest(notes: json['notes'] as String);
 
 Map<String, dynamic> _$CreateLabRequestToJson(CreateLabRequest instance) =>
-    <String, dynamic>{
-      'notes': instance.notes,
-    };
+    <String, dynamic>{'notes': instance.notes};

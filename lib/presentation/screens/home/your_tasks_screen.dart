@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../utils/responsive_utils.dart';
 import '../../providers/phase_provider.dart';
+import '../../providers/core_providers.dart';
 import '../../../data/models/phase_model.dart';
 
 class YourTasksScreen extends ConsumerStatefulWidget {
@@ -226,12 +227,51 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
 
   Widget _buildPendingTaskCard(BuildContext context, PatientTaskModel task) {
     return GestureDetector(
-      onTap: () {
+      onTap: () async {
         if (task.taskType == 'QUESTIONNAIRE') {
-           // Might navigate to Questionnaire screen, or specific task detail 
-           context.push('/task/${task.id}');
+           showDialog(
+             context: context,
+             barrierDismissible: false,
+             builder: (ctx) => const Center(child: CircularProgressIndicator()),
+           );
+
+           try {
+             final response = await ref.read(apiClientProvider).getTaskById(task.id);
+             if (context.mounted) {
+               Navigator.of(context).pop(); // dismiss loading
+             }
+
+             if (response.success && response.data != null) {
+               final fullTask = response.data!;
+               final qId = fullTask.phaseTask?.questionnaireId;
+               
+               if (qId != null && qId.isNotEmpty) {
+                 if (context.mounted) {
+                   context.push('/questionnaire/$qId/${task.id}');
+                 }
+               } else {
+                 if (context.mounted) {
+                   ScaffoldMessenger.of(context).showSnackBar(
+                     const SnackBar(content: Text('Questionnaire ID not found for this task')),
+                   );
+                 }
+               }
+             } else {
+               if (context.mounted) {
+                 ScaffoldMessenger.of(context).showSnackBar(
+                   SnackBar(content: Text(response.message ?? 'Failed to fetch task details')),
+                 );
+               }
+             }
+           } catch (e) {
+             if (context.mounted) {
+               Navigator.of(context).pop(); // dismiss loading
+               ScaffoldMessenger.of(context).showSnackBar(
+                 SnackBar(content: Text('Error fetching task: $e')),
+               );
+             }
+           }
         } else {
-           // Default fallback
            context.push('/task/${task.id}');
         }
       },

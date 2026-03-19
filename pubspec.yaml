@@ -76,6 +76,7 @@ dependencies:
   webview_flutter: ^4.13.1
   http: ^1.6.0
   url_launcher: ^6.3.2
+  freezed_annotation: ^3.1.0
   # retrofit removed due to build incompatibility
 
 dev_dependencies:
@@ -98,6 +99,7 @@ dev_dependencies:
   mockito: ^5.4.4
   mocktail: ^1.0.4
   faker: ^2.2.0
+  freezed: ^3.1.0
   # retrofit_generator removed due to build incompatibility
   
   # CRITICAL: Apple Policy Compliance

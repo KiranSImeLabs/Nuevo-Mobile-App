@@ -84,7 +84,10 @@ class ApiConstants {
   static const String home = '/mobile/home';
   
   // Phases
-  static const String phases = '/phases';          
+  static const String phases = '/phases';
+  
+  // Questionnaires
+  static const String questionnaires = '/questionnaires';
   
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);

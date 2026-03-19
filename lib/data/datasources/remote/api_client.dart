@@ -658,4 +658,30 @@ class ApiClient {
       (json) => BillingResponseData.fromJson(json as Map<String, dynamic>),
     );
   }
+
+  // ============================================
+  // Questionnaire Endpoints
+  // ============================================
+
+  /// Get Questionnaire By ID
+  Future<ApiResponse<dynamic>> getQuestionnaire(String id) async {
+    final response = await _dioClient.get('${ApiConstants.questionnaires}/$id');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => json, // We map this to the domain entity in the repository
+    );
+  }
+
+  /// Submit Questionnaire Responses
+  Future<ApiResponse<dynamic>> submitQuestionnaire(
+      String patientTaskId, List<Map<String, dynamic>> responses) async {
+    final response = await _dioClient.post(
+      '${ApiConstants.questionnaires}/submit/$patientTaskId',
+      data: {'responses': responses},
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => json, 
+    );
+  }
 }
