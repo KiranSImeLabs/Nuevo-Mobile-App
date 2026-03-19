@@ -122,13 +122,28 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
                         return Padding(
                           padding: EdgeInsets.only(
                               bottom: ResponsiveUtils.spacing(context, base: 12)),
-                          child: _buildPhaseCard(
-                            context,
-                            phase:'Phase ${phase.orderIndex}',
-                            title: subtitle,
-                            iconData: iconData,
-                            isActive: isActive,
-                            isLocked: isLocked,
+                          child: GestureDetector(
+                            onTap: isActive
+                                ? () {
+                                    final programName = dashboardState.valueOrNull?.yourProgram?.name ?? '';
+                                    final programDesc = dashboardState.valueOrNull?.yourProgram?.description ?? '';
+                                    context.push(
+                                      '/your-tasks',
+                                      extra: {
+                                        'programName': programName,
+                                        'programDescription': programDesc,
+                                      },
+                                    );
+                                  }
+                                : null,
+                            child: _buildPhaseCard(
+                              context,
+                              phase: 'Phase ${phase.orderIndex}',
+                              title: subtitle,
+                              iconData: iconData,
+                              isActive: isActive,
+                              isLocked: isLocked,
+                            ),
                           ),
                         );
                       }).toList(),

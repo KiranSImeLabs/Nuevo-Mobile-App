@@ -10,6 +10,10 @@ class ApiConstants {
   
   // Endpoints
   // Auth
+  static const String myActivePhaseTasks = '/phases/my-active-phase/tasks';
+  static const String myActivePhase = '/phases/my-active-phase';
+  static const String myActivePhaseWeekly = '/phases/my-active-phase/weekly';
+  static const String myActivePhaseProgress = '/phases/my-active-phase/progress';
   static const String login = '/auth/login';
   static const String register = '/auth/register';
   static const String googleLogin = '/auth/register-or-login-google';

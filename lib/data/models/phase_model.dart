@@ -169,6 +169,13 @@ class PatientTaskModel {
   final String createdAt;
   final String updatedAt;
   final PhaseTaskModel? phaseTask;
+  final String taskName;
+  final String taskType;
+  final String practitioner;
+  final List<String> statusOptions;
+  final String defaultStatus;
+  final String visualIndicator;
+  final String legacyStatus;
 
   const PatientTaskModel({
     required this.id,
@@ -183,6 +190,13 @@ class PatientTaskModel {
     required this.createdAt,
     required this.updatedAt,
     this.phaseTask,
+    this.taskName = '',
+    this.taskType = '',
+    this.practitioner = '',
+    this.statusOptions = const [],
+    this.defaultStatus = '',
+    this.visualIndicator = '',
+    this.legacyStatus = '',
   });
 
   factory PatientTaskModel.fromJson(Map<String, dynamic> json) {
@@ -201,6 +215,16 @@ class PatientTaskModel {
       phaseTask: json['phaseTask'] != null
           ? PhaseTaskModel.fromJson(json['phaseTask'] as Map<String, dynamic>)
           : null,
+      taskName: json['taskName'] as String? ?? json['title'] as String? ?? '',
+      taskType: json['taskType'] as String? ?? '',
+      practitioner: json['practitioner'] as String? ?? '',
+      statusOptions: (json['statusOptions'] as List<dynamic>?)
+              ?.map((e) => e.toString())
+              .toList() ??
+          [],
+      defaultStatus: json['defaultStatus'] as String? ?? '',
+      visualIndicator: json['visualIndicator'] as String? ?? '',
+      legacyStatus: json['legacyStatus'] as String? ?? '',
     );
   }
 
@@ -217,6 +241,13 @@ class PatientTaskModel {
         'createdAt': createdAt,
         'updatedAt': updatedAt,
         'phaseTask': phaseTask?.toJson(),
+        'taskName': taskName,
+        'taskType': taskType,
+        'practitioner': practitioner,
+        'statusOptions': statusOptions,
+        'defaultStatus': defaultStatus,
+        'visualIndicator': visualIndicator,
+        'legacyStatus': legacyStatus,
       };
 
   bool get isCompleted => status == 'COMPLETED';

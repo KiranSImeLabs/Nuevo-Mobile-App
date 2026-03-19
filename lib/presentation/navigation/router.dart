@@ -26,6 +26,7 @@ import '../screens/home/daily_nutrition_screen.dart';
 import '../screens/home/task_detail_screen.dart';
 import '../screens/home/completed_tasks_screen.dart';
 import '../screens/home/your_program_screen.dart';
+import '../screens/home/your_tasks_screen.dart';
 import '../screens/appointments/book_session_screen.dart';
 import '../screens/appointments/select_time_screen.dart';
 import '../screens/appointments/confirm_booking_screen.dart';
@@ -316,6 +317,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/your-program',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) => const YourProgramScreen(),
+      ),
+      GoRoute(
+        path: '/your-tasks',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          return YourTasksScreen(
+            programName: extras?['programName'] ?? 'Insight Program',
+            programDescription: extras?['programDescription'] ?? 'Personalised, clinician-guided care',
+          );
+        },
       ),
       GoRoute(
         path: '/clinician-profile',
