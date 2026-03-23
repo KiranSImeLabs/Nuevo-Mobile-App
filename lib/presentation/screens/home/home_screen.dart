@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/home_provider.dart';
 import '../../providers/user_provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../widgets/common/app_error_widget.dart';
 import '../../../domain/entities/task.dart' as entities;
 import '../../../domain/entities/user.dart' as entities;
@@ -34,12 +35,14 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: const Color(0xFFFDF9F8),
       body: dashboardState.when(
         data: (dashboard) {
-          return SafeArea(
-            bottom: false,
-            child: RefreshIndicator(
-              onRefresh: () async {
-                return ref.refresh(homeDashboardProvider.future);
-              },
+          return Stack(
+            children: [
+              SafeArea(
+                bottom: false,
+                child: RefreshIndicator(
+                  onRefresh: () async {
+                    return ref.refresh(homeDashboardProvider.future);
+                  },
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Padding(
@@ -169,10 +172,96 @@ class HomeScreen extends ConsumerWidget {
                 ),
               ),
             ),
-          );
+          ),
+          if (dashboard.yourProgram == null)
+            Positioned.fill(
+              child: _buildNoProgramOverlay(context, ref),
+            ),
+        ],
+      );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (err, stack) => AppErrorWidget(message: err.toString(), onRetry: () => ref.refresh(homeDashboardProvider)),
+      ),
+    );
+  }
+
+  Widget _buildNoProgramOverlay(BuildContext context, WidgetRef ref) {
+    return Container(
+      color: const Color(0xFFFDF9F8), // Match background to fully cover
+      padding: EdgeInsets.symmetric(horizontal: ResponsiveUtils.getHorizontalPadding(context)),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.info_outline,
+            size: ResponsiveUtils.iconSize(context, base: 64),
+            color: const Color(0xFF964A38),
+          ),
+          SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
+          Text(
+            "Looks like you haven’t chosen a program yet. Please head to our website, select a program, and come back to start using the app.",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: ResponsiveUtils.fontSize(context, base: 16),
+              color: const Color(0xFF17110D),
+              height: 1.5,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+          SizedBox(height: ResponsiveUtils.spacing(context, base: 32)),
+          SizedBox(
+            width: double.infinity,
+            height: ResponsiveUtils.spacing(context, base: 56),
+            child: ElevatedButton(
+              onPressed: () {
+                ref.refresh(homeDashboardProvider.future);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF964A38),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    ResponsiveUtils.spacing(context, base: 12),
+                  ),
+                ),
+              ),
+              child: Text(
+                'Refresh',
+                style: TextStyle(
+                  fontSize: ResponsiveUtils.fontSize(context, base: 16),
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+          SizedBox(
+            width: double.infinity,
+            height: ResponsiveUtils.spacing(context, base: 56),
+            child: OutlinedButton(
+              onPressed: () {
+                ref.read(authProvider.notifier).logout();
+              },
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFF964A38)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(
+                    ResponsiveUtils.spacing(context, base: 12),
+                  ),
+                ),
+              ),
+              child: Text(
+                'Logout',
+                style: TextStyle(
+                  fontSize: ResponsiveUtils.fontSize(context, base: 16),
+                  fontWeight: FontWeight.w600,
+                  color: const Color(0xFF964A38),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
