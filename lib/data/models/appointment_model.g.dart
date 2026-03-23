@@ -98,3 +98,15 @@ CancelAppointmentResponseData _$CancelAppointmentResponseDataFromJson(
 Map<String, dynamic> _$CancelAppointmentResponseDataToJson(
   CancelAppointmentResponseData instance,
 ) => <String, dynamic>{'bookingId': instance.bookingId};
+
+TimeSlot _$TimeSlotFromJson(Map<String, dynamic> json) => TimeSlot(
+  startTime: json['startTime'] as String,
+  endTime: json['endTime'] as String,
+  displayTime: json['displayTime'] as String,
+);
+
+Map<String, dynamic> _$TimeSlotToJson(TimeSlot instance) => <String, dynamic>{
+  'startTime': instance.startTime,
+  'endTime': instance.endTime,
+  'displayTime': instance.displayTime,
+};

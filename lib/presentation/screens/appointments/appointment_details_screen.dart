@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../utils/responsive_utils.dart';
 import 'confirm_booking_screen.dart'; // For BookingConfirmationArgs
 import 'package:go_router/go_router.dart';
 
@@ -86,7 +85,7 @@ class AppointmentDetailsScreen extends StatelessWidget {
                                 ),
                               ),
                               Text(
-                                args.session.professionalName ?? 'Dr. Sarah Smith', // Fallback or from session
+                                args.session.professionalName ?? 'Specialist',
                                 style: AppTextStyles.h3.copyWith(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
@@ -130,9 +129,8 @@ class AppointmentDetailsScreen extends StatelessWidget {
                   children: [
                     _buildDetailRow(
                       icon: Icons.calendar_today_outlined,
-                      label: 'Date and Time',
-                      value: 'Today', // Logic for "Today" vs Date needed, but for now fixed or formatted
-                      subValue: DateFormat('EEEE, d MMMM').format(args.selectedDate),
+                      label: 'Date',
+                      value: DateFormat('EEEE, d MMMM').format(args.selectedDate),
                     ),
                     const SizedBox(height: 16),
                     _buildDetailRow(
@@ -295,7 +293,6 @@ class AppointmentDetailsScreen extends StatelessWidget {
     required IconData icon,
     required String label,
     required String value,
-    String? subValue,
   }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -332,15 +329,6 @@ class AppointmentDetailsScreen extends StatelessWidget {
                       fontSize: 16,
                     ),
                   ),
-                  if (subValue != null)
-                    Text(
-                      subValue,
-                      style: AppTextStyles.bodyMedium.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 14,
-                      ),
-                    ),
                 ],
               ),
             ],

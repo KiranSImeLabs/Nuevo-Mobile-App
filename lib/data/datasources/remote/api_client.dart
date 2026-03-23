@@ -302,6 +302,20 @@ class ApiClient {
     );
   }
 
+  /// Get Time Slots
+  Future<ApiResponse<List<TimeSlot>>> getTimeSlots(String date) async {
+    final response = await _dioClient.get(
+      ApiConstants.timeSlots,
+      queryParameters: {'date': date},
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => (json as List<dynamic>)
+          .map((item) => TimeSlot.fromJson(item as Map<String, dynamic>))
+          .toList(),
+    );
+  }
+
   /// Update Appointment
   Future<ApiResponse<AppointmentResponseData>> updateAppointment(
       String bookingId, UpdateAppointmentRequest request) async {

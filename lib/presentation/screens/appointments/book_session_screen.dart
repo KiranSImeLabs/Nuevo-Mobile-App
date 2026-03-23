@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../utils/responsive_utils.dart';
 import '../../../domain/entities/session.dart';
 import 'package:go_router/go_router.dart';
 

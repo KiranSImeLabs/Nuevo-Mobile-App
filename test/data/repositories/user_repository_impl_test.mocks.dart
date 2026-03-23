@@ -398,6 +398,19 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           as _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>>);
 
   @override
+  _i5.Future<_i2.ApiResponse<List<_i11.TimeSlot>>> getTimeSlots(String? date) =>
+      (super.noSuchMethod(
+            Invocation.method(#getTimeSlots, [date]),
+            returnValue: _i5.Future<_i2.ApiResponse<List<_i11.TimeSlot>>>.value(
+              _FakeApiResponse_0<List<_i11.TimeSlot>>(
+                this,
+                Invocation.method(#getTimeSlots, [date]),
+              ),
+            ),
+          )
+          as _i5.Future<_i2.ApiResponse<List<_i11.TimeSlot>>>);
+
+  @override
   _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>> updateAppointment(
     String? bookingId,
     _i11.UpdateAppointmentRequest? request,

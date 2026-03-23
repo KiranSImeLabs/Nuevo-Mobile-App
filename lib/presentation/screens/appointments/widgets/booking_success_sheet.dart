@@ -172,6 +172,8 @@ class BookingSuccessSheet extends StatelessWidget {
                 selectedTime: selectedTime,
               );
               
+              // Flatten the stack by going to appointments list, then pushing details
+              context.go('/appointments');
               context.push('/appointment-details', extra: args);
             },
             style: ElevatedButton.styleFrom(

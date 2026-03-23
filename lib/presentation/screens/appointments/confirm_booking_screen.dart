@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../utils/responsive_utils.dart';
 import '../../../domain/entities/session.dart';
 import 'widgets/booking_success_sheet.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/appointment_provider.dart';
+import '../../providers/user_provider.dart';
+import '../../providers/home_provider.dart';
+import '../../../data/models/appointment_model.dart';
 
 class BookingConfirmationArgs {
   final Session session;
@@ -17,13 +21,83 @@ class BookingConfirmationArgs {
   });
 }
 
-class ConfirmBookingScreen extends StatelessWidget {
+class ConfirmBookingScreen extends ConsumerStatefulWidget {
   final BookingConfirmationArgs args;
 
   const ConfirmBookingScreen({
     super.key,
     required this.args,
   });
+
+  @override
+  ConsumerState<ConfirmBookingScreen> createState() => _ConfirmBookingScreenState();
+}
+
+class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
+  bool _isLoading = false;
+
+  String _formatTime(String timeString) {
+    try {
+      final parsed = DateFormat.jm().parse(timeString);
+      return DateFormat('HH:mm').format(parsed);
+    } catch (_) {
+      // Fallback
+      return timeString;
+    }
+  }
+
+  Future<void> _handleConfirm() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final userState = ref.read(userProvider);
+      final dashboardState = ref.read(homeDashboardProvider);
+
+      final patientId = userState.value?.id ?? '';
+      final programId = dashboardState.value?.yourProgram?.id ?? '';
+
+      final dateStr = DateFormat('yyyy-MM-dd').format(widget.args.selectedDate);
+      final timeStr = _formatTime(widget.args.selectedTime);
+
+      final request = CreateAppointmentRequest(
+        locationId: '',
+        date: dateStr,
+        time: timeStr,
+        programId: programId,
+        patientId: patientId,
+      );
+      print('Request: ${request.toJson()}');
+
+      final repository = ref.read(appointmentRepositoryProvider);
+      final response = await repository.createAppointment(request);
+
+      if (response.success) {
+        if (!mounted) return;
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => BookingSuccessSheet(
+            session: widget.args.session,
+            selectedDate: widget.args.selectedDate,
+            selectedTime: widget.args.selectedTime,
+          ),
+        );
+      } else {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(response.message ?? 'Failed to book appointment')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('An error occurred: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +146,7 @@ class ConfirmBookingScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                args.session.title,
+                                widget.args.session.title,
                                 style: AppTextStyles.h3.copyWith(
                                   color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w500,
@@ -115,21 +189,21 @@ class ConfirmBookingScreen extends StatelessWidget {
                       context,
                       icon: Icons.calendar_today_outlined,
                       label: 'Date',
-                      value: DateFormat('EEEE, d MMMM').format(args.selectedDate),
+                      value: DateFormat('EEEE, d MMMM').format(widget.args.selectedDate),
                     ),
                     const SizedBox(height: 24),
                     _buildDetailRow(
                       context,
                       icon: Icons.access_time,
                       label: 'Time',
-                      value: args.selectedTime,
+                      value: widget.args.selectedTime,
                     ),
                     const SizedBox(height: 24),
                     _buildDetailRow(
                       context,
                       icon: Icons.timer_outlined,
                       label: 'Duration',
-                      value: '${args.session.durationMinutes} minutes',
+                      value: '${widget.args.session.durationMinutes} minutes',
                     ),
                   ],
                 ),
@@ -139,18 +213,7 @@ class ConfirmBookingScreen extends StatelessWidget {
               
               // Confirm Button
               ElevatedButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => BookingSuccessSheet(
-                      session: args.session,
-                      selectedDate: args.selectedDate,
-                      selectedTime: args.selectedTime,
-                    ),
-                  );
-                },
+                onPressed: _isLoading ? null : _handleConfirm,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primaryButtonColor,
                   foregroundColor: Colors.white,
@@ -160,21 +223,27 @@ class ConfirmBookingScreen extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'Confirm booking',
-                      style: AppTextStyles.button.copyWith(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                child: _isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      )
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Confirm booking',
+                            style: AppTextStyles.button.copyWith(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward, size: 20),
+                        ],
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    const Icon(Icons.arrow_forward, size: 20),
-                  ],
-                ),
               ),
               const SizedBox(height: 16),
             ],

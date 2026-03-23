@@ -130,3 +130,21 @@ class CancelAppointmentResponseData {
 
   Map<String, dynamic> toJson() => _$CancelAppointmentResponseDataToJson(this);
 }
+
+@JsonSerializable()
+class TimeSlot {
+  final String startTime;
+  final String endTime;
+  final String displayTime;
+
+  const TimeSlot({
+    required this.startTime,
+    required this.endTime,
+    required this.displayTime,
+  });
+
+  factory TimeSlot.fromJson(Map<String, dynamic> json) =>
+      _$TimeSlotFromJson(json);
+
+  Map<String, dynamic> toJson() => _$TimeSlotToJson(this);
+}

@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../utils/responsive_utils.dart';
 import '../../../domain/entities/session.dart';
 import 'confirm_booking_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/appointment_provider.dart';
+import '../../../data/models/appointment_model.dart';
 
-class SelectTimeScreen extends StatefulWidget {
+class SelectTimeScreen extends ConsumerStatefulWidget {
   final Session session;
 
   const SelectTimeScreen({
@@ -15,13 +17,13 @@ class SelectTimeScreen extends StatefulWidget {
   });
 
   @override
-  State<SelectTimeScreen> createState() => _SelectTimeScreenState();
+  ConsumerState<SelectTimeScreen> createState() => _SelectTimeScreenState();
 }
 
-class _SelectTimeScreenState extends State<SelectTimeScreen> {
+class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  String? _selectedTimeSlot;
+  TimeSlot? _selectedTimeSlot;
 
   @override
   void initState() {
@@ -69,15 +71,7 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildTimeSlotSection('Morning', [
-                '09:00 AM', '09:30 AM', '10:00 AM',
-                '10:30 AM', '11:00 AM', '11:30 AM',
-              ]),
-              const SizedBox(height: 16),
-              _buildTimeSlotSection('Afternoon', [
-                '02:00 PM', '02:30 PM', '03:00 PM',
-                '03:30 PM', '04:00 PM',
-              ]),
+              if (_selectedDay != null) _buildTimeSlotsList(),
               const SizedBox(height: 32),
               _buildContinueButton(),
               const SizedBox(height: 16),
@@ -135,12 +129,12 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
 
   Widget _buildContinueButton() {
     return ElevatedButton(
-      onPressed: _selectedTimeSlot != null
+      onPressed: _selectedTimeSlot != null && _selectedDay != null
           ? () {
               final args = BookingConfirmationArgs(
                 session: widget.session,
                 selectedDate: _selectedDay!,
-                selectedTime: _selectedTimeSlot!,
+                selectedTime: _selectedTimeSlot!.displayTime,
               );
               context.push('/confirm-booking', extra: args);
             }
@@ -331,29 +325,36 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
     return Column(children: rows);
   }
 
-  Widget _buildTimeSlotSection(String title, List<String> slots) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: const Color(0xFF735B4D),
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
+  Widget _buildTimeSlotsList() {
+    final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDay!);
+    final timeSlotsAsyncValue = ref.watch(timeSlotsProvider(dateStr));
+
+    return timeSlotsAsyncValue.when(
+      data: (slots) {
+        if (slots.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Text(
+                'No available time slots',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: slots.map((time) {
-            final isSelected = _selectedTimeSlot == time;
-            final isDisabled = time == '10:00 AM' || time == '11:00 AM' || time == '11:30 AM';
-            
+          children: slots.map((slot) {
+            final isSelected = _selectedTimeSlot?.startTime == slot.startTime;
+
             return GestureDetector(
-              onTap: isDisabled ? null : () {
+              onTap: () {
                 setState(() {
-                  _selectedTimeSlot = time;
+                  _selectedTimeSlot = slot;
                 });
               },
               child: Container(
@@ -361,21 +362,15 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isDisabled 
-                      ? const Color(0xFFE0E0E0)
-                      : isSelected 
-                          ? const Color(0xFF964A38)
-                          : const Color(0xFFF5EAE8),
+                  color: isSelected
+                      ? const Color(0xFF964A38)
+                      : const Color(0xFFF5EAE8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  time,
+                  slot.displayTime,
                   style: TextStyle(
-                    color: isDisabled 
-                        ? const Color(0xFF9E9E9E) 
-                        : isSelected 
-                            ? Colors.white 
-                            : const Color(0xFF5D4037),
+                    color: isSelected ? Colors.white : const Color(0xFF5D4037),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -383,8 +378,26 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
               ),
             );
           }).toList(),
+        );
+      },
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: CircularProgressIndicator(color: AppColors.primaryColor),
         ),
-      ],
+      ),
+      error: (error, stack) => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          child: Text(
+            'Failed to load time slots.\nPlease try again.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium.copyWith(
+              color: Colors.red,
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
