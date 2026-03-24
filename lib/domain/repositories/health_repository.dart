@@ -7,6 +7,7 @@ import '../../data/models/active_progress_model.dart';
 import '../../data/models/api_response.dart';
 import '../../data/models/lab_report_model.dart';
 import '../../data/models/lab_request_model.dart';
+import '../models/health/patient_habit_history.dart';
 
 abstract class HealthRepository {
   Future<Either<Failure, DailyExerciseModel>> getTodayExercise();
@@ -18,4 +19,6 @@ abstract class HealthRepository {
   Future<Either<Failure, ActiveProgressModel?>> getActiveProgress();
   Future<Either<Failure, LabReportDetailData>> getLabReportDetails(String id);
   Future<Either<Failure, LabRequestData>> createLabRequest(String notes);
+  Future<Either<Failure, PatientHabitHistory?>> getPatientHabitHistory(String date);
+  Future<Either<Failure, PatientHabitHistory>> savePatientHabitHistory(PatientHabitHistory data);
 }

@@ -11,6 +11,7 @@ import '../models/active_progress_model.dart';
 import '../models/api_response.dart';
 import '../models/lab_report_model.dart';
 import '../models/lab_request_model.dart';
+import '../../domain/models/health/patient_habit_history.dart';
 
 class HealthRepositoryImpl implements HealthRepository {
   final ApiClient apiClient;
@@ -149,6 +150,38 @@ class HealthRepositoryImpl implements HealthRepository {
     try {
       final request = CreateLabRequest(notes: notes);
       final response = await apiClient.createLabRequest(request);
+      if (response.success && response.data != null) {
+        return Right(response.data!);
+      } else {
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
+      }
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PatientHabitHistory?>> getPatientHabitHistory(String date) async {
+    try {
+      final response = await apiClient.getPatientHabitHistory(date);
+      if (response.success && response.data != null) {
+        return Right(response.data!.isNotEmpty ? response.data!.first : null);
+      } else {
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
+      }
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, PatientHabitHistory>> savePatientHabitHistory(PatientHabitHistory data) async {
+    try {
+      final response = await apiClient.savePatientHabitHistory(data);
       if (response.success && response.data != null) {
         return Right(response.data!);
       } else {

@@ -55,6 +55,7 @@ class ApiConstants {
   static const String labReports = '/lab-reports';  // Added integrated lab reports API endpoint
   static const String labRequests = '/lab-requests';
   static const String dietPlans = '/diet-plans';
+  static const String patientHabits = '/patient-habits';
 
   // Goals
   static const String goals = '/goals';
