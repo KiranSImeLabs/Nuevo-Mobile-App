@@ -149,14 +149,16 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16.0,
@@ -216,6 +218,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
                 ),
               ),
             ],
+          ),
           ),
         );
       },
@@ -316,7 +319,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
                 border: Border.all(
                   color: isSelected
                       ? const Color(0xFFA05E44)
-                      : const Color(0xFFEBE6E4),
+                      : const Color(0xFFDCD2CE),
                   width: 1.5,
                 ),
               ),
@@ -384,14 +387,16 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
+      isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
         return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                 child: Row(
@@ -419,6 +424,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
               _buildStressListOption("High", currentValue, dataKey),
               const SizedBox(height: 16),
             ],
+          ),
           ),
         );
       },
@@ -470,6 +476,13 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -608,6 +621,13 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -715,7 +735,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 16),
           decoration: BoxDecoration(
-            color: const Color(0xFFFCF8F6),
+            color: const Color(0xFFF2EAE5),
             borderRadius: BorderRadius.circular(24),
           ),
           child: Column(
