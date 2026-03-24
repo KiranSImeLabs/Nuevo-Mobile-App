@@ -26,7 +26,7 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(weeklyViewProvider.notifier).fetchCurrentWeek();
+      ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(1);
     });
   }
 
@@ -196,7 +196,7 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
               ),
               SizedBox(height: ResponsiveUtils.spacing(context, base: 4)),
               Text(
-                'Week: ${weeklyView.currentWeekGlobal}/${weeklyView.weekInPhase}',
+                'Week: ${weeklyView.weekInPhase}/${weeklyView.currentWeekGlobal}',
                 style: TextStyle(
                   fontSize: ResponsiveUtils.fontSize(context, base: 14),
                   fontWeight: FontWeight.w400,

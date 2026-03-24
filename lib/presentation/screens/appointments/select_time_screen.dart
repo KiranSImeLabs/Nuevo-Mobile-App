@@ -169,6 +169,9 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
   }
 
   Widget _buildCustomCalendar() {
+    final now = DateTime.now();
+    final isCurrentMonth = _focusedDay.year == now.year && _focusedDay.month == now.month;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -181,8 +184,8 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.chevron_left, color: AppColors.textSecondary),
-                onPressed: () {
+                icon: Icon(Icons.chevron_left, color: isCurrentMonth ? Colors.grey[400] : AppColors.textSecondary),
+                onPressed: isCurrentMonth ? null : () {
                   setState(() {
                     _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1);
                   });
@@ -257,13 +260,17 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
        );
     }
 
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
     for (int i = 1; i <= daysInMonth; i++) {
       final date = DateTime(_focusedDay.year, _focusedDay.month, i);
       final isSelected = _selectedDay != null && DateUtils.isSameDay(_selectedDay, date);
+      final isPastDate = date.isBefore(today);
       
       dayWidgets.add(
         GestureDetector(
-          onTap: () {
+          onTap: isPastDate ? null : () {
             setState(() {
               _selectedDay = date;
               _selectedTimeSlot = null;
@@ -280,7 +287,9 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
               child: Text(
                 '$i',
                 style: TextStyle(
-                  color: isSelected ? const Color(0xFFA65C4B) : AppColors.textPrimary,
+                  color: isPastDate 
+                      ? const Color(0xFFBDBDBD) 
+                      : (isSelected ? const Color(0xFFA65C4B) : AppColors.textPrimary),
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 14,
                 ),

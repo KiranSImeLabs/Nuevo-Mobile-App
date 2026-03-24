@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/home_provider.dart';
@@ -199,14 +201,35 @@ class HomeScreen extends ConsumerWidget {
             color: const Color(0xFF964A38),
           ),
           SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-          Text(
-            "Looks like you haven’t chosen a program yet. Please head to our website, select a program, and come back to start using the app.",
+          RichText(
             textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: ResponsiveUtils.fontSize(context, base: 16),
-              color: const Color(0xFF17110D),
-              height: 1.5,
-              fontWeight: FontWeight.w400,
+            text: TextSpan(
+              style: TextStyle(
+                fontSize: ResponsiveUtils.fontSize(context, base: 16),
+                color: const Color(0xFF17110D),
+                height: 1.5,
+                fontWeight: FontWeight.w400,
+                fontFamily: 'Inter',
+              ),
+              children: [
+                const TextSpan(text: "Looks like you haven’t chosen a program yet. Please head to our "),
+                TextSpan(
+                  text: "website",
+                  style: const TextStyle(
+                    color: Color(0xFF964A38),
+                    decoration: TextDecoration.underline,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  recognizer: TapGestureRecognizer()
+                    ..onTap = () async {
+                      final url = Uri.parse('https://nuevo-medical.simelabs.in');
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                ),
+                const TextSpan(text: ", select a program, and come back to start using the app."),
+              ],
             ),
           ),
           SizedBox(height: ResponsiveUtils.spacing(context, base: 32)),
@@ -454,7 +477,7 @@ class HomeScreen extends ConsumerWidget {
             SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
         itemBuilder: (context, index) => TaskCard(
           task: tasks[index],
-          onTap: () => context.go('/task/${tasks[index].id}'),
+          onTap: () => context.push('/task/${tasks[index].id}'),
         ),
       ),
     );

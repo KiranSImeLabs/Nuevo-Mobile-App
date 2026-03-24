@@ -1,15 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../utils/responsive_utils.dart';
 import '../../../domain/entities/session.dart';
 import '../../widgets/appointments/appointment_card.dart';
 import 'package:go_router/go_router.dart';
+import '../../providers/specialist_provider.dart';
 
-class AppointmentsScreen extends StatelessWidget {
+class AppointmentsScreen extends ConsumerStatefulWidget {
   const AppointmentsScreen({super.key});
 
   @override
+  ConsumerState<AppointmentsScreen> createState() => _AppointmentsScreenState();
+}
+
+class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(specialistListProvider.notifier).fetchSpecialists();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final specialistState = ref.watch(specialistListProvider);
+
 
     // Mock Data
     final sessionsToSchedule = [
@@ -109,11 +126,64 @@ class AppointmentsScreen extends StatelessWidget {
               // 1. Sessions to Schedule
               _buildSectionHeader(context, 'Sessions to Schedule'),
               SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
-              ...sessionsToSchedule.map((session) => AppointmentCard(
-                session: session,
-                type: AppointmentCardType.schedule,
-                onActionTap: () => context.push('/book-session', extra: session),
-              )),
+              specialistState.when(
+                data: (specialists) {
+                  if (specialists.isEmpty) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: ResponsiveUtils.spacing(context, base: 16),
+                      ),
+                      child: Text(
+                        'No doctors available to schedule.',
+                        style: AppTextStyles.bodyMedium.copyWith(
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                    );
+                  }
+
+                  return Column(
+                    children: List.generate(specialists.length, (index) {
+                      final doctor = specialists[index];
+                      final templateSession = sessionsToSchedule[index % sessionsToSchedule.length];
+                      
+                      final mappedSession = Session(
+                        id: doctor.id, 
+                        title: templateSession.title,
+                        type: templateSession.type,
+                        scheduledTime: templateSession.scheduledTime,
+                        durationMinutes: templateSession.durationMinutes,
+                        professionalName: doctor.fullName,
+                        isCompleted: false,
+                      );
+
+                      return Padding(
+                        padding: EdgeInsets.only(
+                          bottom: ResponsiveUtils.spacing(context, base: 12),
+                        ),
+                        child: AppointmentCard(
+                          session: mappedSession,
+                          type: AppointmentCardType.schedule,
+                          onActionTap: () => context.push('/select-time', extra: mappedSession),
+                        ),
+                      );
+                    }),
+                  );
+                },
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                error: (error, stack) => Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Failed to load doctors.',
+                    style: AppTextStyles.bodyMedium.copyWith(color: Colors.red),
+                  ),
+                ),
+              ),
               SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
 
               // 2. Upcoming

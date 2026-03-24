@@ -27,7 +27,6 @@ import '../screens/home/task_detail_screen.dart';
 import '../screens/home/completed_tasks_screen.dart';
 import '../screens/home/your_program_screen.dart';
 import '../screens/home/your_tasks_screen.dart';
-import '../screens/appointments/book_session_screen.dart';
 import '../screens/appointments/select_time_screen.dart';
 import '../screens/appointments/confirm_booking_screen.dart';
 import '../screens/appointments/appointment_details_screen.dart';
@@ -207,14 +206,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(
-        path: '/book-session',
-        parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) {
-          final session = state.extra as Session;
-          return BookSessionScreen(session: session);
-        },
-      ),
+
       GoRoute(
         path: '/quick-health',
         parentNavigatorKey: rootNavigatorKey,
