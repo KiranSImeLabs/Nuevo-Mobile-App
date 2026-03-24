@@ -20,6 +20,7 @@ import '../../models/billing_response_model.dart';
 import '../../models/goal_model.dart';
 import '../../models/phase_model.dart';
 import '../../models/appointment_model.dart';
+import '../../../domain/models/health/patient_habit_history.dart';
 
 import 'package:dio/dio.dart';
 
@@ -279,6 +280,42 @@ class ApiClient {
     return ApiResponse.fromJson(
       response.data,
       (json) => LabReportDetailData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  // ============================================
+  // Health Metrics / Habits Endpoints
+  // ============================================
+
+  /// Get Patient Habits History
+  Future<ApiResponse<List<PatientHabitHistory>>> getPatientHabitHistory(String date) async {
+    final response = await _dioClient.get(
+      '${ApiConstants.patientHabits}/$date',
+    );
+    
+    return ApiResponse.fromJson(
+      response.data,
+      (json) {
+        if (json is List) {
+          return json.map((e) => PatientHabitHistory.fromJson(e as Map<String, dynamic>)).toList();
+        } else if (json is Map<String, dynamic>) {
+          return [PatientHabitHistory.fromJson(json)];
+        }
+        return <PatientHabitHistory>[];
+      },
+    );
+  }
+
+  /// Save Patient Habits History
+  Future<ApiResponse<PatientHabitHistory>> savePatientHabitHistory(PatientHabitHistory data) async {
+    final response = await _dioClient.post(
+      ApiConstants.patientHabits,
+      data: data.toJson(),
+    );
+    
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PatientHabitHistory.fromJson(json as Map<String, dynamic>),
     );
   }
 
