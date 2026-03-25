@@ -8,14 +8,14 @@ part 'appointment_model.g.dart';
 
 @JsonSerializable()
 class CreateAppointmentRequest {
-  final String locationId;
+  // final String locationId;
   final String date;
   final String time;
   final String programId;
   final String patientId;
 
   const CreateAppointmentRequest({
-    required this.locationId,
+    // required this.locationId,
     required this.date,
     required this.time,
     required this.programId,

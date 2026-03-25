@@ -9,7 +9,7 @@ part of 'appointment_model.dart';
 CreateAppointmentRequest _$CreateAppointmentRequestFromJson(
   Map<String, dynamic> json,
 ) => CreateAppointmentRequest(
-  locationId: json['locationId'] as String,
+  // locationId: json['locationId'] as String,
   date: json['date'] as String,
   time: json['time'] as String,
   programId: json['programId'] as String,
@@ -19,7 +19,7 @@ CreateAppointmentRequest _$CreateAppointmentRequestFromJson(
 Map<String, dynamic> _$CreateAppointmentRequestToJson(
   CreateAppointmentRequest instance,
 ) => <String, dynamic>{
-  'locationId': instance.locationId,
+  // 'locationId': instance.locationId,
   'date': instance.date,
   'time': instance.time,
   'programId': instance.programId,

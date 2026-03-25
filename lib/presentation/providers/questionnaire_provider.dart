@@ -85,7 +85,6 @@ class QuestionnaireNotifier extends StateNotifier<QuestionnaireState> {
         textAnswer: state.textAnswers[q.id],
       );
     }).toList();
-
     final result = await _repository.submitQuestionnaire(patientTaskId, responses);
     
     result.fold(

@@ -60,7 +60,7 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
       final timeStr = _formatTime(widget.args.selectedTime);
 
       final request = CreateAppointmentRequest(
-        locationId: '',
+        // locationId: '',
         date: dateStr,
         time: timeStr,
         programId: programId,
