@@ -28,7 +28,6 @@ RegisterRequest _$RegisterRequestFromJson(Map<String, dynamic> json) =>
       firstName: json['firstName'] as String,
       lastName: json['lastName'] as String,
       email: json['email'] as String,
-      password: json['password'] as String,
     );
 
 Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
@@ -36,7 +35,34 @@ Map<String, dynamic> _$RegisterRequestToJson(RegisterRequest instance) =>
       'firstName': instance.firstName,
       'lastName': instance.lastName,
       'email': instance.email,
-      'password': instance.password,
+    };
+
+SendOtpRequest _$SendOtpRequestFromJson(Map<String, dynamic> json) =>
+    SendOtpRequest(
+      bookingId: json['bookingId'] as String,
+      purposeType: json['purposeType'] as String,
+      userMail: json['userMail'] as String,
+    );
+
+Map<String, dynamic> _$SendOtpRequestToJson(SendOtpRequest instance) =>
+    <String, dynamic>{
+      'bookingId': instance.bookingId,
+      'purposeType': instance.purposeType,
+      'userMail': instance.userMail,
+    };
+
+VerifyOtpRequest _$VerifyOtpRequestFromJson(Map<String, dynamic> json) =>
+    VerifyOtpRequest(
+      email: json['email'] as String,
+      otp: json['otp'] as String,
+      purposeType: json['purposeType'] as String,
+    );
+
+Map<String, dynamic> _$VerifyOtpRequestToJson(VerifyOtpRequest instance) =>
+    <String, dynamic>{
+      'email': instance.email,
+      'otp': instance.otp,
+      'purposeType': instance.purposeType,
     };
 
 ForgotPasswordRequest _$ForgotPasswordRequestFromJson(

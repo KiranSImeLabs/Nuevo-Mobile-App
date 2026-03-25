@@ -1,7 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/logout_usecase.dart';
+import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/signup_usecase.dart';
+import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/user/get_user_profile_usecase.dart';
 import '../../domain/usecases/auth/forgot_password_usecase.dart';
 import '../../domain/usecases/usecase.dart';
@@ -13,6 +15,8 @@ import 'core_providers.dart';
 /// Manages global authentication state
 class AuthNotifier extends StateNotifier<AuthState> {
   final LoginUseCase _loginUseCase;
+  final SendOtpUseCase _sendOtpUseCase;
+  final VerifyOtpUseCase _verifyOtpUseCase;
   final SignupUseCase _signupUseCase;
   final LogoutUseCase _logoutUseCase;
   final GetUserProfileUseCase _getUserProfileUseCase;
@@ -22,6 +26,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   AuthNotifier({
     required LoginUseCase loginUseCase,
+    required SendOtpUseCase sendOtpUseCase,
+    required VerifyOtpUseCase verifyOtpUseCase,
     required SignupUseCase signupUseCase,
     required LogoutUseCase logoutUseCase,
     required GetUserProfileUseCase getUserProfileUseCase,
@@ -29,6 +35,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required AuthRepository authRepository,
     required Ref ref,
   })  : _loginUseCase = loginUseCase,
+        _sendOtpUseCase = sendOtpUseCase,
+        _verifyOtpUseCase = verifyOtpUseCase,
         _signupUseCase = signupUseCase,
         _logoutUseCase = logoutUseCase,
         _getUserProfileUseCase = getUserProfileUseCase,
@@ -90,11 +98,41 @@ class AuthNotifier extends StateNotifier<AuthState> {
     );
   }
 
-  /// Signup
+  /// Send OTP
+  Future<bool> sendOtp(String email) async {
+    state = AuthState.loading();
+    final result = await _sendOtpUseCase(email: email);
+    return result.fold(
+      (failure) {
+        state = AuthState.error(failure.message);
+        return false;
+      },
+      (_) {
+        state = AuthState.unauthenticated(); // OTP sent, but user is not authenticated yet
+        return true;
+      },
+    );
+  }
+
+  /// Verify OTP
+  Future<bool> verifyOtp(String email, String otp) async {
+    state = AuthState.loading();
+    final result = await _verifyOtpUseCase(email: email, otp: otp);
+    return result.fold(
+      (failure) {
+        state = AuthState.error(failure.message);
+        return false;
+      },
+      (user) {
+        state = AuthState.authenticated(user);
+        return true;
+      },
+    );
+  }
+
   /// Signup
   Future<void> signup({
     required String email,
-    required String password,
     required String firstName,
     required String lastName,
     String? phoneNumber,
@@ -102,7 +140,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = AuthState.loading();
     final result = await _signupUseCase(SignupParams(
       email: email,
-      password: password,
       firstName: firstName,
       lastName: lastName,
       phoneNumber: phoneNumber,
@@ -176,6 +213,8 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
   return AuthNotifier(
     ref: ref,
     loginUseCase: ref.watch(loginUseCaseProvider),
+    sendOtpUseCase: ref.watch(sendOtpUseCaseProvider),
+    verifyOtpUseCase: ref.watch(verifyOtpUseCaseProvider),
     signupUseCase: ref.watch(signupUseCaseProvider),
     logoutUseCase: ref.watch(logoutUseCaseProvider),
     getUserProfileUseCase: ref.watch(getUserProfileUseCaseProvider),

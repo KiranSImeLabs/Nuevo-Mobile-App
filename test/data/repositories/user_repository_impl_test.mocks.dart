@@ -63,6 +63,35 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
   }
 
   @override
+  _i5.Future<_i2.ApiResponse<void>> sendOtp(_i6.SendOtpRequest? request) =>
+      (super.noSuchMethod(
+            Invocation.method(#sendOtp, [request]),
+            returnValue: _i5.Future<_i2.ApiResponse<void>>.value(
+              _FakeApiResponse_0<void>(
+                this,
+                Invocation.method(#sendOtp, [request]),
+              ),
+            ),
+          )
+          as _i5.Future<_i2.ApiResponse<void>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>> verifyOtp(
+    _i6.VerifyOtpRequest? request,
+  ) =>
+      (super.noSuchMethod(
+            Invocation.method(#verifyOtp, [request]),
+            returnValue:
+                _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>>.value(
+                  _FakeApiResponse_0<_i6.AuthResponseData>(
+                    this,
+                    Invocation.method(#verifyOtp, [request]),
+                  ),
+                ),
+          )
+          as _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>>);
+
+  @override
   _i5.Future<_i2.ApiResponse<_i6.AuthResponseData>> login(
     _i6.LoginRequest? request,
   ) =>

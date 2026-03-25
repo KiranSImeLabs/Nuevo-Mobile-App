@@ -80,11 +80,86 @@ class AuthRepositoryImpl implements AuthRepository {
       return Left(UnknownFailure(message: e.toString()));
     }
   }
+  @override
+  Future<Either<Failure, void>> sendLoginOtp(String email) async {
+    try {
+      final request = SendOtpRequest(
+        bookingId: '',
+        purposeType: 'auth',
+        userMail: email,
+      );
+      
+      final response = await _apiClient.sendOtp(request);
+      
+      if (response.success) {
+        return const Right(null);
+      } else {
+        return Left(ServerFailure(response.message ?? 'Failed to send OTP'));
+      }
+    } on AppException catch (e) {
+      if (e is AuthException) {
+        return Left(AuthFailure(message: e.message, code: e.code));
+      } else if (e is NetworkException) {
+        return Left(NetworkFailure(message: e.message, code: e.code));
+      } else if (e is ServerException) {
+        return Left(ServerFailure(e.message, e.code));
+      } else {
+        return Left(UnknownFailure(message: e.message));
+      }
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, User>> verifyLoginOtp({
+    required String email,
+    required String otp,
+  }) async {
+    try {
+      final request = VerifyOtpRequest(
+        email: email,
+        otp: otp,
+        purposeType: 'login',
+      );
+      
+      final response = await _apiClient.verifyOtp(request);
+      
+      if (response.success && response.data != null) {
+        final data = response.data!;
+        
+        // Save tokens securely
+        await _localDataSource.saveAccessToken(data.token);
+        await _localDataSource.saveUserId(data.user.id);
+        
+        // Convert to domain entity and return
+        return Right(data.user.toEntity());
+      } else {
+        return Left(ServerFailure(response.message ?? 'OTP Verification failed'));
+      }
+    } on AppException catch (e) {
+      if (e is AuthException) {
+        return Left(AuthFailure(message: e.message, code: e.code));
+      } else if (e is NetworkException) {
+        return Left(NetworkFailure(message: e.message, code: e.code));
+      } else if (e is ServerException) {
+        return Left(ServerFailure(e.message, e.code));
+      } else if (e is ValidationException) {
+        final msg = e.errors != null && e.errors!.isNotEmpty
+            ? e.errors!.join(', ')
+            : e.message;
+        return Left(ValidationFailure(message: msg, code: e.code));
+      } else {
+        return Left(UnknownFailure(message: e.message));
+      }
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
   
   @override
   Future<Either<Failure, User>> signup({
     required String email,
-    required String password,
     required String firstName,
     required String lastName,
     String? phoneNumber,
@@ -93,7 +168,6 @@ class AuthRepositoryImpl implements AuthRepository {
       // Create register request
       final request = RegisterRequest(
         email: email,
-        password: password,
         firstName: firstName,
         lastName: lastName,
       );

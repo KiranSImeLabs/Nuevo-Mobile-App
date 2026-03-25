@@ -58,9 +58,40 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
           as _i4.Future<_i2.Either<_i5.Failure, _i6.User>>);
 
   @override
+  _i4.Future<_i2.Either<_i5.Failure, void>> sendLoginOtp(String? email) =>
+      (super.noSuchMethod(
+            Invocation.method(#sendLoginOtp, [email]),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, void>>.value(
+              _FakeEither_0<_i5.Failure, void>(
+                this,
+                Invocation.method(#sendLoginOtp, [email]),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, void>>);
+
+  @override
+  _i4.Future<_i2.Either<_i5.Failure, _i6.User>> verifyLoginOtp({
+    required String? email,
+    required String? otp,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#verifyLoginOtp, [], {#email: email, #otp: otp}),
+            returnValue: _i4.Future<_i2.Either<_i5.Failure, _i6.User>>.value(
+              _FakeEither_0<_i5.Failure, _i6.User>(
+                this,
+                Invocation.method(#verifyLoginOtp, [], {
+                  #email: email,
+                  #otp: otp,
+                }),
+              ),
+            ),
+          )
+          as _i4.Future<_i2.Either<_i5.Failure, _i6.User>>);
+
+  @override
   _i4.Future<_i2.Either<_i5.Failure, _i6.User>> signup({
     required String? email,
-    required String? password,
     required String? firstName,
     required String? lastName,
     String? phoneNumber,
@@ -68,7 +99,6 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
       (super.noSuchMethod(
             Invocation.method(#signup, [], {
               #email: email,
-              #password: password,
               #firstName: firstName,
               #lastName: lastName,
               #phoneNumber: phoneNumber,
@@ -78,7 +108,6 @@ class MockAuthRepository extends _i1.Mock implements _i3.AuthRepository {
                 this,
                 Invocation.method(#signup, [], {
                   #email: email,
-                  #password: password,
                   #firstName: firstName,
                   #lastName: lastName,
                   #phoneNumber: phoneNumber,

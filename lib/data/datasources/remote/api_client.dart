@@ -34,7 +34,31 @@ class ApiClient {
   // Authentication Endpoints
   // ============================================
   
-  /// Login with email and password
+  /// Send OTP
+  Future<ApiResponse<void>> sendOtp(SendOtpRequest request) async {
+    final response = await _dioClient.post(
+      ApiConstants.generateOtp,
+      data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => null,
+    );
+  }
+
+  /// Verify OTP
+  Future<ApiResponse<AuthResponseData>> verifyOtp(VerifyOtpRequest request) async {
+    final response = await _dioClient.post(
+      ApiConstants.loginOtp,
+      data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Login with email and password (Legacy / Alternative)
   Future<ApiResponse<AuthResponseData>> login(LoginRequest request) async {
     final response = await _dioClient.post(
       ApiConstants.login,

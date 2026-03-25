@@ -15,6 +15,8 @@ class ApiConstants {
   static const String myActivePhaseWeekly = '/phases/my-active-phase/weekly';
   static const String myActivePhaseProgress = '/phases/my-active-phase/progress';
   static const String login = '/auth/login';
+  static const String generateOtp = '/auth/generate-otp';
+  static const String loginOtp = '/auth/login-otp';
   static const String register = '/auth/register';
   static const String googleLogin = '/auth/register-or-login-google';
   static const String appleLogin = '/auth/register-or-login-apple';

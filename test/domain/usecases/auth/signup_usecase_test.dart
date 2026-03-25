@@ -21,14 +21,12 @@ void main() {
   });
   
   const tEmail = 'newuser@example.com';
-  const tPassword = 'Test@1234';
   const tFirstName = 'New';
   const tLastName = 'User';
   const tName = 'New User'; // User entity might still use name?
   const tPhoneNumber = '+1234567890';
   const tParams = SignupParams(
     email: tEmail,
-    password: tPassword,
     firstName: tFirstName,
     lastName: tLastName,
     phoneNumber: tPhoneNumber,
@@ -46,7 +44,6 @@ void main() {
       // arrange
       when(mockAuthRepository.signup(
         email: anyNamed('email'),
-        password: anyNamed('password'),
         firstName: anyNamed('firstName'),
         lastName: anyNamed('lastName'),
         phoneNumber: anyNamed('phoneNumber'),
@@ -59,7 +56,6 @@ void main() {
       expect(result, Right(tUser));
       verify(mockAuthRepository.signup(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
         phoneNumber: tPhoneNumber,
@@ -71,7 +67,6 @@ void main() {
       // arrange
       const paramsWithoutPhone = SignupParams(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
       );
@@ -83,7 +78,6 @@ void main() {
       
       when(mockAuthRepository.signup(
         email: anyNamed('email'),
-        password: anyNamed('password'),
         firstName: anyNamed('firstName'),
         lastName: anyNamed('lastName'),
         phoneNumber: anyNamed('phoneNumber'),
@@ -96,7 +90,6 @@ void main() {
       expect(result, Right(userWithoutPhone));
       verify(mockAuthRepository.signup(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
         phoneNumber: null,
@@ -110,7 +103,6 @@ void main() {
       );
       when(mockAuthRepository.signup(
         email: anyNamed('email'),
-        password: anyNamed('password'),
         firstName: anyNamed('firstName'),
         lastName: anyNamed('lastName'),
         phoneNumber: anyNamed('phoneNumber'),
@@ -123,7 +115,6 @@ void main() {
       expect(result, const Left(tFailure));
       verify(mockAuthRepository.signup(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
         phoneNumber: tPhoneNumber,
@@ -135,7 +126,6 @@ void main() {
       const tFailure = ValidationFailure(message: 'Invalid email format');
       when(mockAuthRepository.signup(
         email: anyNamed('email'),
-        password: anyNamed('password'),
         firstName: anyNamed('firstName'),
         lastName: anyNamed('lastName'),
         phoneNumber: anyNamed('phoneNumber'),
@@ -154,14 +144,12 @@ void main() {
       // arrange
       const params1 = SignupParams(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
         phoneNumber: tPhoneNumber,
       );
       const params2 = SignupParams(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
         phoneNumber: tPhoneNumber,
@@ -176,13 +164,11 @@ void main() {
       // arrange
       const params1 = SignupParams(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
       );
       const params2 = SignupParams(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
       );
@@ -195,14 +181,13 @@ void main() {
       // arrange
       const params = SignupParams(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
         phoneNumber: tPhoneNumber,
       );
       
       // assert
-      expect(params.props, [tEmail, tPassword, tFirstName, tLastName, tPhoneNumber]);
+      expect(params.props, [tEmail, tFirstName, tLastName, tPhoneNumber]);
     });
   });
 }

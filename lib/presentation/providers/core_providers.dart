@@ -23,7 +23,9 @@ import '../../domain/usecases/lab/get_lab_request_by_id_usecase.dart';
 import '../../domain/usecases/auth/login_usecase.dart';
 import '../../domain/usecases/auth/logout_usecase.dart';
 import '../../domain/usecases/auth/refresh_token_usecase.dart';
+import '../../domain/usecases/auth/send_otp_usecase.dart';
 import '../../domain/usecases/auth/signup_usecase.dart';
+import '../../domain/usecases/auth/verify_otp_usecase.dart';
 import '../../domain/usecases/auth/forgot_password_usecase.dart';
 import '../../domain/usecases/subscription/check_feature_access_usecase.dart';
 import '../../domain/usecases/subscription/get_subscription_status_usecase.dart';
@@ -139,6 +141,16 @@ final userRepositoryProvider = Provider<UserRepository>((ref) {
 final loginUseCaseProvider = Provider<LoginUseCase>((ref) {
   final repository = ref.watch(authRepositoryProvider);
   return LoginUseCase(repository: repository);
+});
+
+final sendOtpUseCaseProvider = Provider<SendOtpUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return SendOtpUseCase(repository);
+});
+
+final verifyOtpUseCaseProvider = Provider<VerifyOtpUseCase>((ref) {
+  final repository = ref.watch(authRepositoryProvider);
+  return VerifyOtpUseCase(repository);
 });
 
 final signupUseCaseProvider = Provider<SignupUseCase>((ref) {

@@ -30,6 +30,7 @@ void main() {
 
   const tEmail = 'test@example.com';
   const tPassword = 'password123';
+  const tOtp = '123456';
   const tFirstName = 'John';
   const tLastName = 'Doe';
   const tName = 'John Doe';
@@ -53,6 +54,11 @@ void main() {
     data: tAuthResponseData,
   );
 
+  const tApiVoidResponse = ApiResponse<void>(
+    success: true,
+    data: null,
+  );
+
   group('login', () {
     test('should return User when login call is successful', () async {
       // Arrange
@@ -67,7 +73,6 @@ void main() {
       final result = await repository.login(email: tEmail, password: tPassword);
       
       // Assert
-      // verify(mockApiClient.login(any));
       verify(mockLocalDataSource.saveAccessToken(tToken));
       verify(mockLocalDataSource.saveUserId(tUserId));
       expect(result, isA<Right>());
@@ -88,6 +93,33 @@ void main() {
     });
   });
 
+  group('sendLoginOtp', () {
+    test('should return void when sendOtp is successful', () async {
+      when(mockApiClient.sendOtp(argThat(isA<SendOtpRequest>())))
+          .thenAnswer((_) async => tApiVoidResponse);
+          
+      final result = await repository.sendLoginOtp(tEmail);
+      
+      verify(mockApiClient.sendOtp(argThat(isA<SendOtpRequest>())));
+      expect(result, const Right(null));
+    });
+  });
+
+  group('verifyLoginOtp', () {
+    test('should return User and save tokens when verifyOtp is successful', () async {
+      when(mockApiClient.verifyOtp(argThat(isA<VerifyOtpRequest>())))
+          .thenAnswer((_) async => tApiResponse);
+      when(mockLocalDataSource.saveAccessToken(any)).thenAnswer((_) async => {});
+      when(mockLocalDataSource.saveUserId(any)).thenAnswer((_) async => {});
+          
+      final result = await repository.verifyLoginOtp(email: tEmail, otp: tOtp);
+      
+      verify(mockLocalDataSource.saveAccessToken(tToken));
+      verify(mockLocalDataSource.saveUserId(tUserId));
+      expect(result, isA<Right>());
+    });
+  });
+
   group('signup', () {
     test('should return User when signup call is successful', () async {
       // Arrange
@@ -101,7 +133,6 @@ void main() {
       // Act
       final result = await repository.signup(
         email: tEmail,
-        password: tPassword,
         firstName: tFirstName,
         lastName: tLastName,
       );
