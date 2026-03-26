@@ -122,6 +122,65 @@ class HealthResultsTab extends ConsumerWidget {
             ),
           ),
         ),
+        const SizedBox(height: AppSpacing.md),
+        
+        // Update Lab Reports Entry Point
+        InkWell(
+          onTap: () {
+            context.push('/health/update-lab-reports');
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFCF8F6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE5D5D0), width: 1),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.note_add_outlined, color: Color(0xFFA05E44), size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Update Lab Reports',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E1E1E),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Manually enter biomarker data',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF757575),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Icon(Icons.arrow_forward_ios, color: Color(0xFFBDBDBD), size: 16),
+              ],
+            ),
+          ),
+        ),
+        
         const SizedBox(height: AppSpacing.xl),
         
         // Book New Test Section
