@@ -596,14 +596,21 @@ class ApiClient {
 
   /// Get My Specialists
   Future<ApiResponse<List<SpecialistModel>>> getMySpecialists() async {
-    final response = await _dioClient.get(ApiConstants.mySpecialists);
-    return ApiResponse.fromJson(
-      response.data,
-      (json) => (json as List<dynamic>)
+  final response = await _dioClient.get(ApiConstants.mySpecialists);
+
+  return ApiResponse.fromJson(
+    response.data,
+    (json) {
+      if (json is! Map<String, dynamic>) return [];
+
+      final careTeam = json['careTeam'] as List<dynamic>? ?? [];
+
+      return careTeam
           .map((item) => SpecialistModel.fromJson(item as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+          .toList();
+    },
+  );
+}
 
   /// Get Specialist Details
   Future<ApiResponse<SpecialistModel>> getSpecialistDetails(String id) async {

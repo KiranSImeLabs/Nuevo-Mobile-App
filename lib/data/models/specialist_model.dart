@@ -14,24 +14,31 @@ class SpecialistModel extends Specialist {
   });
 
   factory SpecialistModel.fromJson(Map<String, dynamic> json) {
+    
+    final roleMap = json['role'] as Map<String, dynamic>?;
+    print('roleMap: $roleMap');
     return SpecialistModel(
-      id: json['id'] as String,
-      fullName: json['fullName'] as String,
-      role: json['role'] as String,
+      id: json['id'] as String? ?? '',
+      fullName: json['fullName'] as String? ?? '',
+      role: roleMap?['name'] as String? ?? '',
       profileImage: json['profileImage'] as String?,
       biography: json['biography'] as String?,
+
       specialties: (json['specialties'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+
       qualifications: (json['qualifications'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
+
       yearsOfExperience: json['yearsOfExperience'] as int?,
+
       languagesSpoken: (json['languagesSpoken'] as List<dynamic>?)
           ?.map((e) => e as String)
           .toList(),
-    );
-  }
+  );
+}
 
   Map<String, dynamic> toJson() {
     return {

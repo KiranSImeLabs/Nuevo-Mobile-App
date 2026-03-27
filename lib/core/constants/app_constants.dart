@@ -65,7 +65,7 @@ class ApiConstants {
   static const String goals = '/goals';
 
   // Specialists
-  static const String mySpecialists = '/patients/my-specialists';
+  static const String mySpecialists = '/care-team/my-care-team';
   static const String specialistDetails = '/patients/specialists';
   
   // Guided Sessions

@@ -136,11 +136,14 @@ class TimeSlot {
   final String startTime;
   final String endTime;
   final String displayTime;
+  final bool isAvailable;
+
 
   const TimeSlot({
     required this.startTime,
     required this.endTime,
     required this.displayTime,
+    required this.isAvailable,
   });
 
   factory TimeSlot.fromJson(Map<String, dynamic> json) =>

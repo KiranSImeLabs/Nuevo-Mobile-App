@@ -103,6 +103,7 @@ TimeSlot _$TimeSlotFromJson(Map<String, dynamic> json) => TimeSlot(
   startTime: json['startTime'] as String,
   endTime: json['endTime'] as String,
   displayTime: json['displayTime'] as String,
+  isAvailable: json['isAvailable'] as bool? ?? true,
 );
 
 Map<String, dynamic> _$TimeSlotToJson(TimeSlot instance) => <String, dynamic>{
