@@ -6,28 +6,70 @@ import '../../utils/responsive_utils.dart';
 import '../../providers/phase_provider.dart';
 import '../../providers/core_providers.dart';
 import '../../../data/models/phase_model.dart';
+import '../../../domain/usecases/phase/phase_usecases.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class YourTasksScreen extends ConsumerStatefulWidget {
   final String programName;
   final String programDescription;
+  final String phaseId;
+  final bool isActive;
 
   const YourTasksScreen({
     super.key,
     required this.programName,
     required this.programDescription,
+    required this.phaseId,
+    required this.isActive,
   });
 
   @override
   ConsumerState<YourTasksScreen> createState() => _YourTasksScreenState();
 }
 
+
+
 class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
+  int _durationWeeks = 1;
+  bool _isLoadingPhase = true;
+
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(1);
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      await _initializeData();
     });
+  }
+
+  Future<void> _initializeData() async {
+    try {
+      final getPhaseByIdUseCase = ref.read(getPhaseByIdUseCaseProvider);
+      final phaseResult = await getPhaseByIdUseCase(PhaseByIdParams(widget.phaseId));
+      
+      phaseResult.fold(
+        (failure) {
+           if (mounted) setState(() => _isLoadingPhase = false);
+        },
+        (phaseData) {
+           if (mounted) {
+             setState(() {
+               _durationWeeks = phaseData.durationWeeks;
+               _isLoadingPhase = false;
+             });
+           }
+           
+           if (widget.isActive) {
+             ref.read(weeklyViewProvider.notifier).fetchCurrentWeek();
+           } else {
+             final phaseTasks = phaseData.phaseTasks;
+             int weekNumber = phaseTasks.isNotEmpty ? phaseTasks.first.weekNumberGlobal : 1;
+             ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(weekNumber);
+           }
+        }
+      );
+    } catch (e) {
+      if (mounted) setState(() => _isLoadingPhase = false);
+    }
   }
 
   @override
@@ -71,15 +113,23 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
                 _buildHeaderSection(context),
                 SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
                 _buildCurrentPhaseWeekCard(context, weeklyView),
+                SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
+                _buildWeekNavigation(context, weeklyView),
                 if (pendingTasks.isNotEmpty) ...[
                   SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-                  Text(
-                    'Action Required',
-                    style: TextStyle(
-                      fontSize: ResponsiveUtils.fontSize(context, base: 16),
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF17110D),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Action Required',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.fontSize(context, base: 16),
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF17110D),
+                        ),
+                      ),
+                      const Icon(Icons.error_outline, color: Color(0xFF964A38), size: 20),
+                    ],
                   ),
                   SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
                   ...pendingTasks.map((t) => Padding(
@@ -89,13 +139,19 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
                 ],
                 if (completedTasks.isNotEmpty) ...[
                   SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
-                  Text(
-                    'Completed Tasks',
-                    style: TextStyle(
-                      fontSize: ResponsiveUtils.fontSize(context, base: 16),
-                      fontWeight: FontWeight.w500,
-                      color: const Color(0xFF17110D),
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Completed Tasks',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.fontSize(context, base: 16),
+                          fontWeight: FontWeight.w500,
+                          color: const Color(0xFF17110D),
+                        ),
+                      ),
+                      const Icon(Icons.check_circle_outline, color: Color(0xFF438A7A), size: 20),
+                    ],
                   ),
                   SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
                   ...completedTasks.map((t) => Padding(
@@ -172,6 +228,7 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
   }
 
   Widget _buildCurrentPhaseWeekCard(BuildContext context, WeeklyViewModel weeklyView) {
+    if (_isLoadingPhase) return const SizedBox.shrink();
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(ResponsiveUtils.spacing(context, base: 16)),
@@ -196,7 +253,7 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
               ),
               SizedBox(height: ResponsiveUtils.spacing(context, base: 4)),
               Text(
-                'Week: ${weeklyView.weekInPhase}/${weeklyView.currentWeekGlobal}',
+                'Week: ${weeklyView.weekInPhase}/$_durationWeeks',
                 style: TextStyle(
                   fontSize: ResponsiveUtils.fontSize(context, base: 14),
                   fontWeight: FontWeight.w400,
@@ -205,20 +262,119 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
               ),
             ],
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-            decoration: BoxDecoration(
-              color: const Color(0xFF964A38),
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              'Active',
-              style: TextStyle(
-                fontSize: ResponsiveUtils.fontSize(context, base: 12),
-                fontWeight: FontWeight.w500,
-                color: Colors.white,
+          if (widget.isActive)
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFF964A38),
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Text(
+                'Active',
+                style: TextStyle(
+                  fontSize: ResponsiveUtils.fontSize(context, base: 12),
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
               ),
             ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeekNavigation(BuildContext context, WeeklyViewModel weeklyView) {
+    if (_isLoadingPhase) return const SizedBox.shrink();
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: ResponsiveUtils.spacing(context, base: 16),
+        vertical: ResponsiveUtils.spacing(context, base: 12),
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9F5F3),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          IconButton(
+            icon: const Icon(Icons.arrow_left, color: Color(0xFF6B3528)),
+            onPressed: () {
+              final weekNumber = weeklyView.currentWeekGlobal - 1;
+              if (weekNumber >= 1) {
+                ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(weekNumber);
+              }
+            },
+          ),
+          Text(
+            'Week: ${weeklyView.weekInPhase}/$_durationWeeks',
+            style: TextStyle(
+              fontSize: ResponsiveUtils.fontSize(context, base: 14),
+              fontWeight: FontWeight.w500,
+              color: const Color(0xFF17110D),
+            ),
+          ),
+          const SizedBox(width: 8),
+          InkWell(
+            onTap: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) {
+                  return ListView.builder(
+                    itemCount: _durationWeeks,
+                    itemBuilder: (context, index) {
+                      final inputValue = index + 1;
+                      return ListTile(
+                        title: Text('Week $inputValue'),
+                        onTap: () {
+                          Navigator.pop(context);
+                          if (inputValue == weeklyView.weekInPhase) return;
+                          
+                          int weekNumber;
+                          if (inputValue < weeklyView.weekInPhase) {
+                            weekNumber = weeklyView.currentWeekGlobal - (weeklyView.weekInPhase - inputValue);
+                          } else {
+                            weekNumber = weeklyView.currentWeekGlobal + (inputValue - weeklyView.weekInPhase);
+                          }
+                          
+                          ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(weekNumber);
+                        },
+                      );
+                    },
+                  );
+                },
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFE5DCD8),
+                borderRadius: BorderRadius.circular(4),
+              ),
+              child: Text(
+                '${weeklyView.weekInPhase}',
+                style: TextStyle(
+                  fontSize: ResponsiveUtils.fontSize(context, base: 14),
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF6B3528),
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: SvgPicture.asset(
+              'assets/icons/arrow_right.svg',
+              colorFilter: const ColorFilter.mode(Color(0xFF6B3528), BlendMode.srcIn),
+              width: 24,
+              height: 24,
+            ),
+            onPressed: () {
+              final weekNumber = weeklyView.currentWeekGlobal + 1;
+              if (weeklyView.weekInPhase < _durationWeeks) {
+                ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(weekNumber);
+              }
+            },
           ),
         ],
       ),
@@ -271,6 +427,9 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
                );
              }
            }
+        } 
+        else if (task.taskType == 'APPOINTMENT') {
+          context.push('/connecting-session');
         } else {
            context.push('/task/${task.id}');
         }

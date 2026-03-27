@@ -319,6 +319,8 @@ final routerProvider = Provider<GoRouter>((ref) {
           return YourTasksScreen(
             programName: extras?['programName'] ?? 'Insight Program',
             programDescription: extras?['programDescription'] ?? 'Personalised, clinician-guided care',
+            phaseId: extras?['phaseId'] ?? '',
+            isActive: extras?['isActive'] ?? false,
           );
         },
       ),
