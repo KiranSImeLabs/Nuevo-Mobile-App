@@ -2,6 +2,9 @@ import 'dart:math' as math;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../providers/health_provider.dart';
+import '../../../../domain/models/health/patient_habit_history.dart';
 
 class DottedLinePainter extends CustomPainter {
   @override
@@ -71,14 +74,14 @@ class StepGoalArcPainter extends CustomPainter {
   }
 }
 
-class HealthInsightsTab extends StatefulWidget {
+class HealthInsightsTab extends ConsumerStatefulWidget {
   const HealthInsightsTab({super.key});
 
   @override
-  State<HealthInsightsTab> createState() => _HealthInsightsTabState();
+  ConsumerState<HealthInsightsTab> createState() => _HealthInsightsTabState();
 }
 
-class _HealthInsightsTabState extends State<HealthInsightsTab> {
+class _HealthInsightsTabState extends ConsumerState<HealthInsightsTab> {
   final Map<String, Map<String, String>> _dailyData = {};
   late DateTime _selectedDate;
   final ScrollController _dateScrollController = ScrollController();
@@ -103,19 +106,54 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
     super.dispose();
   }
 
-  void _initializeDataFor(DateTime date) {
+  void _initializeDataFor(DateTime date) async {
     final dateKey = _formatDateKey(date);
     if (!_dailyData.containsKey(dateKey)) {
-      _dailyData[dateKey] = {
-        "sleep": "0:00",
-        "water": "0",
-        "screenTime": "0:00",
-        "stressLevel": "-",
-        "steps": "0",
-        "stepGoal": "8000",
-      };
+      setState(() {
+        _dailyData[dateKey] = {
+          "sleep": "0:00",
+          "water": "0",
+          "screenTime": "0:00",
+          "stressLevel": "Normal",
+          "steps": "0",
+          "stepGoal": "8000",
+        };
+      });
+
+      try {
+        final history = await ref.read(patientHabitHistoryProvider(dateKey).future);
+        if (history != null && mounted) {
+           setState(() {
+             _dailyData[dateKey] = {
+                "sleep": _formatHoursToHrMm(history.sleepHours),
+                "water": history.waterIntake.toString(),
+                "screenTime": _formatHoursToHrMm(history.screenTime),
+                "stressLevel": history.stressLevel,
+                "steps": history.stepsCount.toString(),
+                "stepGoal": "8000",
+             };
+           });
+        }
+      } catch (e) {
+        // Keep default if fetching fails or data doesn't exist yet
+      }
     }
   }
+
+  String _formatHoursToHrMm(double hours) {
+    int h = hours.floor();
+    int m = ((hours - h) * 60).round();
+    return "$h:${m.toString().padLeft(2, '0')}";
+  }
+
+  double _parseHrMmToHours(String time) {
+    if (time.isEmpty || !time.contains(':')) return 0.0;
+    final parts = time.split(':');
+    final h = double.tryParse(parts[0]) ?? 0.0;
+    final m = parts.length > 1 ? (double.tryParse(parts[1]) ?? 0.0) : 0.0;
+    return h + (m / 60.0);
+  }
+
 
   String _formatDateKey(DateTime date) {
     return DateFormat('yyyy-MM-dd').format(date);
@@ -191,7 +229,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
                         Navigator.pop(context);
                       },
                       child: const Text(
-                        'Save',
+                        'Ok',
                         style: TextStyle(
                           color: Color(0xFFA05E44),
                           fontSize: 16,
@@ -272,7 +310,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              child: const Text('Save'),
+              child: const Text('Ok'),
             ),
           ],
         );
@@ -514,7 +552,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
     );
   }
 
-  Widget _buildSleepBottomContent() {
+  Widget _buildSleepBottomContent(double progress) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -528,7 +566,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
               ),
             ),
             FractionallySizedBox(
-              widthFactor: 0.75,
+              widthFactor: progress.clamp(0.0, 1.0),
               child: Container(
                 height: 8,
                 decoration: BoxDecoration(
@@ -550,32 +588,39 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
     );
   }
 
-  Widget _buildWaterBottomContent() {
+  Widget _buildWaterBottomContent(double progress) {
+    final safeProgress = progress.clamp(0.0, 1.0);
+    final fillFlex = (safeProgress * 1000).toInt();
+    final emptyFlex = ((1.0 - safeProgress) * 1000).toInt();
+
     return Row(
       children: [
-        Expanded(
-          flex: 5,
-          child: Container(
-            height: 8,
-            decoration: BoxDecoration(
-              color: const Color(0xFF6B8BE8),
-              borderRadius: BorderRadius.circular(4),
+        if (fillFlex > 0)
+          Expanded(
+            flex: fillFlex,
+            child: Container(
+              height: 8,
+              decoration: BoxDecoration(
+                color: const Color(0xFF6B8BE8),
+                borderRadius: BorderRadius.circular(4),
+              ),
             ),
           ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 5,
-          child: SizedBox(
-            height: 8,
-            child: CustomPaint(painter: DottedLinePainter()),
+        if (fillFlex > 0 && emptyFlex > 0)
+          const SizedBox(width: 8),
+        if (emptyFlex > 0)
+          Expanded(
+            flex: emptyFlex,
+            child: SizedBox(
+              height: 8,
+              child: CustomPaint(painter: DottedLinePainter()),
+            ),
           ),
-        ),
       ],
     );
   }
 
-  Widget _buildScreenTimeBottomContent() {
+  Widget _buildScreenTimeBottomContent(double progress) {
     return Stack(
       children: [
         Container(
@@ -586,7 +631,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
           ),
         ),
         FractionallySizedBox(
-          widthFactor: 0.6,
+          widthFactor: progress.clamp(0.0, 1.0),
           child: Container(
             height: 8,
             decoration: BoxDecoration(
@@ -741,17 +786,17 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Row(
+              Row(
                 children: [
-                  Icon(
+                  const Icon(
                     Icons.monitor_heart_outlined,
                     color: Color(0xFF73584D),
                     size: 24,
                   ),
-                  SizedBox(width: 12),
+                  const SizedBox(width: 12),
                   Text(
-                    "Daily Metrics",
-                    style: TextStyle(
+                    "Daily Metrics - ${DateFormat('MMM d, yyyy').format(_selectedDate)}",
+                    style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF42332D),
@@ -767,7 +812,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
                   _formatHrMmDisplay(data['sleep']!),
                   showArrow: false,
                 ),
-                bottomContent: _buildSleepBottomContent(),
+                bottomContent: _buildSleepBottomContent(_parseHrMmToHours(data['sleep']!) / 8.0),
                 onTap: () =>
                     _showHrMmDialog("Average Sleep", "sleep", data['sleep']!),
               ),
@@ -778,7 +823,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
                   "${data['water']} L",
                   showArrow: true,
                 ),
-                bottomContent: _buildWaterBottomContent(),
+                bottomContent: _buildWaterBottomContent((double.tryParse(data['water']!) ?? 0.0) / 4.0),
                 onTap: () => _showNumberDialog(
                   "Water Intake",
                   "water",
@@ -794,7 +839,7 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
                   _formatHrMmDisplay(data['screenTime']!),
                   showArrow: true,
                 ),
-                bottomContent: _buildScreenTimeBottomContent(),
+                bottomContent: _buildScreenTimeBottomContent(_parseHrMmToHours(data['screenTime']!) / 2.0),
                 onTap: () => _showHrMmDialog(
                   "Daily Screen Time",
                   "screenTime",
@@ -816,15 +861,43 @@ class _HealthInsightsTabState extends State<HealthInsightsTab> {
           width: double.infinity,
           height: 50,
           child: ElevatedButton(
-            onPressed: () {
-              // Add save logic here. You can access the current day's data via _currentData
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Daily metrics saved successfully!'),
-                  backgroundColor: Color(0xFFA05E44),
-                  behavior: SnackBarBehavior.floating,
-                ),
+            onPressed: () async {
+              final data = _currentData;
+              final history = PatientHabitHistory(
+                date: _formatDateKey(_selectedDate),
+                sleepHours: _parseHrMmToHours(data['sleep']!),
+                waterIntake: double.tryParse(data['water']!) ?? 0.0,
+                screenTime: _parseHrMmToHours(data['screenTime']!),
+                stressLevel: data['stressLevel']!,
+                stepsCount: int.tryParse(data['steps']!) ?? 0,
               );
+
+              try {
+                final result = await ref.read(healthRepositoryProvider).savePatientHabitHistory(history);
+                if (!mounted) return;
+                result.fold(
+                  (failure) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Failed to save: ${failure.message}')),
+                    );
+                  },
+                  (success) {
+                    ref.invalidate(patientHabitHistoryProvider(_formatDateKey(_selectedDate)));
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Daily metrics saved successfully!'),
+                        backgroundColor: Color(0xFFA05E44),
+                        behavior: SnackBarBehavior.floating,
+                      ),
+                    );
+                  },
+                );
+              } catch (e) {
+                if (!mounted) return;
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Error saving daily metrics.')),
+                );
+              }
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFA05E44),

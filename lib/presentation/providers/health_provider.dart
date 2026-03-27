@@ -11,6 +11,7 @@ import 'core_providers.dart';
 import '../../data/models/api_response.dart';
 import '../../data/models/lab_report_model.dart';
 import '../../data/models/lab_request_model.dart';
+import '../../domain/models/health/patient_habit_history.dart';
 
 // Provider for HealthRepository
 final healthRepositoryProvider = Provider<HealthRepository>((ref) {
@@ -114,6 +115,17 @@ final labReportDetailsProvider = FutureProvider.family<LabReportDetailData?, Str
 final createLabRequestProvider = FutureProvider.family<LabRequestData?, String>((ref, notes) async {
   final repository = ref.watch(healthRepositoryProvider);
   final result = await repository.createLabRequest(notes);
+  
+  return result.fold(
+    (failure) => throw failure.message,
+    (data) => data,
+  );
+});
+
+// FutureProvider.family for Patient Habit History
+final patientHabitHistoryProvider = FutureProvider.family<PatientHabitHistory?, String>((ref, date) async {
+  final repository = ref.watch(healthRepositoryProvider);
+  final result = await repository.getPatientHabitHistory(date);
   
   return result.fold(
     (failure) => throw failure.message,
