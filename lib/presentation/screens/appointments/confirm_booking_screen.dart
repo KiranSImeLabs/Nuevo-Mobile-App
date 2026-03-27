@@ -2,27 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/session.dart';
+import '../../../data/models/appointment_model.dart';
 import 'widgets/booking_success_sheet.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/appointment_provider.dart';
-import '../../providers/user_provider.dart';
-import '../../providers/home_provider.dart';
-import '../../../data/models/appointment_model.dart';
 
-class BookingConfirmationArgs {
+/// Arguments passed from SelectTimeScreen → ConfirmBookingScreen
+class BookingArgs {
   final Session session;
-  final DateTime selectedDate;
-  final String selectedTime;
+  final TimeSlot selectedSlot;
+  final String memberId;
 
-  BookingConfirmationArgs({
+  const BookingArgs({
     required this.session,
-    required this.selectedDate,
-    required this.selectedTime,
+    required this.selectedSlot,
+    required this.memberId,
   });
 }
 
 class ConfirmBookingScreen extends ConsumerStatefulWidget {
-  final BookingConfirmationArgs args;
+  final BookingArgs args;
 
   const ConfirmBookingScreen({
     super.key,
@@ -30,63 +29,42 @@ class ConfirmBookingScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ConfirmBookingScreen> createState() => _ConfirmBookingScreenState();
+  ConsumerState<ConfirmBookingScreen> createState() =>
+      _ConfirmBookingScreenState();
 }
 
 class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
   bool _isLoading = false;
 
-  String _formatTime(String timeString) {
-    try {
-      final parsed = DateFormat.jm().parse(timeString);
-      return DateFormat('HH:mm').format(parsed);
-    } catch (_) {
-      // Fallback
-      return timeString;
-    }
-  }
-
   Future<void> _handleConfirm() async {
     setState(() => _isLoading = true);
 
     try {
-      final userState = ref.read(userProvider);
-      final dashboardState = ref.read(homeDashboardProvider);
-
-      final patientId = userState.value?.id ?? '';
-      final programId = dashboardState.value?.yourProgram?.id ?? '';
-
-      final dateStr = DateFormat('yyyy-MM-dd').format(widget.args.selectedDate);
-      final timeStr = _formatTime(widget.args.selectedTime);
-
-      final request = CreateAppointmentRequest(
-        // locationId: '',
-        date: dateStr,
-        time: timeStr,
-        programId: programId,
-        patientId: patientId,
-      );
-      print('Request: ${request.toJson()}');
-
       final repository = ref.read(appointmentRepositoryProvider);
-      final response = await repository.createAppointment(request);
+      final response = await repository.bookAppointment(
+        memberId: widget.args.memberId,
+        startTime: widget.args.selectedSlot.startTime,
+      );
+
+      if (!mounted) return;
 
       if (response.success) {
-        if (!mounted) return;
+        final appointmentId = response.data?.appointment?.id ?? '';
         showModalBottomSheet(
           context: context,
           isScrollControlled: true,
           backgroundColor: Colors.transparent,
           builder: (context) => BookingSuccessSheet(
             session: widget.args.session,
-            selectedDate: widget.args.selectedDate,
-            selectedTime: widget.args.selectedTime,
+            selectedSlot: widget.args.selectedSlot,
+            appointmentId: appointmentId,
           ),
         );
       } else {
-        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(response.message ?? 'Failed to book appointment')),
+          SnackBar(
+              content:
+                  Text(response.message ?? 'Failed to book appointment')),
         );
       }
     } catch (e) {
@@ -101,6 +79,8 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final slot = widget.args.selectedSlot;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -130,13 +110,13 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF5EAE8), // Pinkish background
+                  color: const Color(0xFFF5EAE8),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Header Section
+                    // Header
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,7 +145,8 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
                           ),
                         ),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
                             color: const Color(0xFFE8D5D1),
                             borderRadius: BorderRadius.circular(4),
@@ -183,34 +164,34 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
                     const SizedBox(height: 24),
                     const Divider(color: Color(0xFFE0E0E0), height: 1),
                     const SizedBox(height: 24),
-                    
-                    // Details List
+
+                    // Details
                     _buildDetailRow(
                       context,
                       icon: Icons.calendar_today_outlined,
                       label: 'Date',
-                      value: DateFormat('EEEE, d MMMM').format(widget.args.selectedDate),
+                      value: _parseDateFromStartTime(slot.startTime),
                     ),
                     const SizedBox(height: 24),
                     _buildDetailRow(
                       context,
                       icon: Icons.access_time,
                       label: 'Time',
-                      value: widget.args.selectedTime,
+                      value: slot.displayTime,
                     ),
                     const SizedBox(height: 24),
                     _buildDetailRow(
                       context,
-                      icon: Icons.timer_outlined,
-                      label: 'Duration',
-                      value: '${widget.args.session.durationMinutes} minutes',
+                      icon: Icons.person_outline,
+                      label: 'With',
+                      value: widget.args.session.professionalName ?? 'Specialist',
                     ),
                   ],
                 ),
               ),
-              
+
               const Spacer(),
-              
+
               // Confirm Button
               ElevatedButton(
                 onPressed: _isLoading ? null : _handleConfirm,
@@ -227,7 +208,8 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
                     ? const SizedBox(
                         height: 20,
                         width: 20,
-                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        child: CircularProgressIndicator(
+                            color: Colors.white, strokeWidth: 2),
                       )
                     : Row(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -253,7 +235,20 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
     );
   }
 
-  Widget _buildDetailRow(BuildContext context, {required IconData icon, required String label, required String value}) {
+  /// Attempt to parse a human-readable date from the ISO startTime string
+  String _parseDateFromStartTime(String startTime) {
+    try {
+      final dt = DateTime.parse(startTime).toLocal();
+      return DateFormat('EEEE, d MMMM').format(dt);
+    } catch (_) {
+      return startTime;
+    }
+  }
+
+  Widget _buildDetailRow(BuildContext context,
+      {required IconData icon,
+      required String label,
+      required String value}) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
