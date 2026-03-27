@@ -203,12 +203,24 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
                 final isCompleted = phase.orderIndex < activeOrderIndex;
                 final isActive = phase.orderIndex == activeOrderIndex;
 
+                final program = ref.read(homeDashboardProvider).valueOrNull?.yourProgram;
                 return _buildTimelineItem(
                   phase.name,
                   isActive: isActive,
                   isCompleted: isCompleted,
                   isFirst: isFirst,
                   isLast: isLast,
+                  onTap: () {
+                    context.push(
+                      '/your-tasks',
+                      extra: {
+                        'programName': program?.name ?? 'Insight Program',
+                        'programDescription': program?.description ?? 'Personalised, clinician-guided care',
+                        'phaseId': phase.id,
+                        'isActive': isActive,
+                      },
+                    );
+                  },
                 );
               }).toList(),
             );
@@ -224,6 +236,7 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
     bool isCompleted = false,
     bool isFirst = false,
     bool isLast = false,
+    VoidCallback? onTap,
   }) {
     return IntrinsicHeight(
       child: Row(
@@ -274,17 +287,20 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(bottom: 12.0), // Spacing between items
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-                decoration: BoxDecoration(
-                  color: AppColors.roseSurface,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  title,
-                  style: AppTextStyles.bodyMedium.copyWith(
-                    color: const Color(0xFF5D4037),
-                    fontWeight: FontWeight.w500,
+              child: GestureDetector(
+                onTap: onTap,
+                child: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: AppColors.roseSurface,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    title,
+                    style: AppTextStyles.bodyMedium.copyWith(
+                      color: const Color(0xFF5D4037),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               ),

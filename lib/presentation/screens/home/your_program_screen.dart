@@ -123,7 +123,7 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
                           padding: EdgeInsets.only(
                               bottom: ResponsiveUtils.spacing(context, base: 12)),
                           child: GestureDetector(
-                            onTap: isActive
+                            onTap: true //isActive
                                 ? () {
                                     final programName = dashboardState.valueOrNull?.yourProgram?.name ?? '';
                                     final programDesc = dashboardState.valueOrNull?.yourProgram?.description ?? '';
@@ -132,6 +132,8 @@ class _YourProgramScreenState extends ConsumerState<YourProgramScreen> {
                                       extra: {
                                         'programName': programName,
                                         'programDescription': programDesc,
+                                        'isActive': isActive,
+                                        'phaseId': phase.id,
                                       },
                                     );
                                   }
