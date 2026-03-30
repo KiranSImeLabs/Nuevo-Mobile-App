@@ -34,3 +34,14 @@ final appointmentDetailProvider =
   }
   throw Exception(response.message ?? 'Failed to fetch appointment details');
 });
+
+/// Fetch all user appointments
+final userAppointmentsProvider =
+    FutureProvider<UserAppointmentsResponse>((ref) async {
+  final repository = ref.watch(appointmentRepositoryProvider);
+  final response = await repository.getUserAppointments();
+  if (response.success && response.data != null) {
+    return response.data!;
+  }
+  throw Exception(response.message ?? 'Failed to fetch appointments');
+});

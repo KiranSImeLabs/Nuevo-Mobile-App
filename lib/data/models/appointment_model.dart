@@ -87,21 +87,53 @@ class AppointmentMember {
   }
 }
 
+class AppointmentProgram {
+  final String id;
+  final String name;
+  final String type;
+  final String price;
+
+  const AppointmentProgram({
+    required this.id,
+    required this.name,
+    required this.type,
+    required this.price,
+  });
+
+  factory AppointmentProgram.fromJson(Map<String, dynamic> json) {
+    return AppointmentProgram(
+      id: json['id'] as String? ?? '',
+      name: json['name'] as String? ?? '',
+      type: json['type'] as String? ?? '',
+      price: json['price']?.toString() ?? '0.00',
+    );
+  }
+}
+
 class AppointmentUser {
+  final String id;
   final String firstName;
   final String lastName;
+  final String? email;
+  final String? mobilePhone;
 
   const AppointmentUser({
+    required this.id,
     required this.firstName,
     required this.lastName,
+    this.email,
+    this.mobilePhone,
   });
 
   String get fullName => '$firstName $lastName'.trim();
 
   factory AppointmentUser.fromJson(Map<String, dynamic> json) {
     return AppointmentUser(
+      id: json['id'] as String? ?? '',
       firstName: json['firstName'] as String? ?? '',
       lastName: json['lastName'] as String? ?? '',
+      email: json['email'] as String?,
+      mobilePhone: json['mobilePhone'] as String?,
     );
   }
 }
@@ -120,6 +152,12 @@ class AppointmentDetail {
   final AppointmentMember? member;
   final AppointmentUser? user;
   final String? createdAt;
+  final String? updatedAt;
+  final String? bookingType;
+  final String? currentStep;
+  final String? period;
+  final String? consultationDateTime;
+  final AppointmentProgram? program;
 
   const AppointmentDetail({
     required this.id,
@@ -131,6 +169,12 @@ class AppointmentDetail {
     this.member,
     this.user,
     this.createdAt,
+    this.updatedAt,
+    this.bookingType,
+    this.currentStep,
+    this.period,
+    this.consultationDateTime,
+    this.program,
   });
 
   factory AppointmentDetail.fromJson(Map<String, dynamic> json) {
@@ -148,6 +192,14 @@ class AppointmentDetail {
           ? AppointmentUser.fromJson(json['user'] as Map<String, dynamic>)
           : null,
       createdAt: json['createdAt'] as String?,
+      updatedAt: json['updatedAt'] as String?,
+      bookingType: json['bookingType'] as String?,
+      currentStep: json['currentStep'] as String?,
+      period: json['period'] as String?,
+      consultationDateTime: json['consultationDateTime'] as String?,
+      program: json['program'] != null
+          ? AppointmentProgram.fromJson(json['program'] as Map<String, dynamic>)
+          : null,
     );
   }
 }
@@ -175,9 +227,26 @@ class AppointmentResponseData {
     final apptJson = json['appointment'] as Map<String, dynamic>?;
     print('apptJson :$apptJson');
     return AppointmentResponseData(
-      appointment: apptJson != null ? AppointmentDetail.fromJson(apptJson) : null,
+      appointment:
+          apptJson != null ? AppointmentDetail.fromJson(apptJson) : null,
       bookingId: json['bookingId'] as String?,
       status: json['status'] as String?,
+    );
+  }
+}
+
+/// Returned by getUserAppointments (GET /bookings/appointments/all)
+class UserAppointmentsResponse {
+  final List<AppointmentDetail> appointments;
+
+  const UserAppointmentsResponse({required this.appointments});
+
+  factory UserAppointmentsResponse.fromJson(Map<String, dynamic> json) {
+    final appointmentsJson = json['appointments'] as List<dynamic>? ?? [];
+    return UserAppointmentsResponse(
+      appointments: appointmentsJson
+          .map((e) => AppointmentDetail.fromJson(e as Map<String, dynamic>))
+          .toList(),
     );
   }
 }
