@@ -114,7 +114,7 @@ class AppointmentDetail {
   final String id;
   final String? displayDate;
   final String? displayTime;
-  final int? duration;
+  final String? duration;
   final String? notes;
   final String status;
   final AppointmentMember? member;
@@ -138,7 +138,7 @@ class AppointmentDetail {
       id: json['id'] as String? ?? '',
       displayDate: json['displayDate'] as String?,
       displayTime: json['displayTime'] as String?,
-      duration: json['duration'] as int?,
+      duration: json['duration']?.toString(),
       notes: json['notes'] as String?,
       status: json['status'] as String? ?? '',
       member: json['member'] != null
@@ -173,6 +173,7 @@ class AppointmentResponseData {
   factory AppointmentResponseData.fromJson(Map<String, dynamic> json) {
     // New endpoints nest under 'appointment'
     final apptJson = json['appointment'] as Map<String, dynamic>?;
+    print('apptJson :$apptJson');
     return AppointmentResponseData(
       appointment: apptJson != null ? AppointmentDetail.fromJson(apptJson) : null,
       bookingId: json['bookingId'] as String?,

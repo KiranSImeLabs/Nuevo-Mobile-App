@@ -186,7 +186,7 @@ class AppointmentDetailsScreen extends ConsumerWidget {
                     _buildDetailRow(
                       icon: Icons.timer_outlined,
                       label: 'Duration',
-                      value: '${appt.duration} minutes',
+                      value: appt.duration!,
                     ),
                   if (appt.duration != null) const SizedBox(height: 16),
                   _buildDetailRow(
