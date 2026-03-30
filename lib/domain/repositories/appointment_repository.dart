@@ -13,6 +13,9 @@ abstract class AppointmentRepository {
     String? notes,
   });
 
+
   Future<ApiResponse<AppointmentResponseData>> getAppointmentById(
       String appointmentId);
+
+  Future<ApiResponse<UserAppointmentsResponse>> getUserAppointments();
 }

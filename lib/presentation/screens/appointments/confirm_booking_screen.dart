@@ -49,6 +49,9 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
       if (!mounted) return;
 
       if (response.success) {
+        // Invalidate the appointments provider to trigger a refresh
+        ref.invalidate(userAppointmentsProvider);
+        
         final appointmentId = response.data?.appointment?.id ?? '';
         showModalBottomSheet(
           context: context,

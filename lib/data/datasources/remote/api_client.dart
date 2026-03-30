@@ -391,7 +391,19 @@ class ApiClient {
     final response = await _dioClient.delete('${ApiConstants.bookings}/$bookingId');
     return ApiResponse.fromJson(
       response.data,
-      (json) => CancelAppointmentResponseData.fromJson(json as Map<String, dynamic>),
+      (json) =>
+          CancelAppointmentResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get all user appointments
+  /// GET /bookings/appointments/all
+  Future<ApiResponse<UserAppointmentsResponse>> getUserAppointments() async {
+    final response = await _dioClient.get(ApiConstants.allAppointments);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) =>
+          UserAppointmentsResponse.fromJson(json as Map<String, dynamic>),
     );
   }
   
