@@ -350,12 +350,32 @@ class ApiClient {
   // Appointment/Booking Endpoints
   // ============================================
 
-  /// Create Appointment
-  Future<ApiResponse<AppointmentResponseData>> createAppointment(
-      CreateAppointmentRequest request) async {
+  /// Get Time Slots for a specific care-team member
+  /// GET /specialist-timeslots/care-team/{member_id}?date=YYYY-MM-DD
+  Future<ApiResponse<TimeSlotResponse>> getTimeSlots({
+    required String memberId,
+    required String date,
+  }) async {
+    final response = await _dioClient.get(
+      '${ApiConstants.specialistTimeSlots}/care-team/$memberId',
+      queryParameters: {'date': date},
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => TimeSlotResponse.fromJson(response.data as Map<String, dynamic>),
+    );
+  }
+
+  /// Book appointment with a specific care-team member
+  /// POST /specialist-timeslots/care-team/{member_id}/book
+  Future<ApiResponse<AppointmentResponseData>> bookAppointment({
+    required String memberId,
+    required String startTime,
+    String? notes,
+  }) async {
     final response = await _dioClient.post(
-      ApiConstants.createAppointment,
-      data: request.toJson(),
+      '${ApiConstants.specialistTimeSlots}/care-team/$memberId/book',
+      data: BookAppointmentRequest(startTime: startTime, notes: notes).toJson(),
     );
     return ApiResponse.fromJson(
       response.data,
@@ -363,17 +383,16 @@ class ApiClient {
     );
   }
 
-  /// Get Time Slots
-  Future<ApiResponse<List<TimeSlot>>> getTimeSlots(String date) async {
+  /// Get appointment details by ID
+  /// GET /specialist-timeslots/appointments/{appointment_id}
+  Future<ApiResponse<AppointmentResponseData>> getAppointmentById(
+      String appointmentId) async {
     final response = await _dioClient.get(
-      ApiConstants.timeSlots,
-      queryParameters: {'date': date},
+      '${ApiConstants.specialistTimeSlots}/appointments/$appointmentId',
     );
     return ApiResponse.fromJson(
       response.data,
-      (json) => (json as List<dynamic>)
-          .map((item) => TimeSlot.fromJson(item as Map<String, dynamic>))
-          .toList(),
+      (json) => AppointmentResponseData.fromJson(json as Map<String, dynamic>),
     );
   }
 
@@ -657,14 +676,21 @@ class ApiClient {
 
   /// Get My Specialists
   Future<ApiResponse<List<SpecialistModel>>> getMySpecialists() async {
-    final response = await _dioClient.get(ApiConstants.mySpecialists);
-    return ApiResponse.fromJson(
-      response.data,
-      (json) => (json as List<dynamic>)
+  final response = await _dioClient.get(ApiConstants.mySpecialists);
+
+  return ApiResponse.fromJson(
+    response.data,
+    (json) {
+      if (json is! Map<String, dynamic>) return [];
+
+      final careTeam = json['careTeam'] as List<dynamic>? ?? [];
+
+      return careTeam
           .map((item) => SpecialistModel.fromJson(item as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+          .toList();
+    },
+  );
+}
 
   /// Get Specialist Details
   Future<ApiResponse<SpecialistModel>> getSpecialistDetails(String id) async {

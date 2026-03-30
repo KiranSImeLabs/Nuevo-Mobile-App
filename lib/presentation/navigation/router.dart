@@ -228,7 +228,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/confirm-booking',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
-          final args = state.extra as BookingConfirmationArgs;
+          final args = state.extra as BookingArgs;
           return ConfirmBookingScreen(args: args);
         },
       ),
@@ -236,8 +236,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/appointment-details',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
-          final args = state.extra as BookingConfirmationArgs;
-          return AppointmentDetailsScreen(args: args);
+          final appointmentId = state.extra as String;
+          return AppointmentDetailsScreen(appointmentId: appointmentId);
         },
       ),
       GoRoute(

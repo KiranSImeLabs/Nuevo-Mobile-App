@@ -9,13 +9,26 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
   AppointmentRepositoryImpl(this._apiClient);
 
   @override
-  Future<ApiResponse<List<TimeSlot>>> getTimeSlots(String date) {
-    return _apiClient.getTimeSlots(date);
+  Future<ApiResponse<TimeSlotResponse>> getTimeSlots({
+    required String memberId,
+    required String date,
+  }) {
+    return _apiClient.getTimeSlots(memberId: memberId, date: date);
   }
 
   @override
-  Future<ApiResponse<AppointmentResponseData>> createAppointment(
-      CreateAppointmentRequest request) {
-    return _apiClient.createAppointment(request);
+  Future<ApiResponse<AppointmentResponseData>> bookAppointment({
+    required String memberId,
+    required String startTime,
+    String? notes,
+  }) {
+    return _apiClient.bookAppointment(
+        memberId: memberId, startTime: startTime, notes: notes);
+  }
+
+  @override
+  Future<ApiResponse<AppointmentResponseData>> getAppointmentById(
+      String appointmentId) {
+    return _apiClient.getAppointmentById(appointmentId);
   }
 }
