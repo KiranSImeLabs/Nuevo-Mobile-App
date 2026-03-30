@@ -225,7 +225,6 @@ class AppointmentResponseData {
   factory AppointmentResponseData.fromJson(Map<String, dynamic> json) {
     // New endpoints nest under 'appointment'
     final apptJson = json['appointment'] as Map<String, dynamic>?;
-    print('apptJson :$apptJson');
     return AppointmentResponseData(
       appointment:
           apptJson != null ? AppointmentDetail.fromJson(apptJson) : null,

@@ -64,8 +64,19 @@ class DioClient {
         },
       ),
     );
-    
-    // Logs removed per user request
+    /*
+    // Add LogInterceptor to print ALL API requests and responses
+    _dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+        error: true,
+        logPrint: (obj) => print(obj), // Using print instead of developer.log so it shows up cleanly in standard debug console
+      ),
+    );*/
   }
   
   /// Expose Dio instance for Retrofit

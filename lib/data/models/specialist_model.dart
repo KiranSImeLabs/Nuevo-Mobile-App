@@ -16,7 +16,6 @@ class SpecialistModel extends Specialist {
   factory SpecialistModel.fromJson(Map<String, dynamic> json) {
     
     final roleMap = json['role'] as Map<String, dynamic>?;
-    print('roleMap: $roleMap');
     return SpecialistModel(
       id: json['id'] as String? ?? '',
       fullName: json['fullName'] as String? ?? '',
