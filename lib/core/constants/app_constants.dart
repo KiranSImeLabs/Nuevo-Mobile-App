@@ -38,6 +38,7 @@ class ApiConstants {
   static const String timeSlots = '/timeslots/day'; // legacy, kept for reference
   static const String createAppointment = '/bookings'; // legacy, kept for reference
   static const String specialistTimeSlots = '/specialist-timeslots';
+  static const String allAppointments = '/bookings/appointments/all';
   
   // Payments
   static const String paymentCustomer = '/payments/customer';

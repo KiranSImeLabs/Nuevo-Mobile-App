@@ -31,4 +31,9 @@ class AppointmentRepositoryImpl implements AppointmentRepository {
       String appointmentId) {
     return _apiClient.getAppointmentById(appointmentId);
   }
+
+  @override
+  Future<ApiResponse<UserAppointmentsResponse>> getUserAppointments() {
+    return _apiClient.getUserAppointments();
+  }
 }
