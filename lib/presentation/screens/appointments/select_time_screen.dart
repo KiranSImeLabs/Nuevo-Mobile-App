@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/session.dart';
+import '../../../data/models/appointment_model.dart';
 import 'confirm_booking_screen.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../providers/appointment_provider.dart';
-import '../../../data/models/appointment_model.dart';
 
 class SelectTimeScreen extends ConsumerStatefulWidget {
   final Session session;
@@ -131,10 +131,10 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
     return ElevatedButton(
       onPressed: _selectedTimeSlot != null && _selectedDay != null
           ? () {
-              final args = BookingConfirmationArgs(
+              final args = BookingArgs(
                 session: widget.session,
-                selectedDate: _selectedDay!,
-                selectedTime: _selectedTimeSlot!.displayTime,
+                selectedSlot: _selectedTimeSlot!,
+                memberId: widget.session.id,
               );
               context.push('/confirm-booking', extra: args);
             }
@@ -170,7 +170,8 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
 
   Widget _buildCustomCalendar() {
     final now = DateTime.now();
-    final isCurrentMonth = _focusedDay.year == now.year && _focusedDay.month == now.month;
+    final isCurrentMonth =
+        _focusedDay.year == now.year && _focusedDay.month == now.month;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -184,12 +185,18 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: Icon(Icons.chevron_left, color: isCurrentMonth ? Colors.grey[400] : AppColors.textSecondary),
-                onPressed: isCurrentMonth ? null : () {
-                  setState(() {
-                    _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1);
-                  });
-                },
+                icon: Icon(Icons.chevron_left,
+                    color: isCurrentMonth
+                        ? Colors.grey[400]
+                        : AppColors.textSecondary),
+                onPressed: isCurrentMonth
+                    ? null
+                    : () {
+                        setState(() {
+                          _focusedDay = DateTime(
+                              _focusedDay.year, _focusedDay.month - 1);
+                        });
+                      },
               ),
               Text(
                 DateFormat('MMMM yyyy').format(_focusedDay),
@@ -199,10 +206,12 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                icon: const Icon(Icons.chevron_right,
+                    color: AppColors.textSecondary),
                 onPressed: () {
                   setState(() {
-                    _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1);
+                    _focusedDay =
+                        DateTime(_focusedDay.year, _focusedDay.month + 1);
                   });
                 },
               ),
@@ -234,30 +243,30 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
   }
 
   Widget _buildCalendarGrid() {
-    final daysInMonth = DateUtils.getDaysInMonth(_focusedDay.year, _focusedDay.month);
-    final firstDayOfMonth = DateTime(_focusedDay.year, _focusedDay.month, 1);
+    final daysInMonth =
+        DateUtils.getDaysInMonth(_focusedDay.year, _focusedDay.month);
+    final firstDayOfMonth =
+        DateTime(_focusedDay.year, _focusedDay.month, 1);
     final int weekdayOffset = firstDayOfMonth.weekday % 7;
 
     final List<Widget> rows = [];
     List<Widget> dayWidgets = [];
 
-    // Empty slots for previous month
     for (int i = 0; i < weekdayOffset; i++) {
-       final prevMonth = DateTime(_focusedDay.year, _focusedDay.month - 1);
-       final daysInPrevMonth = DateUtils.getDaysInMonth(prevMonth.year, prevMonth.month);
-       final dayNum = daysInPrevMonth - (weekdayOffset - i) + 1;
-       
-       dayWidgets.add(
-         SizedBox(
-           width: 32, height: 32,
-           child: Center(
-             child: Text(
-               '$dayNum',
-               style: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14),
-             ),
-           ),
-         )
-       );
+      final prevMonth =
+          DateTime(_focusedDay.year, _focusedDay.month - 1);
+      final daysInPrevMonth =
+          DateUtils.getDaysInMonth(prevMonth.year, prevMonth.month);
+      final dayNum = daysInPrevMonth - (weekdayOffset - i) + 1;
+
+      dayWidgets.add(SizedBox(
+        width: 32,
+        height: 32,
+        child: Center(
+          child: Text('$dayNum',
+              style: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14)),
+        ),
+      ));
     }
 
     final now = DateTime.now();
@@ -265,40 +274,45 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
 
     for (int i = 1; i <= daysInMonth; i++) {
       final date = DateTime(_focusedDay.year, _focusedDay.month, i);
-      final isSelected = _selectedDay != null && DateUtils.isSameDay(_selectedDay, date);
+      final isSelected =
+          _selectedDay != null && DateUtils.isSameDay(_selectedDay, date);
       final isPastDate = date.isBefore(today);
-      
-      dayWidgets.add(
-        GestureDetector(
-          onTap: isPastDate ? null : () {
-            setState(() {
-              _selectedDay = date;
-              _selectedTimeSlot = null;
-            });
-          },
-          child: Container(
-            width: 32, height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: isSelected ? Border.all(color: const Color(0xFFA65C4B)) : null,
-              color: Colors.transparent,
-            ),
-            child: Center(
-              child: Text(
-                '$i',
-                style: TextStyle(
-                  color: isPastDate 
-                      ? const Color(0xFFBDBDBD) 
-                      : (isSelected ? const Color(0xFFA65C4B) : AppColors.textPrimary),
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  fontSize: 14,
-                ),
+
+      dayWidgets.add(GestureDetector(
+        onTap: isPastDate
+            ? null
+            : () {
+                setState(() {
+                  _selectedDay = date;
+                  _selectedTimeSlot = null;
+                });
+              },
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border:
+                isSelected ? Border.all(color: const Color(0xFFA65C4B)) : null,
+            color: Colors.transparent,
+          ),
+          child: Center(
+            child: Text(
+              '$i',
+              style: TextStyle(
+                color: isPastDate
+                    ? const Color(0xFFBDBDBD)
+                    : (isSelected
+                        ? const Color(0xFFA65C4B)
+                        : AppColors.textPrimary),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 14,
               ),
             ),
           ),
-        )
-      );
-      
+        ),
+      ));
+
       if (dayWidgets.length == 7) {
         rows.add(Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -312,18 +326,16 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
     if (dayWidgets.isNotEmpty) {
       int nextMonthDay = 1;
       while (dayWidgets.length < 7) {
-         dayWidgets.add(
-           SizedBox(
-             width: 32, height: 32,
-             child: Center(
-               child: Text(
-                 '$nextMonthDay',
-                 style: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14),
-               ),
-             ),
-           )
-         );
-         nextMonthDay++;
+        dayWidgets.add(SizedBox(
+          width: 32,
+          height: 32,
+          child: Center(
+            child: Text('$nextMonthDay',
+                style:
+                    const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14)),
+          ),
+        ));
+        nextMonthDay++;
       }
       rows.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -336,11 +348,27 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
 
   Widget _buildTimeSlotsList() {
     final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDay!);
-    final timeSlotsAsyncValue = ref.watch(timeSlotsProvider(dateStr));
+    final memberId = widget.session.id;
+    final key = (memberId: memberId, date: dateStr);
+    final timeSlotsAsync = ref.watch(timeSlotsProvider(key));
 
-    return timeSlotsAsyncValue.when(
-      data: (slots) {
-        if (slots.isEmpty) {
+    return timeSlotsAsync.when(
+      data: (slotResponse) {
+        if (!slotResponse.isWorkingDay) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Text(
+                'No slots available on this day',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (slotResponse.slots.isEmpty || slotResponse.availableSlots == 0) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 24.0),
@@ -357,29 +385,39 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
         return Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: slots.map((slot) {
-            final isSelected = _selectedTimeSlot?.startTime == slot.startTime;
+          children: slotResponse.slots.map((slot) {
+            final isSelected =
+                _selectedTimeSlot?.startTime == slot.startTime;
+            final isUnavailable = !slot.available;
 
             return GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedTimeSlot = slot;
-                });
-              },
+              onTap: isUnavailable
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedTimeSlot = slot;
+                      });
+                    },
               child: Container(
                 width: (MediaQuery.of(context).size.width - 48 - 24) / 3,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isSelected
-                      ? const Color(0xFF964A38)
-                      : const Color(0xFFF5EAE8),
+                  color: isUnavailable
+                      ? const Color(0xFFEEEEEE)
+                      : isSelected
+                          ? const Color(0xFF964A38)
+                          : const Color(0xFFF5EAE8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   slot.displayTime,
                   style: TextStyle(
-                    color: isSelected ? Colors.white : const Color(0xFF5D4037),
+                    color: isUnavailable
+                        ? const Color(0xFFBDBDBD)
+                        : isSelected
+                            ? Colors.white
+                            : const Color(0xFF5D4037),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
                   ),
@@ -401,9 +439,7 @@ class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
           child: Text(
             'Failed to load time slots.\nPlease try again.',
             textAlign: TextAlign.center,
-            style: AppTextStyles.bodyMedium.copyWith(
-              color: Colors.red,
-            ),
+            style: AppTextStyles.bodyMedium.copyWith(color: Colors.red),
           ),
         ),
       ),

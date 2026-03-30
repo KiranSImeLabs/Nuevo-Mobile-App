@@ -382,33 +382,69 @@ class MockApiClient extends _i1.Mock implements _i4.ApiClient {
           as _i5.Future<_i2.ApiResponse<_i10.LabReportDetailData>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>> createAppointment(
-    _i11.CreateAppointmentRequest? request,
-  ) =>
+  _i5.Future<_i2.ApiResponse<_i11.TimeSlotResponse>> getTimeSlots({
+    required String? memberId,
+    required String? date,
+  }) =>
       (super.noSuchMethod(
-            Invocation.method(#createAppointment, [request]),
+            Invocation.method(#getTimeSlots, [], {
+              #memberId: memberId,
+              #date: date,
+            }),
+            returnValue:
+                _i5.Future<_i2.ApiResponse<_i11.TimeSlotResponse>>.value(
+                  _FakeApiResponse_0<_i11.TimeSlotResponse>(
+                    this,
+                    Invocation.method(#getTimeSlots, [], {
+                      #memberId: memberId,
+                      #date: date,
+                    }),
+                  ),
+                ),
+          )
+          as _i5.Future<_i2.ApiResponse<_i11.TimeSlotResponse>>);
+
+  @override
+  _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>> bookAppointment({
+    required String? memberId,
+    required String? startTime,
+    String? notes,
+  }) =>
+      (super.noSuchMethod(
+            Invocation.method(#bookAppointment, [], {
+              #memberId: memberId,
+              #startTime: startTime,
+              #notes: notes,
+            }),
             returnValue:
                 _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>>.value(
                   _FakeApiResponse_0<_i11.AppointmentResponseData>(
                     this,
-                    Invocation.method(#createAppointment, [request]),
+                    Invocation.method(#bookAppointment, [], {
+                      #memberId: memberId,
+                      #startTime: startTime,
+                      #notes: notes,
+                    }),
                   ),
                 ),
           )
           as _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>>);
 
   @override
-  _i5.Future<_i2.ApiResponse<List<_i11.TimeSlot>>> getTimeSlots(String? date) =>
+  _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>> getAppointmentById(
+    String? appointmentId,
+  ) =>
       (super.noSuchMethod(
-            Invocation.method(#getTimeSlots, [date]),
-            returnValue: _i5.Future<_i2.ApiResponse<List<_i11.TimeSlot>>>.value(
-              _FakeApiResponse_0<List<_i11.TimeSlot>>(
-                this,
-                Invocation.method(#getTimeSlots, [date]),
-              ),
-            ),
+            Invocation.method(#getAppointmentById, [appointmentId]),
+            returnValue:
+                _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>>.value(
+                  _FakeApiResponse_0<_i11.AppointmentResponseData>(
+                    this,
+                    Invocation.method(#getAppointmentById, [appointmentId]),
+                  ),
+                ),
           )
-          as _i5.Future<_i2.ApiResponse<List<_i11.TimeSlot>>>);
+          as _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>>);
 
   @override
   _i5.Future<_i2.ApiResponse<_i11.AppointmentResponseData>> updateAppointment(
