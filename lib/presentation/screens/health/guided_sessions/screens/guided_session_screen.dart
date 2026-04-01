@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
 import 'package:video_player/video_player.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../widgets/health/session_completed_sheet.dart';
-import '../../widgets/health/session_paused_sheet.dart';
-import '../../../data/models/daily_exercise_model.dart';
+import '../../../../../core/theme/app_theme.dart';
+import '../../../../widgets/health/session_completed_sheet.dart';
+import '../../../../widgets/health/session_paused_sheet.dart';
+import '../../../../../data/models/daily_exercise_model.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../providers/health_provider.dart';
-import '../../../data/models/active_progress_model.dart';
-import '../../../core/constants/app_strings.dart';
+import '../../../../providers/health_provider.dart';
+import '../../../../../data/models/active_progress_model.dart';
+import '../../../../../core/constants/app_strings.dart';
 
 class GuidedSessionScreen extends ConsumerStatefulWidget {
   final List<ExerciseStepModel>? steps;

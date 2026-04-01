@@ -8,7 +8,7 @@ import '../../../../core/theme/app_theme.dart';
 import '../../../providers/health_provider.dart';
 import '../../../providers/lab_reports_provider.dart';
 import '../../../widgets/common/dashed_border.dart';
-import 'lab_report_card.dart';
+import '../lab_reports/components/lab_report_card.dart';
 
 class HealthResultsTab extends ConsumerWidget {
   const HealthResultsTab({super.key});
@@ -16,6 +16,8 @@ class HealthResultsTab extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final labReportsAsync = ref.watch(labReportsProvider);
+    final labReportsData = labReportsAsync.valueOrNull;
+    final int reportCount = labReportsData?.reports?.length ?? 0;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -89,35 +91,48 @@ class HealthResultsTab extends ConsumerWidget {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: const Color(0xFFFCF8F6),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: const Color(0xFFE5D5D0), width: 1),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
             ),
-            child: const Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    Icon(Icons.inventory_2_outlined, color: Color(0xFFA05E44), size: 24),
-                    SizedBox(width: 16),
-                    Text(
-                      'View All Lab Reports',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color(0xFF1E1E1E),
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      child: const Icon(Icons.inventory_2_outlined, color: Color(0xFFA05E44), size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'View All Lab Reports',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E1E1E),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'You have $reportCount ${reportCount == 1 ? 'report' : 'reports'} available',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF757575),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-                Icon(Icons.arrow_forward_ios, color: Color(0xFFBDBDBD), size: 16),
+                const Icon(Icons.arrow_forward_ios, color: Color(0xFFBDBDBD), size: 16),
               ],
             ),
           ),
@@ -166,6 +181,65 @@ class HealthResultsTab extends ConsumerWidget {
                         SizedBox(height: 4),
                         Text(
                           'Manually enter biomarker data',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Color(0xFF757575),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const Icon(Icons.arrow_forward_ios, color: Color(0xFFBDBDBD), size: 16),
+              ],
+            ),
+          ),
+        ),
+
+        const SizedBox(height: AppSpacing.md),
+        
+        // Upload Lab Report Entry Point
+        InkWell(
+          onTap: () {
+            context.push('/health/upload-lab-report');
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFCF8F6),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: const Color(0xFFE5D5D0), width: 1),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Icon(Icons.file_upload_outlined, color: Color(0xFFA05E44), size: 24),
+                    ),
+                    const SizedBox(width: 16),
+                    const Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Upload Lab Report',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Color(0xFF1E1E1E),
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Upload your report (PDF or Image)',
                           style: TextStyle(
                             fontSize: 12,
                             color: Color(0xFF757575),

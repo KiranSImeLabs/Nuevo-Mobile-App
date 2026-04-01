@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../widgets/common/dashed_border.dart';
+import '../../../../../core/theme/app_theme.dart';
+import '../../../../widgets/common/dashed_border.dart';
 
 class UpdateLabReportsScreen extends StatefulWidget {
   const UpdateLabReportsScreen({super.key});

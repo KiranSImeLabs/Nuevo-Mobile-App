@@ -9,12 +9,13 @@ import '../screens/auth/forgot_password_screen.dart';
 import '../screens/home/home_screen.dart';
 import '../screens/my_plan/my_plan_screen.dart';
 import '../screens/health/health_screen.dart';
-import '../screens/health/session_overview_screen.dart';
-import '../screens/health/active_session_screen.dart';
-import '../screens/health/guided_session_screen.dart';
-import '../screens/health/result_details_screen.dart';
-import '../screens/health/lab_reports_list_screen.dart';
-import '../screens/health/update_lab_reports_screen.dart';
+import '../screens/health/guided_sessions/screens/session_overview_screen.dart';
+import '../screens/health/guided_sessions/screens/active_session_screen.dart';
+import '../screens/health/guided_sessions/screens/guided_session_screen.dart';
+import '../screens/health/lab_reports/screens/result_details_screen.dart';
+import '../screens/health/lab_reports/screens/lab_reports_list_screen.dart';
+import '../screens/health/lab_reports/screens/update_lab_reports_screen.dart';
+import '../screens/health/lab_reports/screens/upload_lab_report_screen.dart';
 import '../../data/models/daily_exercise_model.dart';
 import '../../data/models/lab_report_model.dart';
 import '../screens/appointments/appointments_screen.dart';
@@ -296,6 +297,10 @@ final routerProvider = Provider<GoRouter>((ref) {
           GoRoute(
             path: '/health/update-lab-reports',
             builder: (context, state) => const UpdateLabReportsScreen(),
+          ),
+          GoRoute(
+            path: '/health/upload-lab-report',
+            builder: (context, state) => const UploadLabReportScreen(),
           ),
           GoRoute(
             path: '/completed-tasks',

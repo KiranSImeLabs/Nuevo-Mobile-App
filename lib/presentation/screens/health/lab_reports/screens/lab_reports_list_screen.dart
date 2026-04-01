@@ -5,10 +5,10 @@ import 'package:intl/intl.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:developer' as developer;
 
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/constants/app_strings.dart';
-import '../../providers/health_provider.dart';
-import '../../providers/lab_reports_provider.dart';
+import '../../../../../core/theme/app_theme.dart';
+import '../../../../../core/constants/app_strings.dart';
+import '../../../../providers/health_provider.dart';
+import '../../../../providers/lab_reports_provider.dart';
 
 class LabReportsListScreen extends ConsumerWidget {
   const LabReportsListScreen({super.key});
