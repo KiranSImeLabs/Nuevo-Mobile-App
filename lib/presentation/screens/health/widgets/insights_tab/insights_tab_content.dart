@@ -37,11 +37,11 @@ class InsightsTabContent extends StatelessWidget {
                 textBaseline: TextBaseline.alphabetic,
                 children: [
                   const Text(
-                    "32",
+                    "--",
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w400,
-                      color: Color(0xFF1E1E1E),
+                      color: Colors.green,//Color(0xFF1E1E1E),
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -56,7 +56,7 @@ class InsightsTabContent extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                "5 years younger than your biological age",
+                "-- years younger than your biological age",
                 style: TextStyle(
                   fontSize: 14,
                   color: const Color(0xFF1E1E1E).withAlpha(150),
