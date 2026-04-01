@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:async';
-import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_strings.dart';
+import '../../../../../core/theme/app_theme.dart';
+import '../../../../../core/constants/app_strings.dart';
 
 class ActiveSessionScreen extends StatefulWidget {
   const ActiveSessionScreen({super.key});

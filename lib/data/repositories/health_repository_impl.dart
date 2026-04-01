@@ -179,6 +179,22 @@ class HealthRepositoryImpl implements HealthRepository {
   }
 
   @override
+  Future<Either<Failure, List<PatientHabitHistory>>> getAllPatientHabitHistory() async {
+    try {
+      final response = await apiClient.getPatientHabitHistoryAll();
+      if (response.success && response.data != null) {
+        return Right(response.data!);
+      } else {
+        return Left(ServerFailure(response.message ?? 'Unknown Error'));
+      }
+    } on AppException catch (e) {
+      return Left(ServerFailure(e.message));
+    } catch (e) {
+      return Left(UnknownFailure(message: e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, PatientHabitHistory>> savePatientHabitHistory(PatientHabitHistory data) async {
     try {
       final response = await apiClient.savePatientHabitHistory(data);

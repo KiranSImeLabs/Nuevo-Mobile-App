@@ -20,5 +20,6 @@ abstract class HealthRepository {
   Future<Either<Failure, LabReportDetailData>> getLabReportDetails(String id);
   Future<Either<Failure, LabRequestData>> createLabRequest(String notes);
   Future<Either<Failure, PatientHabitHistory?>> getPatientHabitHistory(String date);
+  Future<Either<Failure, List<PatientHabitHistory>>> getAllPatientHabitHistory();
   Future<Either<Failure, PatientHabitHistory>> savePatientHabitHistory(PatientHabitHistory data);
 }

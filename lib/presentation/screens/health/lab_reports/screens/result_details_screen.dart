@@ -6,13 +6,13 @@ import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/theme/app_theme.dart';
-import '../../../core/constants/app_strings.dart';
-import '../../../data/models/lab_report_model.dart';
-import '../../providers/health_provider.dart';
-import '../../widgets/common/app_error_widget.dart';
-import 'widgets/metric_result_card.dart';
-import 'widgets/progress_summary_card.dart';
+import '../../../../../core/theme/app_theme.dart';
+import '../../../../../core/constants/app_strings.dart';
+import '../../../../../data/models/lab_report_model.dart';
+import '../../../../providers/health_provider.dart';
+import '../../../../widgets/common/app_error_widget.dart';
+import '../components/metric_result_card.dart';
+import '../../widgets/progress_summary_card.dart';
 
 class ResultDetailsScreen extends ConsumerWidget {
   final LabReportModel report;

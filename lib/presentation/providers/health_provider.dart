@@ -132,3 +132,14 @@ final patientHabitHistoryProvider = FutureProvider.family<PatientHabitHistory?, 
     (data) => data,
   );
 });
+
+// FutureProvider for All Patient Habit History
+final patientHabitHistoryListProvider = FutureProvider<List<PatientHabitHistory>>((ref) async {
+  final repository = ref.watch(healthRepositoryProvider);
+  final result = await repository.getAllPatientHabitHistory();
+  
+  return result.fold(
+    (failure) => throw failure.message,
+    (data) => data,
+  );
+});

@@ -329,6 +329,25 @@ class ApiClient {
       },
     );
   }
+  /// Get All Patient Habits History
+  Future<ApiResponse<List<PatientHabitHistory>>> getPatientHabitHistoryAll() async {
+    final response = await _dioClient.get(ApiConstants.patientHabitsHistory);
+    
+    return ApiResponse.fromJson(
+      response.data,
+      (json) {
+        if (json is List) {
+          return json.map((e) => PatientHabitHistory.fromJson(e as Map<String, dynamic>)).toList();
+        } else if (json is Map<String, dynamic>) {
+          if (json.containsKey('data') && json['data'] is List) {
+            return (json['data'] as List).map((e) => PatientHabitHistory.fromJson(e as Map<String, dynamic>)).toList();
+          }
+          return [PatientHabitHistory.fromJson(json)];
+        }
+        return <PatientHabitHistory>[];
+      },
+    );
+  }
 
   /// Save Patient Habits History
   Future<ApiResponse<PatientHabitHistory>> savePatientHabitHistory(PatientHabitHistory data) async {
