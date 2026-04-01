@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
-import '../../providers/health_provider.dart';
-import '../../../core/constants/app_constants.dart';
-import '../../../data/models/daily_exercise_model.dart';
-import '../../../data/models/active_progress_model.dart';
-import '../../../core/constants/app_strings.dart';
+import '../../../../../core/theme/app_theme.dart';
+import '../../../../providers/health_provider.dart';
+import '../../../../../core/constants/app_constants.dart';
+import '../../../../../data/models/daily_exercise_model.dart';
+import '../../../../../data/models/active_progress_model.dart';
+import '../../../../../core/constants/app_strings.dart';
 
 class SessionOverviewScreen extends ConsumerStatefulWidget {
   final String sessionId;

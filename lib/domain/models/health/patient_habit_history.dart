@@ -5,6 +5,7 @@ class PatientHabitHistory {
   final double screenTime;
   final String stressLevel;
   final int stepsCount;
+  final String energyLevel;
 
   PatientHabitHistory({
     required this.date,
@@ -13,6 +14,7 @@ class PatientHabitHistory {
     required this.screenTime,
     required this.stressLevel,
     required this.stepsCount,
+    required this.energyLevel,
   });
 
   factory PatientHabitHistory.fromJson(Map<String, dynamic> json) {
@@ -29,6 +31,7 @@ class PatientHabitHistory {
       screenTime: parseDouble(json['screenTime']),
       stressLevel: json['stressLevel'] as String? ?? 'Normal',
       stepsCount: (json['stepsCount'] as num?)?.toInt() ?? 0,
+      energyLevel: json['energyLevel'] as String? ?? 'Balanced',
     );
   }
 
@@ -40,6 +43,7 @@ class PatientHabitHistory {
       'screenTime': screenTime,
       'stressLevel': stressLevel,
       'stepsCount': stepsCount,
+      'energyLevel': energyLevel,
     };
   }
 }
