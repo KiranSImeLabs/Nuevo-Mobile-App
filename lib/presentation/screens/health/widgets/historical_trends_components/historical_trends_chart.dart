@@ -101,8 +101,11 @@ class HistoricalTrendsChart extends StatelessWidget {
               getTitlesWidget: (value, meta) {
                 if (value <= minY || value >= maxY) return const SizedBox.shrink(); 
                 String label;
-                if (value >= 1000) label = '${(value / 1000).toStringAsFixed(value % 1000 == 0 ? 0 : 1)}k';
-                else label = value.toInt().toString();
+                if (value >= 1000) {
+                  label = '${(value / 1000).toStringAsFixed(value % 1000 == 0 ? 0 : 1)}k';
+                } else {
+                  label = value.toInt().toString();
+                }
 
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),

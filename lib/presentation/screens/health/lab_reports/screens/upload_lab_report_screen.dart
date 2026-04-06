@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:file_picker/file_picker.dart';
 
-import '../../../../../core/theme/app_theme.dart';
-import '../../../../../core/constants/app_strings.dart';
 
 class UploadLabReportScreen extends StatefulWidget {
   const UploadLabReportScreen({super.key});
@@ -20,7 +18,7 @@ class _UploadLabReportScreenState extends State<UploadLabReportScreen> {
 
   Future<void> _pickFile() async {
     try {
-      final result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['pdf', 'jpg', 'jpeg', 'png'],
       );
@@ -79,7 +77,7 @@ class _UploadLabReportScreenState extends State<UploadLabReportScreen> {
                   width: 64,
                   height: 64,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF4CAF50).withOpacity(0.1),
+                    color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
@@ -193,7 +191,7 @@ class _UploadLabReportScreenState extends State<UploadLabReportScreen> {
                   color: const Color(0xFFFCF8F6),
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: const Color(0xFFA05E44).withOpacity(0.5),
+                    color: const Color(0xFFA05E44).withValues(alpha: 0.5),
                     width: 1.5,
                   ),
                 ),
@@ -202,7 +200,7 @@ class _UploadLabReportScreenState extends State<UploadLabReportScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFA05E44).withOpacity(0.1),
+                        color: const Color(0xFFA05E44).withValues(alpha: 0.1),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -251,7 +249,7 @@ class _UploadLabReportScreenState extends State<UploadLabReportScreen> {
                   border: Border.all(color: const Color(0xFFE5D5D0), width: 1),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: 0.02),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -300,7 +298,7 @@ class _UploadLabReportScreenState extends State<UploadLabReportScreen> {
                 onPressed: (_selectedFile == null || _isUploading) ? null : _uploadFile,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFA05E44),
-                  disabledBackgroundColor: const Color(0xFFA05E44).withOpacity(0.5),
+                  disabledBackgroundColor: const Color(0xFFA05E44).withValues(alpha: 0.5),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
