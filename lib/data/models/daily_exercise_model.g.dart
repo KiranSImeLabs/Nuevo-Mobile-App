@@ -19,7 +19,8 @@ DailyExerciseModel _$DailyExerciseModelFromJson(Map<String, dynamic> json) =>
       session: json['session'] == null
           ? null
           : GuidedSessionModel.fromJson(
-              json['session'] as Map<String, dynamic>),
+              json['session'] as Map<String, dynamic>,
+            ),
       progress: json['progress'],
     );
 

@@ -35,7 +35,31 @@ class ApiClient {
   // Authentication Endpoints
   // ============================================
   
-  /// Login with email and password
+  /// Send OTP
+  Future<ApiResponse<void>> sendOtp(SendOtpRequest request) async {
+    final response = await _dioClient.post(
+      ApiConstants.generateOtp,
+      data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => null,
+    );
+  }
+
+  /// Verify OTP
+  Future<ApiResponse<AuthResponseData>> verifyOtp(VerifyOtpRequest request) async {
+    final response = await _dioClient.post(
+      ApiConstants.loginOtp,
+      data: request.toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AuthResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Login with email and password (Legacy / Alternative)
   Future<ApiResponse<AuthResponseData>> login(LoginRequest request) async {
     final response = await _dioClient.post(
       ApiConstants.login,
@@ -345,12 +369,45 @@ class ApiClient {
   // Appointment/Booking Endpoints
   // ============================================
 
-  /// Create Appointment
-  Future<ApiResponse<AppointmentResponseData>> createAppointment(
-      CreateAppointmentRequest request) async {
+  /// Get Time Slots for a specific care-team member
+  /// GET /specialist-timeslots/care-team/{member_id}?date=YYYY-MM-DD
+  Future<ApiResponse<TimeSlotResponse>> getTimeSlots({
+    required String memberId,
+    required String date,
+  }) async {
+    final response = await _dioClient.get(
+      '${ApiConstants.specialistTimeSlots}/care-team/$memberId',
+      queryParameters: {'date': date},
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => TimeSlotResponse.fromJson(response.data as Map<String, dynamic>),
+    );
+  }
+
+  /// Book appointment with a specific care-team member
+  /// POST /specialist-timeslots/care-team/{member_id}/book
+  Future<ApiResponse<AppointmentResponseData>> bookAppointment({
+    required String memberId,
+    required String startTime,
+    String? notes,
+  }) async {
     final response = await _dioClient.post(
-      ApiConstants.createAppointment,
-      data: request.toJson(),
+      '${ApiConstants.specialistTimeSlots}/care-team/$memberId/book',
+      data: BookAppointmentRequest(startTime: startTime, notes: notes).toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => AppointmentResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get appointment details by ID
+  /// GET /specialist-timeslots/appointments/{appointment_id}
+  Future<ApiResponse<AppointmentResponseData>> getAppointmentById(
+      String appointmentId) async {
+    final response = await _dioClient.get(
+      '${ApiConstants.specialistTimeSlots}/appointments/$appointmentId',
     );
     return ApiResponse.fromJson(
       response.data,
@@ -377,7 +434,19 @@ class ApiClient {
     final response = await _dioClient.delete('${ApiConstants.bookings}/$bookingId');
     return ApiResponse.fromJson(
       response.data,
-      (json) => CancelAppointmentResponseData.fromJson(json as Map<String, dynamic>),
+      (json) =>
+          CancelAppointmentResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get all user appointments
+  /// GET /bookings/appointments/all
+  Future<ApiResponse<UserAppointmentsResponse>> getUserAppointments() async {
+    final response = await _dioClient.get(ApiConstants.allAppointments);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) =>
+          UserAppointmentsResponse.fromJson(json as Map<String, dynamic>),
     );
   }
   
@@ -450,6 +519,87 @@ class ApiClient {
       (json) => (json as List<dynamic>)
           .map((item) => PhaseModel.fromJson(item as Map<String, dynamic>))
           .toList(),
+    );
+  }
+
+  /// Get Phase By ID — GET /phases/{phaseId}
+  Future<ApiResponse<PhaseModel>> getPhaseById(String phaseId) async {
+    final response = await _dioClient.get('${ApiConstants.phases}/$phaseId');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PhaseModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get My Active Phase — GET /phases/my-active-phase
+  Future<ApiResponse<ActivePhaseResponseModel>> getMyActivePhase() async {
+    final response = await _dioClient.get(ApiConstants.myActivePhase);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) =>
+          ActivePhaseResponseModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Current Weekly View — GET /phases/my-active-phase/weekly
+  Future<ApiResponse<WeeklyViewModel>> getCurrentWeeklyView() async {
+    final response = await _dioClient.get(ApiConstants.myActivePhaseWeekly);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => WeeklyViewModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Phase Progress — GET /phases/my-active-phase/progress
+  Future<ApiResponse<PhaseProgressModel>> getPhaseProgress() async {
+    final response = await _dioClient.get(ApiConstants.myActivePhaseProgress);
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PhaseProgressModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Week View By Number — GET /phases/my-active-phase/weeks/{weekNumber}
+  Future<ApiResponse<WeeklyViewModel>> getWeekByNumber(int weekNumber) async {
+    final response = await _dioClient
+        .get('${ApiConstants.myActivePhase}/weeks/$weekNumber');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => WeeklyViewModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Get Task By ID — GET /phases/my-active-phase/tasks/{taskId}
+  Future<ApiResponse<PatientTaskModel>> getTaskById(String taskId) async {
+    final response =
+        await _dioClient.get('${ApiConstants.myActivePhaseTasks}/$taskId');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PatientTaskModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Mark Task Completed — PATCH /phases/my-active-phase/tasks/{taskId}/complete
+  Future<ApiResponse<PatientTaskModel>> markTaskCompleted(
+      String taskId) async {
+    final response = await _dioClient
+        .patch('${ApiConstants.myActivePhaseTasks}/$taskId/complete');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PatientTaskModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Update Task Status — PATCH /phases/my-active-phase/tasks/{taskId}/status
+  Future<ApiResponse<PatientTaskModel>> updateTaskStatus(
+      String taskId, String statusValue) async {
+    final response = await _dioClient.patch(
+      '${ApiConstants.myActivePhaseTasks}/$taskId/status',
+      data: UpdateTaskStatusRequest(statusValue: statusValue).toJson(),
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => PatientTaskModel.fromJson(json as Map<String, dynamic>),
     );
   }
 
@@ -557,14 +707,21 @@ class ApiClient {
 
   /// Get My Specialists
   Future<ApiResponse<List<SpecialistModel>>> getMySpecialists() async {
-    final response = await _dioClient.get(ApiConstants.mySpecialists);
-    return ApiResponse.fromJson(
-      response.data,
-      (json) => (json as List<dynamic>)
+  final response = await _dioClient.get(ApiConstants.mySpecialists);
+
+  return ApiResponse.fromJson(
+    response.data,
+    (json) {
+      if (json is! Map<String, dynamic>) return [];
+
+      final careTeam = json['careTeam'] as List<dynamic>? ?? [];
+
+      return careTeam
           .map((item) => SpecialistModel.fromJson(item as Map<String, dynamic>))
-          .toList(),
-    );
-  }
+          .toList();
+    },
+  );
+}
 
   /// Get Specialist Details
   Future<ApiResponse<SpecialistModel>> getSpecialistDetails(String id) async {
@@ -631,6 +788,32 @@ class ApiClient {
     return ApiResponse.fromJson(
       response.data,
       (json) => BillingResponseData.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  // ============================================
+  // Questionnaire Endpoints
+  // ============================================
+
+  /// Get Questionnaire By ID
+  Future<ApiResponse<dynamic>> getQuestionnaire(String id) async {
+    final response = await _dioClient.get('${ApiConstants.questionnaires}/$id');
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => json, // We map this to the domain entity in the repository
+    );
+  }
+
+  /// Submit Questionnaire Responses
+  Future<ApiResponse<dynamic>> submitQuestionnaire(
+      String patientTaskId, List<Map<String, dynamic>> responses) async {
+    final response = await _dioClient.post(
+      '${ApiConstants.questionnaires}/submit/$patientTaskId',
+      data: {'responses': responses},
+    );
+    return ApiResponse.fromJson(
+      response.data,
+      (json) => json, 
     );
   }
 }

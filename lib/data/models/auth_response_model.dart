@@ -47,19 +47,55 @@ class RegisterRequest {
   @JsonKey(name: 'lastName')
   final String lastName;
   final String email;
-  final String password;
   
   const RegisterRequest({
     required this.firstName,
     required this.lastName,
     required this.email,
-    required this.password,
   });
   
   factory RegisterRequest.fromJson(Map<String, dynamic> json) =>
       _$RegisterRequestFromJson(json);
   
   Map<String, dynamic> toJson() => _$RegisterRequestToJson(this);
+}
+
+/// Send OTP Request
+@JsonSerializable()
+class SendOtpRequest {
+  final String bookingId;
+  final String purposeType;
+  final String userMail;
+
+  const SendOtpRequest({
+    required this.bookingId,
+    required this.purposeType,
+    required this.userMail,
+  });
+
+  factory SendOtpRequest.fromJson(Map<String, dynamic> json) =>
+      _$SendOtpRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$SendOtpRequestToJson(this);
+}
+
+/// Verify OTP Request
+@JsonSerializable()
+class VerifyOtpRequest {
+  final String email;
+  final String otp;
+  final String purposeType;
+
+  const VerifyOtpRequest({
+    required this.email,
+    required this.otp,
+    required this.purposeType,
+  });
+
+  factory VerifyOtpRequest.fromJson(Map<String, dynamic> json) =>
+      _$VerifyOtpRequestFromJson(json);
+
+  Map<String, dynamic> toJson() => _$VerifyOtpRequestToJson(this);
 }
 
 /// Forgot Password Request

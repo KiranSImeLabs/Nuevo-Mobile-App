@@ -11,7 +11,7 @@ class AppStrings {
   static const String notAvailable = 'N/A';
   
   // Auth - Login
-  static const String welcomeBack = 'Welcome back';
+  static const String welcomeBack = 'Welcome';
   static const String accessProgram = 'Access your personalised care program';
   static const String emailAddress = 'Email Address';
   static const String password = 'Password';

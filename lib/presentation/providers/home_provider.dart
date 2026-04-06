@@ -7,6 +7,8 @@ import '../../data/repositories/home_repository_impl.dart';
 import '../../domain/usecases/usecase.dart';
 import '../../domain/usecases/home/get_home_dashboard_usecase.dart';
 import '../../presentation/providers/core_providers.dart'; // Import core_providers
+import '../../presentation/providers/auth_provider.dart';
+import '../../presentation/providers/auth_state.dart';
 
 /// Home Repository Provider
 final homeRepositoryProvider = Provider<HomeRepository>((ref) {
@@ -21,6 +23,13 @@ final getHomeDashboardUseCaseProvider = Provider<GetHomeDashboardUseCase>((ref) 
 
 /// Home Dashboard Provider
 final homeDashboardProvider = FutureProvider<HomeDashboard>((ref) async {
+  // Clear cache if user logs out to avoid showing previous user's data
+  ref.listen<AuthState>(authProvider, (previous, next) {
+    if (next.status == AuthStatus.unauthenticated) {
+      ref.invalidateSelf();
+    }
+  });
+
   final getHomeDashboard = ref.watch(getHomeDashboardUseCaseProvider);
   final result = await getHomeDashboard(const NoParams());
   

@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/theme/app_theme.dart';
 import '../../presentation/utils/responsive_utils.dart';
+import '../providers/home_provider.dart';
 
 /// Main Shell with Bottom Navigation
 /// Wraps all main app screens with persistent bottom navigation bar
-class MainShell extends StatelessWidget {
+class MainShell extends ConsumerWidget {
   final Widget child;
   final String currentPath;
   
@@ -16,11 +18,27 @@ class MainShell extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    bool disableTabs = false;
+    
+    final dashboardState = ref.watch(homeDashboardProvider);
+    dashboardState.whenData((dashboard) {
+      if (dashboard.yourProgram == null) {
+        disableTabs = true;
+      }
+    });
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: _buildBottomNavigationBar(context),
+      bottomNavigationBar: disableTabs
+          ? IgnorePointer(
+              ignoring: true,
+              child: Opacity(
+                opacity: 0.5,
+                child: _buildBottomNavigationBar(context),
+              ),
+            )
+          : _buildBottomNavigationBar(context),
     );
   }
 

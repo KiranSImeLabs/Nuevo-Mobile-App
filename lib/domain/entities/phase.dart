@@ -6,6 +6,9 @@ class Phase extends Equatable {
   final int durationWeeks;
   final int orderIndex;
   final String programType;
+  final int? totalAppointments;
+  final String? createdAt;
+  final String? updatedAt;
 
   const Phase({
     required this.id,
@@ -13,6 +16,9 @@ class Phase extends Equatable {
     required this.durationWeeks,
     required this.orderIndex,
     required this.programType,
+    this.totalAppointments,
+    this.createdAt,
+    this.updatedAt,
   });
 
   @override
@@ -22,5 +28,8 @@ class Phase extends Equatable {
         durationWeeks,
         orderIndex,
         programType,
+        totalAppointments,
+        createdAt,
+        updatedAt,
       ];
 }

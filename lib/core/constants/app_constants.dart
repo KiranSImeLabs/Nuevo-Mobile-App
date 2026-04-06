@@ -2,14 +2,21 @@
 /// IMPORTANT: Update these with actual backend URLs before deployment
 class ApiConstants {
   // Base URLs
-  static const String baseUrl = 'https://nuevo-dev-be.simelabs.in/api/v1';//'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';//'http://192.168.0.220:3000/api/v1';
+  static const String baseUrl = 'https://nuevo-medical-be.simelabs.in/api/v1';//'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';//'http://192.168.0.220:3000/api/v1';
   //'https://untaut-arletha-noninfusible.ngrok-free.dev/api/v1';
+  //'https://nuevo-dev-be.simelabs.in/api/v1'
   //'https://nuevo-medical-be.simelabs.in/api/v1';
   //http://192.168.0.220:3000/api/v1
   
   // Endpoints
   // Auth
+  static const String myActivePhaseTasks = '/phases/my-active-phase/tasks';
+  static const String myActivePhase = '/phases/my-active-phase';
+  static const String myActivePhaseWeekly = '/phases/my-active-phase/weekly';
+  static const String myActivePhaseProgress = '/phases/my-active-phase/progress';
   static const String login = '/auth/login';
+  static const String generateOtp = '/auth/generate-otp';
+  static const String loginOtp = '/auth/login-otp';
   static const String register = '/auth/register';
   static const String googleLogin = '/auth/register-or-login-google';
   static const String appleLogin = '/auth/register-or-login-apple';
@@ -28,8 +35,10 @@ class ApiConstants {
   
   // Bookings
   static const String bookings = '/bookings';
-  static const String timeSlots = '/timeslots/day';
-  static const String createAppointment = '/bookings/appointment';
+  static const String timeSlots = '/timeslots/day'; // legacy, kept for reference
+  static const String createAppointment = '/bookings'; // legacy, kept for reference
+  static const String specialistTimeSlots = '/specialist-timeslots';
+  static const String allAppointments = '/bookings/appointments/all';
   
   // Payments
   static const String paymentCustomer = '/payments/customer';
@@ -62,7 +71,7 @@ class ApiConstants {
   static const String goals = '/goals';
 
   // Specialists
-  static const String mySpecialists = '/patients/my-specialists';
+  static const String mySpecialists = '/care-team/my-care-team';
   static const String specialistDetails = '/patients/specialists';
   
   // Guided Sessions
@@ -81,7 +90,10 @@ class ApiConstants {
   static const String home = '/mobile/home';
   
   // Phases
-  static const String phases = '/phases';          
+  static const String phases = '/phases';
+  
+  // Questionnaires
+  static const String questionnaires = '/questionnaires';
   
   // Timeouts
   static const Duration connectTimeout = Duration(seconds: 30);

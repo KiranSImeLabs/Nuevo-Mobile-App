@@ -22,38 +22,39 @@ ActiveProgressModel _$ActiveProgressModelFromJson(Map<String, dynamic> json) =>
       session: json['session'] == null
           ? null
           : ActiveSessionDataModel.fromJson(
-              json['session'] as Map<String, dynamic>),
+              json['session'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$ActiveProgressModelToJson(
-        ActiveProgressModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'userId': instance.userId,
-      'sessionId': instance.sessionId,
-      'startTime': instance.startTime,
-      'endTime': instance.endTime,
-      'status': instance.status,
-      'currentStepIndex': instance.currentStepIndex,
-      'currentTimeInStep': instance.currentTimeInStep,
-      'heartRate': instance.heartRate,
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
-      'session': instance.session,
-    };
+  ActiveProgressModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'userId': instance.userId,
+  'sessionId': instance.sessionId,
+  'startTime': instance.startTime,
+  'endTime': instance.endTime,
+  'status': instance.status,
+  'currentStepIndex': instance.currentStepIndex,
+  'currentTimeInStep': instance.currentTimeInStep,
+  'heartRate': instance.heartRate,
+  'createdAt': instance.createdAt,
+  'updatedAt': instance.updatedAt,
+  'session': instance.session,
+};
 
 ActiveSessionDataModel _$ActiveSessionDataModelFromJson(
-        Map<String, dynamic> json) =>
-    ActiveSessionDataModel(
-      id: json['id'] as String?,
-      title: json['title'] as String?,
-      imageUrl: json['imageUrl'] as String?,
-    );
+  Map<String, dynamic> json,
+) => ActiveSessionDataModel(
+  id: json['id'] as String?,
+  title: json['title'] as String?,
+  imageUrl: json['imageUrl'] as String?,
+);
 
 Map<String, dynamic> _$ActiveSessionDataModelToJson(
-        ActiveSessionDataModel instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'title': instance.title,
-      'imageUrl': instance.imageUrl,
-    };
+  ActiveSessionDataModel instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'title': instance.title,
+  'imageUrl': instance.imageUrl,
+};

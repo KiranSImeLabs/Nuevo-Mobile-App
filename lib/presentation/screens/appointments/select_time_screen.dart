@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../utils/responsive_utils.dart';
 import '../../../domain/entities/session.dart';
+import '../../../data/models/appointment_model.dart';
 import 'confirm_booking_screen.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../providers/appointment_provider.dart';
 
-class SelectTimeScreen extends StatefulWidget {
+class SelectTimeScreen extends ConsumerStatefulWidget {
   final Session session;
 
   const SelectTimeScreen({
@@ -15,13 +17,13 @@ class SelectTimeScreen extends StatefulWidget {
   });
 
   @override
-  State<SelectTimeScreen> createState() => _SelectTimeScreenState();
+  ConsumerState<SelectTimeScreen> createState() => _SelectTimeScreenState();
 }
 
-class _SelectTimeScreenState extends State<SelectTimeScreen> {
+class _SelectTimeScreenState extends ConsumerState<SelectTimeScreen> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  String? _selectedTimeSlot;
+  TimeSlot? _selectedTimeSlot;
 
   @override
   void initState() {
@@ -69,15 +71,7 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
                 ),
               ),
               const SizedBox(height: 16),
-              _buildTimeSlotSection('Morning', [
-                '09:00 AM', '09:30 AM', '10:00 AM',
-                '10:30 AM', '11:00 AM', '11:30 AM',
-              ]),
-              const SizedBox(height: 16),
-              _buildTimeSlotSection('Afternoon', [
-                '02:00 PM', '02:30 PM', '03:00 PM',
-                '03:30 PM', '04:00 PM',
-              ]),
+              if (_selectedDay != null) _buildTimeSlotsList(),
               const SizedBox(height: 32),
               _buildContinueButton(),
               const SizedBox(height: 16),
@@ -135,12 +129,12 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
 
   Widget _buildContinueButton() {
     return ElevatedButton(
-      onPressed: _selectedTimeSlot != null
+      onPressed: _selectedTimeSlot != null && _selectedDay != null
           ? () {
-              final args = BookingConfirmationArgs(
+              final args = BookingArgs(
                 session: widget.session,
-                selectedDate: _selectedDay!,
-                selectedTime: _selectedTimeSlot!,
+                selectedSlot: _selectedTimeSlot!,
+                memberId: widget.session.id,
               );
               context.push('/confirm-booking', extra: args);
             }
@@ -175,6 +169,10 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
   }
 
   Widget _buildCustomCalendar() {
+    final now = DateTime.now();
+    final isCurrentMonth =
+        _focusedDay.year == now.year && _focusedDay.month == now.month;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -187,12 +185,18 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.chevron_left, color: AppColors.textSecondary),
-                onPressed: () {
-                  setState(() {
-                    _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1);
-                  });
-                },
+                icon: Icon(Icons.chevron_left,
+                    color: isCurrentMonth
+                        ? Colors.grey[400]
+                        : AppColors.textSecondary),
+                onPressed: isCurrentMonth
+                    ? null
+                    : () {
+                        setState(() {
+                          _focusedDay = DateTime(
+                              _focusedDay.year, _focusedDay.month - 1);
+                        });
+                      },
               ),
               Text(
                 DateFormat('MMMM yyyy').format(_focusedDay),
@@ -202,10 +206,12 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                icon: const Icon(Icons.chevron_right,
+                    color: AppColors.textSecondary),
                 onPressed: () {
                   setState(() {
-                    _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1);
+                    _focusedDay =
+                        DateTime(_focusedDay.year, _focusedDay.month + 1);
                   });
                 },
               ),
@@ -237,65 +243,76 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
   }
 
   Widget _buildCalendarGrid() {
-    final daysInMonth = DateUtils.getDaysInMonth(_focusedDay.year, _focusedDay.month);
-    final firstDayOfMonth = DateTime(_focusedDay.year, _focusedDay.month, 1);
+    final daysInMonth =
+        DateUtils.getDaysInMonth(_focusedDay.year, _focusedDay.month);
+    final firstDayOfMonth =
+        DateTime(_focusedDay.year, _focusedDay.month, 1);
     final int weekdayOffset = firstDayOfMonth.weekday % 7;
 
     final List<Widget> rows = [];
     List<Widget> dayWidgets = [];
 
-    // Empty slots for previous month
     for (int i = 0; i < weekdayOffset; i++) {
-       final prevMonth = DateTime(_focusedDay.year, _focusedDay.month - 1);
-       final daysInPrevMonth = DateUtils.getDaysInMonth(prevMonth.year, prevMonth.month);
-       final dayNum = daysInPrevMonth - (weekdayOffset - i) + 1;
-       
-       dayWidgets.add(
-         SizedBox(
-           width: 32, height: 32,
-           child: Center(
-             child: Text(
-               '$dayNum',
-               style: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14),
-             ),
-           ),
-         )
-       );
+      final prevMonth =
+          DateTime(_focusedDay.year, _focusedDay.month - 1);
+      final daysInPrevMonth =
+          DateUtils.getDaysInMonth(prevMonth.year, prevMonth.month);
+      final dayNum = daysInPrevMonth - (weekdayOffset - i) + 1;
+
+      dayWidgets.add(SizedBox(
+        width: 32,
+        height: 32,
+        child: Center(
+          child: Text('$dayNum',
+              style: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14)),
+        ),
+      ));
     }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
 
     for (int i = 1; i <= daysInMonth; i++) {
       final date = DateTime(_focusedDay.year, _focusedDay.month, i);
-      final isSelected = _selectedDay != null && DateUtils.isSameDay(_selectedDay, date);
-      
-      dayWidgets.add(
-        GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedDay = date;
-              _selectedTimeSlot = null;
-            });
-          },
-          child: Container(
-            width: 32, height: 32,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: isSelected ? Border.all(color: const Color(0xFFA65C4B)) : null,
-              color: Colors.transparent,
-            ),
-            child: Center(
-              child: Text(
-                '$i',
-                style: TextStyle(
-                  color: isSelected ? const Color(0xFFA65C4B) : AppColors.textPrimary,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  fontSize: 14,
-                ),
+      final isSelected =
+          _selectedDay != null && DateUtils.isSameDay(_selectedDay, date);
+      final isPastDate = date.isBefore(today);
+
+      dayWidgets.add(GestureDetector(
+        onTap: isPastDate
+            ? null
+            : () {
+                setState(() {
+                  _selectedDay = date;
+                  _selectedTimeSlot = null;
+                });
+              },
+        child: Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border:
+                isSelected ? Border.all(color: const Color(0xFFA65C4B)) : null,
+            color: Colors.transparent,
+          ),
+          child: Center(
+            child: Text(
+              '$i',
+              style: TextStyle(
+                color: isPastDate
+                    ? const Color(0xFFBDBDBD)
+                    : (isSelected
+                        ? const Color(0xFFA65C4B)
+                        : AppColors.textPrimary),
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                fontSize: 14,
               ),
             ),
           ),
-        )
-      );
-      
+        ),
+      ));
+
       if (dayWidgets.length == 7) {
         rows.add(Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -309,18 +326,16 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
     if (dayWidgets.isNotEmpty) {
       int nextMonthDay = 1;
       while (dayWidgets.length < 7) {
-         dayWidgets.add(
-           SizedBox(
-             width: 32, height: 32,
-             child: Center(
-               child: Text(
-                 '$nextMonthDay',
-                 style: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14),
-               ),
-             ),
-           )
-         );
-         nextMonthDay++;
+        dayWidgets.add(SizedBox(
+          width: 32,
+          height: 32,
+          child: Center(
+            child: Text('$nextMonthDay',
+                style:
+                    const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14)),
+          ),
+        ));
+        nextMonthDay++;
       }
       rows.add(Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -331,50 +346,77 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
     return Column(children: rows);
   }
 
-  Widget _buildTimeSlotSection(String title, List<String> slots) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: AppTextStyles.bodyMedium.copyWith(
-            color: const Color(0xFF735B4D),
-            fontSize: 14,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Wrap(
+  Widget _buildTimeSlotsList() {
+    final dateStr = DateFormat('yyyy-MM-dd').format(_selectedDay!);
+    final memberId = widget.session.id;
+    final key = (memberId: memberId, date: dateStr);
+    final timeSlotsAsync = ref.watch(timeSlotsProvider(key));
+
+    return timeSlotsAsync.when(
+      data: (slotResponse) {
+        if (!slotResponse.isWorkingDay) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Text(
+                'No slots available on this day',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        }
+
+        if (slotResponse.slots.isEmpty || slotResponse.availableSlots == 0) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 24.0),
+              child: Text(
+                'No available time slots',
+                style: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Wrap(
           spacing: 12,
           runSpacing: 12,
-          children: slots.map((time) {
-            final isSelected = _selectedTimeSlot == time;
-            final isDisabled = time == '10:00 AM' || time == '11:00 AM' || time == '11:30 AM';
-            
+          children: slotResponse.slots.map((slot) {
+            final isSelected =
+                _selectedTimeSlot?.startTime == slot.startTime;
+            final isUnavailable = !slot.available;
+
             return GestureDetector(
-              onTap: isDisabled ? null : () {
-                setState(() {
-                  _selectedTimeSlot = time;
-                });
-              },
+              onTap: isUnavailable
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedTimeSlot = slot;
+                      });
+                    },
               child: Container(
                 width: (MediaQuery.of(context).size.width - 48 - 24) / 3,
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: isDisabled 
-                      ? const Color(0xFFE0E0E0)
-                      : isSelected 
+                  color: isUnavailable
+                      ? const Color(0xFFEEEEEE)
+                      : isSelected
                           ? const Color(0xFF964A38)
                           : const Color(0xFFF5EAE8),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  time,
+                  slot.displayTime,
                   style: TextStyle(
-                    color: isDisabled 
-                        ? const Color(0xFF9E9E9E) 
-                        : isSelected 
-                            ? Colors.white 
+                    color: isUnavailable
+                        ? const Color(0xFFBDBDBD)
+                        : isSelected
+                            ? Colors.white
                             : const Color(0xFF5D4037),
                     fontSize: 13,
                     fontWeight: FontWeight.w500,
@@ -383,8 +425,24 @@ class _SelectTimeScreenState extends State<SelectTimeScreen> {
               ),
             );
           }).toList(),
+        );
+      },
+      loading: () => const Center(
+        child: Padding(
+          padding: EdgeInsets.all(24.0),
+          child: CircularProgressIndicator(color: AppColors.primaryColor),
         ),
-      ],
+      ),
+      error: (error, stack) => Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 24.0),
+          child: Text(
+            'Failed to load time slots.\nPlease try again.',
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMedium.copyWith(color: Colors.red),
+          ),
+        ),
+      ),
     );
   }
 }

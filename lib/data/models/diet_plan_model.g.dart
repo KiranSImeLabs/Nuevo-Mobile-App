@@ -45,7 +45,8 @@ GuidanceModel _$GuidanceModelFromJson(Map<String, dynamic> json) =>
       whyThisMatters: json['whyThisMatters'] == null
           ? null
           : GuidanceInfoModel.fromJson(
-              json['whyThisMatters'] as Map<String, dynamic>),
+              json['whyThisMatters'] as Map<String, dynamic>,
+            ),
       howToAchieve: (json['howToAchieve'] as List<dynamic>?)
           ?.map((e) => GuidanceInfoModel.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -68,28 +69,24 @@ GuidanceInfoModel _$GuidanceInfoModelFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$GuidanceInfoModelToJson(GuidanceInfoModel instance) =>
-    <String, dynamic>{
-      'title': instance.title,
-      'text': instance.text,
-    };
+    <String, dynamic>{'title': instance.title, 'text': instance.text};
 
 MealModel _$MealModelFromJson(Map<String, dynamic> json) => MealModel(
-      id: json['id'] as String?,
-      name: json['name'] as String?,
-      description: json['description'] as String?,
-      time: json['time'] as String?,
-      calories: _stringToInt(json['calories']),
-      foods:
-          (json['foods'] as List<dynamic>?)?.map((e) => e as String).toList(),
-      imageUrl: json['image_url'] as String?,
-    );
+  id: json['id'] as String?,
+  name: json['name'] as String?,
+  description: json['description'] as String?,
+  time: json['time'] as String?,
+  calories: _stringToInt(json['calories']),
+  foods: (json['foods'] as List<dynamic>?)?.map((e) => e as String).toList(),
+  imageUrl: json['image_url'] as String?,
+);
 
 Map<String, dynamic> _$MealModelToJson(MealModel instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'description': instance.description,
-      'time': instance.time,
-      'calories': instance.calories,
-      'foods': instance.foods,
-      'image_url': instance.imageUrl,
-    };
+  'id': instance.id,
+  'name': instance.name,
+  'description': instance.description,
+  'time': instance.time,
+  'calories': instance.calories,
+  'foods': instance.foods,
+  'image_url': instance.imageUrl,
+};

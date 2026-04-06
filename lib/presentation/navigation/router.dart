@@ -28,7 +28,7 @@ import '../screens/home/daily_nutrition_screen.dart';
 import '../screens/home/task_detail_screen.dart';
 import '../screens/home/completed_tasks_screen.dart';
 import '../screens/home/your_program_screen.dart';
-import '../screens/appointments/book_session_screen.dart';
+import '../screens/home/your_tasks_screen.dart';
 import '../screens/appointments/select_time_screen.dart';
 import '../screens/appointments/confirm_booking_screen.dart';
 import '../screens/appointments/appointment_details_screen.dart';
@@ -41,6 +41,7 @@ import '../screens/profile/notification_settings_screen.dart';
 import '../screens/profile/doctor_list_screen.dart';
 import '../screens/profile/support_screen.dart';
 import '../../domain/entities/session.dart';
+import '../screens/questionnaire/questionnaire_screen.dart';
 import 'main_shell.dart';
 
 // Keys for navigation
@@ -207,14 +208,7 @@ final routerProvider = Provider<GoRouter>((ref) {
           ),
         ],
       ),
-      GoRoute(
-        path: '/book-session',
-        parentNavigatorKey: rootNavigatorKey,
-        builder: (context, state) {
-          final session = state.extra as Session;
-          return BookSessionScreen(session: session);
-        },
-      ),
+
       GoRoute(
         path: '/quick-health',
         parentNavigatorKey: rootNavigatorKey,
@@ -236,7 +230,7 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/confirm-booking',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
-          final args = state.extra as BookingConfirmationArgs;
+          final args = state.extra as BookingArgs;
           return ConfirmBookingScreen(args: args);
         },
       ),
@@ -244,8 +238,8 @@ final routerProvider = Provider<GoRouter>((ref) {
         path: '/appointment-details',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
-          final args = state.extra as BookingConfirmationArgs;
-          return AppointmentDetailsScreen(args: args);
+          final appointmentId = state.extra as String;
+          return AppointmentDetailsScreen(appointmentId: appointmentId);
         },
       ),
       GoRoute(
@@ -328,6 +322,19 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const YourProgramScreen(),
       ),
       GoRoute(
+        path: '/your-tasks',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final extras = state.extra as Map<String, dynamic>?;
+          return YourTasksScreen(
+            programName: extras?['programName'] ?? 'Insight Program',
+            programDescription: extras?['programDescription'] ?? 'Personalised, clinician-guided care',
+            phaseId: extras?['phaseId'] ?? '',
+            isActive: extras?['isActive'] ?? false,
+          );
+        },
+      ),
+      GoRoute(
         path: '/clinician-profile',
         parentNavigatorKey: rootNavigatorKey,
         builder: (context, state) {
@@ -338,6 +345,18 @@ final routerProvider = Provider<GoRouter>((ref) {
             role: extras?['role'] ?? 'Specialist',
             imageUrl: extras?['imageUrl'],
             bio: extras?['bio'],
+          );
+        },
+      ),
+      GoRoute(
+        path: '/questionnaire/:id/:taskId',
+        parentNavigatorKey: rootNavigatorKey,
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          final taskId = state.pathParameters['taskId'] ?? '';
+          return QuestionnaireScreen(
+            questionnaireId: id,
+            patientTaskId: taskId,
           );
         },
       ),

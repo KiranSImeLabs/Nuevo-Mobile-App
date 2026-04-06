@@ -15,8 +15,8 @@ WeeklyScheduleModel _$WeeklyScheduleModelFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$WeeklyScheduleModelToJson(
-        WeeklyScheduleModel instance) =>
-    <String, dynamic>{
-      'currentDayNumber': instance.currentDayNumber,
-      'schedules': instance.schedules,
-    };
+  WeeklyScheduleModel instance,
+) => <String, dynamic>{
+  'currentDayNumber': instance.currentDayNumber,
+  'schedules': instance.schedules,
+};

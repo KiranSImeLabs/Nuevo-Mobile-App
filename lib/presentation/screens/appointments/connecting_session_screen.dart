@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../utils/responsive_utils.dart'; // Assuming usage
 
 class ConnectingSessionScreen extends StatefulWidget {
   const ConnectingSessionScreen({super.key});

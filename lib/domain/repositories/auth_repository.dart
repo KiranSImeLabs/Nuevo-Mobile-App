@@ -11,12 +11,22 @@ abstract class AuthRepository {
     required String email,
     required String password,
   });
+
+  /// Send OTP to user's email
+  /// Returns void on success, Failure on error
+  Future<Either<Failure, void>> sendLoginOtp(String email);
+
+  /// Verify OTP and login
+  /// Returns User on success, Failure on error
+  Future<Either<Failure, User>> verifyLoginOtp({
+    required String email,
+    required String otp,
+  });
   
   /// Sign up new user
   /// Returns User on success, Failure on error
   Future<Either<Failure, User>> signup({
     required String email,
-    required String password,
     required String firstName,
     required String lastName,
     String? phoneNumber,

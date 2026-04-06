@@ -31,10 +31,7 @@ LabReportListData _$LabReportListDataFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$LabReportListDataToJson(LabReportListData instance) =>
-    <String, dynamic>{
-      'reports': instance.reports,
-      'count': instance.count,
-    };
+    <String, dynamic>{'reports': instance.reports, 'count': instance.count};
 
 LabReportModel _$LabReportModelFromJson(Map<String, dynamic> json) =>
     LabReportModel(
@@ -46,7 +43,8 @@ LabReportModel _$LabReportModelFromJson(Map<String, dynamic> json) =>
       uploadedBy: json['uploadedBy'] == null
           ? null
           : LabReportUploader.fromJson(
-              json['uploadedBy'] as Map<String, dynamic>),
+              json['uploadedBy'] as Map<String, dynamic>,
+            ),
       createdAt: json['createdAt'] as String?,
       updatedAt: json['updatedAt'] as String?,
     );
@@ -64,34 +62,28 @@ Map<String, dynamic> _$LabReportModelToJson(LabReportModel instance) =>
     };
 
 LabReportUploader _$LabReportUploaderFromJson(Map<String, dynamic> json) =>
-    LabReportUploader(
-      id: json['id'] as String?,
-      name: json['name'] as String?,
-    );
+    LabReportUploader(id: json['id'] as String?, name: json['name'] as String?);
 
 Map<String, dynamic> _$LabReportUploaderToJson(LabReportUploader instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-    };
+    <String, dynamic>{'id': instance.id, 'name': instance.name};
 
 LabReportComparisonResponse _$LabReportComparisonResponseFromJson(
-        Map<String, dynamic> json) =>
-    LabReportComparisonResponse(
-      success: json['success'] as bool?,
-      message: json['message'] as String?,
-      data: json['data'] == null
-          ? null
-          : LabReportDetailData.fromJson(json['data'] as Map<String, dynamic>),
-    );
+  Map<String, dynamic> json,
+) => LabReportComparisonResponse(
+  success: json['success'] as bool?,
+  message: json['message'] as String?,
+  data: json['data'] == null
+      ? null
+      : LabReportDetailData.fromJson(json['data'] as Map<String, dynamic>),
+);
 
 Map<String, dynamic> _$LabReportComparisonResponseToJson(
-        LabReportComparisonResponse instance) =>
-    <String, dynamic>{
-      'success': instance.success,
-      'message': instance.message,
-      'data': instance.data,
-    };
+  LabReportComparisonResponse instance,
+) => <String, dynamic>{
+  'success': instance.success,
+  'message': instance.message,
+  'data': instance.data,
+};
 
 LabReportDetailData _$LabReportDetailDataFromJson(Map<String, dynamic> json) =>
     LabReportDetailData(
@@ -108,59 +100,59 @@ LabReportDetailData _$LabReportDetailDataFromJson(Map<String, dynamic> json) =>
       comparison: json['comparison'] == null
           ? null
           : LabReportComparisonData.fromJson(
-              json['comparison'] as Map<String, dynamic>),
+              json['comparison'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$LabReportDetailDataToJson(
-        LabReportDetailData instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'testType': instance.testType,
-      'testDate': instance.testDate,
-      'reportUrl': instance.reportUrl,
-      'parameters': instance.parameters,
-      'notes': instance.notes,
-      'user': instance.user,
-      'uploadedBy': instance.uploadedBy,
-      'createdAt': instance.createdAt,
-      'updatedAt': instance.updatedAt,
-      'comparison': instance.comparison,
-    };
+  LabReportDetailData instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'testType': instance.testType,
+  'testDate': instance.testDate,
+  'reportUrl': instance.reportUrl,
+  'parameters': instance.parameters,
+  'notes': instance.notes,
+  'user': instance.user,
+  'uploadedBy': instance.uploadedBy,
+  'createdAt': instance.createdAt,
+  'updatedAt': instance.updatedAt,
+  'comparison': instance.comparison,
+};
 
 LabReportComparisonData _$LabReportComparisonDataFromJson(
-        Map<String, dynamic> json) =>
-    LabReportComparisonData(
-      currentReport: json['currentReport'] == null
-          ? null
-          : ReportSummary.fromJson(
-              json['currentReport'] as Map<String, dynamic>),
-      previousReport: json['previousReport'] == null
-          ? null
-          : ReportSummary.fromJson(
-              json['previousReport'] as Map<String, dynamic>),
-      timeBetweenReports: json['timeBetweenReports'] as String?,
-      overallProgress: json['overallProgress'] == null
-          ? null
-          : OverallProgress.fromJson(
-              json['overallProgress'] as Map<String, dynamic>),
-      parameterComparisons: (json['parameterComparisons'] as List<dynamic>?)
-          ?.map((e) => ParameterComparison.fromJson(e as Map<String, dynamic>))
-          .toList(),
-      insights: (json['insights'] as List<dynamic>?)
-          ?.map((e) => e as String)
-          .toList(),
-    );
+  Map<String, dynamic> json,
+) => LabReportComparisonData(
+  currentReport: json['currentReport'] == null
+      ? null
+      : ReportSummary.fromJson(json['currentReport'] as Map<String, dynamic>),
+  previousReport: json['previousReport'] == null
+      ? null
+      : ReportSummary.fromJson(json['previousReport'] as Map<String, dynamic>),
+  timeBetweenReports: json['timeBetweenReports'] as String?,
+  overallProgress: json['overallProgress'] == null
+      ? null
+      : OverallProgress.fromJson(
+          json['overallProgress'] as Map<String, dynamic>,
+        ),
+  parameterComparisons: (json['parameterComparisons'] as List<dynamic>?)
+      ?.map((e) => ParameterComparison.fromJson(e as Map<String, dynamic>))
+      .toList(),
+  insights: (json['insights'] as List<dynamic>?)
+      ?.map((e) => e as String)
+      .toList(),
+);
 
 Map<String, dynamic> _$LabReportComparisonDataToJson(
-        LabReportComparisonData instance) =>
-    <String, dynamic>{
-      'currentReport': instance.currentReport,
-      'previousReport': instance.previousReport,
-      'timeBetweenReports': instance.timeBetweenReports,
-      'overallProgress': instance.overallProgress,
-      'parameterComparisons': instance.parameterComparisons,
-      'insights': instance.insights,
-    };
+  LabReportComparisonData instance,
+) => <String, dynamic>{
+  'currentReport': instance.currentReport,
+  'previousReport': instance.previousReport,
+  'timeBetweenReports': instance.timeBetweenReports,
+  'overallProgress': instance.overallProgress,
+  'parameterComparisons': instance.parameterComparisons,
+  'insights': instance.insights,
+};
 
 ReportSummary _$ReportSummaryFromJson(Map<String, dynamic> json) =>
     ReportSummary(
@@ -207,13 +199,13 @@ ParameterComparison _$ParameterComparisonFromJson(Map<String, dynamic> json) =>
     );
 
 Map<String, dynamic> _$ParameterComparisonToJson(
-        ParameterComparison instance) =>
-    <String, dynamic>{
-      'parameterName': instance.parameterName,
-      'current': instance.current,
-      'previous': instance.previous,
-      'change': instance.change,
-    };
+  ParameterComparison instance,
+) => <String, dynamic>{
+  'parameterName': instance.parameterName,
+  'current': instance.current,
+  'previous': instance.previous,
+  'change': instance.change,
+};
 
 ParameterData _$ParameterDataFromJson(Map<String, dynamic> json) =>
     ParameterData(
@@ -223,7 +215,8 @@ ParameterData _$ParameterDataFromJson(Map<String, dynamic> json) =>
       referenceRange: json['referenceRange'] == null
           ? null
           : ReferenceRange.fromJson(
-              json['referenceRange'] as Map<String, dynamic>),
+              json['referenceRange'] as Map<String, dynamic>,
+            ),
     );
 
 Map<String, dynamic> _$ParameterDataToJson(ParameterData instance) =>
@@ -252,8 +245,9 @@ ReferenceRange _$ReferenceRangeFromJson(Map<String, dynamic> json) =>
     ReferenceRange(
       max: json['max'] as num?,
       min: json['min'] as num?,
-      optimal:
-          (json['optimal'] as List<dynamic>?)?.map((e) => e as num).toList(),
+      optimal: (json['optimal'] as List<dynamic>?)
+          ?.map((e) => e as num)
+          .toList(),
     );
 
 Map<String, dynamic> _$ReferenceRangeToJson(ReferenceRange instance) =>

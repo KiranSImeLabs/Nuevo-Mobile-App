@@ -32,6 +32,7 @@ class Session extends Equatable {
     required this.isCompleted,
   });
   
+  
   @override
   List<Object?> get props => [
     id,
@@ -43,4 +44,40 @@ class Session extends Equatable {
     notes,
     isCompleted,
   ];
+
+  factory Session.fromAppointmentDetail(dynamic detail) {
+    // We use dynamic to avoid circular dependency if models import entities
+    // or vice versa in a way that's hard to manage here. 
+    // But since this is the entity, we'll assume it's passed correctly.
+    final DateTime scheduled = detail.consultationDateTime != null 
+        ? DateTime.parse(detail.consultationDateTime!).toLocal()
+        : DateTime.now();
+
+    return Session(
+      id: detail.id,
+      title: detail.program?.name ?? detail.bookingType ?? 'Appointment',
+      type: _mapBookingTypeToSessionType(detail.bookingType),
+      scheduledTime: scheduled,
+      durationMinutes: int.tryParse(detail.duration ?? '30') ?? 30,
+      professionalName: detail.member?.fullName ?? detail.user?.fullName,
+      notes: detail.notes,
+      isCompleted: detail.period == 'past' || detail.status == 'COMPLETED',
+    );
+  }
+
+  static SessionType _mapBookingTypeToSessionType(String? type) {
+    switch (type) {
+      case 'DIETITIAN':
+        return SessionType.dietitian;
+      case 'DOCTOR_APPOINTMENT':
+      case 'INITIAL_CONSULTATION':
+        return SessionType.doctor;
+      case 'THERAPIST':
+        return SessionType.therapist;
+      case 'TRAINER':
+        return SessionType.trainer;
+      default:
+        return SessionType.general;
+    }
+  }
 }

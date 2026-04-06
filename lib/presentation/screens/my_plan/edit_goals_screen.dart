@@ -207,11 +207,11 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
                     fontSize: 16,
                   ),
                 ),
-                const Icon(
-                  Icons.edit_outlined,
-                  size: 20,
-                  color: Color(0xFF8D6E63),
-                ),
+                // const Icon(
+                //   Icons.edit_outlined,
+                //   size: 20,
+                //   color: Color(0xFF8D6E63),
+                // ),
               ],
             ),
           ),

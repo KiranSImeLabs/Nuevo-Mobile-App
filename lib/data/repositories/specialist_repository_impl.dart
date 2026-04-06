@@ -26,6 +26,7 @@ class SpecialistRepositoryImpl implements SpecialistRepository {
             response.message ?? 'Failed to get specialists'));
       }
     } on AppException catch (exception) {
+      print('exception $exception');
       if (exception is AuthException) {
         return Left(
             AuthFailure(message: exception.message, code: exception.code));
