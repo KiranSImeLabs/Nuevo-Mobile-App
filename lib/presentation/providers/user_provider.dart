@@ -80,8 +80,9 @@ final userProvider = StateNotifierProvider<UserNotifier, AsyncValue<User?>>((ref
      if (authState.user == null) {
         Future.microtask(() => notifier.fetchProfile());
      } else {
-        // Background refresh to get latest profile image and data without flickering
-        Future.microtask(() => notifier.fetchProfile(isBackground: true));
+        // Optionally, we could refresh in background here, but since authProvider 
+        // JUST fetched it during checkLoginStatus(), doing it again immediately 
+        // causes duplicate network calls. We rely on the initial auth data.
      }
   } else if (authState.status == AuthStatus.unauthenticated) {
     // Determine if we should clear state? UserNotifier is recreated anyway if authProvider changes

@@ -42,10 +42,12 @@ final phaseListProvider =
 class ActivePhaseNotifier
     extends StateNotifier<AsyncValue<ActivePhaseResponseModel>> {
   final Ref _ref;
+  bool hasInitiatedFetch = false;
 
   ActivePhaseNotifier(this._ref) : super(const AsyncValue.loading());
 
   Future<void> fetchActivePhase() async {
+    hasInitiatedFetch = true;
     state = const AsyncValue.loading();
     final useCase = _ref.read(getMyActivePhaseUseCaseProvider);
     final result = await useCase(const NoParams());

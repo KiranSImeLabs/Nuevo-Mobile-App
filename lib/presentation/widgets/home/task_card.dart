@@ -72,18 +72,23 @@ class TaskCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center, // Center vertically
                     children: [
-                      Text(
-                        task.title,
-                        style: TextStyle(
-                          fontSize: ResponsiveUtils.fontSize(context, base: 14), // Reduced slightly to 14 to fit better if 2 lines
-                          fontWeight: FontWeight.w400,
-                          color: const Color(0xFF1E1E1E),
-                          height: 1.2, // Tighter line height
+                      Expanded(
+                        child: Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            task.title,
+                            style: TextStyle(
+                              fontSize: ResponsiveUtils.fontSize(context, base: 14),
+                              fontWeight: FontWeight.w400,
+                              color: const Color(0xFF1E1E1E),
+                              height: 1.2,
+                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
                       ),
-                      const Spacer(), // Use Spacer to push content apart slightly if needed, or just SizedBox
+                      // Spacer removed to prevent RenderFlex overflow
                       
                       // Duration & Action Row combined or separate? 
                       // Spec image has them separate lines or same? 

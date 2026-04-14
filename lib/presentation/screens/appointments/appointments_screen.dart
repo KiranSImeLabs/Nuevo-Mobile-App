@@ -34,11 +34,19 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
     final List<Session> pastAppointments = [];
 
     appointmentsState.whenData((data) {
+      final now = DateTime.now();
       for (final detail in data.appointments) {
         final session = Session.fromAppointmentDetail(detail);
-        if (detail.period == 'upcoming') {
+        
+        final isUpcoming = detail.period == 'upcoming' || 
+            (detail.period == null && session.scheduledTime.isAfter(now));
+            
+        final isPast = detail.period == 'past' || 
+            (detail.period == null && session.scheduledTime.isBefore(now));
+
+        if (isUpcoming) {
           upcomingAppointments.add(session);
-        } else if (detail.period == 'past') {
+        } else if (isPast) {
           pastAppointments.add(session);
         }
       }
@@ -150,7 +158,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
               SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
 
               // 2. Upcoming
-              _buildSectionHeader(context, 'Upcoming'),
+              /* _buildSectionHeader(context, 'Upcoming'),
               SizedBox(height: ResponsiveUtils.spacing(context, base: 12)),
               appointmentsState.when(
                 data: (_) {
@@ -169,7 +177,7 @@ class _AppointmentsScreenState extends ConsumerState<AppointmentsScreen> {
                 loading: () => const Center(child: CircularProgressIndicator()),
                 error: (error, _) => Center(child: Text('Error: $error')),
               ),
-              SizedBox(height: ResponsiveUtils.spacing(context, base: 24)),
+              SizedBox(height: ResponsiveUtils.spacing(context, base: 24)), */
 
               // 3. Past Appointments
               _buildSectionHeader(context, 'Past Appointments'),

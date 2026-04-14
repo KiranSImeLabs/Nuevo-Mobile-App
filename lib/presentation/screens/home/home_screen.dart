@@ -7,10 +7,13 @@ import '../../providers/home_provider.dart';
 import '../../providers/user_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/app_error_widget.dart';
+import '../../providers/core_providers.dart';
+import '../../providers/phase_provider.dart';
 import '../../../domain/entities/task.dart' as entities;
 import '../../../domain/entities/user.dart' as entities;
 import '../../../domain/entities/wellness_program.dart';
 import '../../../domain/entities/home/home_dashboard.dart';
+import '../../../data/models/phase_model.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/home/wellness_card.dart';
 import '../../widgets/home/info_card.dart';
@@ -23,14 +26,50 @@ import '../../widgets/home/dietitian_session_card.dart';
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
+  entities.Task _mapPatientTaskToEntity(PatientTaskModel pTask) {
+    entities.TaskType type;
+    final String actualType = (pTask.taskType.isNotEmpty ? pTask.taskType : (pTask.phaseTask?.taskType ?? '')).toUpperCase();
+    
+    switch (actualType) {
+      case 'QUESTIONNAIRE':
+        type = entities.TaskType.questionnaire;
+        break;
+      case 'APPOINTMENT':
+        type = entities.TaskType.appointment;
+        break;
+      case 'EXERCISE':
+        type = entities.TaskType.exercise;
+        break;
+      case 'NUTRITION':
+        type = entities.TaskType.nutrition;
+        break;
+      default:
+        type = entities.TaskType.general;
+    }
+    return entities.Task(
+      id: pTask.id,
+      title: pTask.taskName.isNotEmpty ? pTask.taskName : (pTask.phaseTask?.title ?? 'Task'),
+      description: pTask.phaseTask?.description ?? '',
+      durationMinutes: pTask.phaseTask?.points ?? 5,
+      isCompleted: pTask.legacyStatus == 'COMPLETED' || pTask.status == 'COMPLETED',
+      type: type,
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final dashboardState = ref.watch(homeDashboardProvider);
     final userState = ref.watch(userProvider);
     
-    // Call user details if not available
-    if (userState.valueOrNull == null && !userState.isLoading && !userState.hasError) {
-      Future.microtask(() => ref.read(userProvider.notifier).fetchProfile());
+    // Call active phase API after auth and home api are loaded
+    final activePhaseState = ref.watch(activePhaseProvider);
+    final isHomeAndProfileLoaded = userState.valueOrNull != null && dashboardState.valueOrNull != null;
+    
+    if (isHomeAndProfileLoaded && 
+        activePhaseState.valueOrNull == null && 
+        !ref.read(activePhaseProvider.notifier).hasInitiatedFetch && 
+        !activePhaseState.hasError) {
+      Future.microtask(() => ref.read(activePhaseProvider.notifier).fetchActivePhase());
     }
 
     return Scaffold(
@@ -76,69 +115,64 @@ class HomeScreen extends ConsumerWidget {
                         height: ResponsiveUtils.spacing(context, base: 24),
                       ),
                       // 5. Task Completed
-                      //context.go('/my-plan')
-                      if (dashboard.tasksCompleted.isNotEmpty) ...[
-                        _buildSectionHeader(
-                          context,
-                          'Task Completed',
-                          onActionTap: () {
-                            context.push('/completed-tasks',
-                                extra: {'showCompleted': true});
+                      if (activePhaseState.valueOrNull != null) ...[
+                        Builder(
+                          builder: (context) {
+                            final activePhaseTasks = activePhaseState.value?.tasks ?? [];
+                            final completedPhaseTasks = activePhaseTasks.where((t) => t.legacyStatus == 'COMPLETED' || t.status == 'COMPLETED').map(_mapPatientTaskToEntity).toList();
+                            final pendingPhaseTasks = activePhaseTasks.where((t) => t.legacyStatus != 'COMPLETED' && t.status != 'COMPLETED').map(_mapPatientTaskToEntity).toList();
+
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                if (completedPhaseTasks.isNotEmpty) ...[
+                                  _buildSectionHeader(
+                                    context,
+                                    'Task Completed',
+                                    onActionTap: () {
+                                      context.push('/completed-tasks',
+                                          extra: {'showCompleted': true});
+                                    },
+                                    actionLabel: 'See All',
+                                    showArrow: false,
+                                  ),
+                                  SizedBox(
+                                    height: ResponsiveUtils.spacing(context, base: 24),
+                                  ),
+                                ],
+                                
+                                // 4. Action Required
+                                _buildSectionHeader(
+                                  context,
+                                  'Action required',
+                                  onActionTap: () => context.push(
+                                    '/completed-tasks',
+                                    extra: {'showCompleted': false},
+                                  ),
+                                  actionLabel: 'Complete Now',
+                                  showArrow: true,
+                                ),
+                                SizedBox(
+                                  height: ResponsiveUtils.spacing(context, base: 16),
+                                ),
+                                if (pendingPhaseTasks.isNotEmpty)
+                                  _buildTasksList(context, ref, activePhaseTasks.where((t) => t.legacyStatus != 'COMPLETED' && t.status != 'COMPLETED').toList())
+                                else
+                                  Padding(
+                                    padding: EdgeInsets.only(bottom: ResponsiveUtils.spacing(context, base: 8)),
+                                    child: Text(
+                                      'No pending actions.',
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                  ),
+                                SizedBox(
+                                  height: ResponsiveUtils.spacing(context, base: 24),
+                                ),
+                              ],
+                            );
                           },
-                          actionLabel: 'See All',
-                          showArrow: false,
-                        )
+                        ),
                       ],
-                      SizedBox(
-                                height: ResponsiveUtils.spacing(
-                                  context,
-                                  base: 24,
-                                ),
-                              ),
-                      // 4. Action Required
-                      
-                      // Force show section per request
-                      Builder(
-                        builder: (context) {
-                          final List<entities.Task> actions =
-                              dashboard.actionRequired;
-
-                          // Only show header if empty, show list only if not empty
-                          return Column(
-                            children: [
-                              _buildSectionHeader(
-                                context,
-                                'Action required',
-                                onActionTap: () => context.push(
-                                  '/completed-tasks',
-                                  extra: {'showCompleted': false},
-                                ),
-                                actionLabel: 'Complete Now',
-                                showArrow: true,
-                              ),
-                              SizedBox(
-                          height: ResponsiveUtils.spacing(context, base: 16),
-                        ),
-                        _buildTasksList(context, dashboard.tasksCompleted),
-                        SizedBox(
-                          height: ResponsiveUtils.spacing(context, base: 24),
-                        ),
-
-                              // Widget below removed per user request "remove the pression quesioner widget completly"
-                              // if (actions.isNotEmpty) ...[
-                              //   SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
-                              //   _buildTasksList(context, actions),
-                              // ],
-                              SizedBox(
-                                height: ResponsiveUtils.spacing(
-                                  context,
-                                  base: 24,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
 
 
                       // 6. Program Card
@@ -222,7 +256,8 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   recognizer: TapGestureRecognizer()
                     ..onTap = () async {
-                      final url = Uri.parse('https://nuevo-medical.simelabs.in');
+                      //                      final url = Uri.parse('https://nuevo-medical.simelabs.in');
+                      final url = Uri.parse('https://nuevo-dev.simelabs.in/');
                       if (await canLaunchUrl(url)) {
                         await launchUrl(url, mode: LaunchMode.externalApplication);
                       }
@@ -467,18 +502,67 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildTasksList(BuildContext context, List<entities.Task> tasks) {
+  Widget _buildTasksList(BuildContext context, WidgetRef ref, List<PatientTaskModel> patientTasks) {
     return SizedBox(
       height: ResponsiveUtils.spacing(context, base: 110),
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: tasks.length,
+        itemCount: patientTasks.length,
         separatorBuilder: (_, __) =>
             SizedBox(width: ResponsiveUtils.spacing(context, base: 12)),
-        itemBuilder: (context, index) => TaskCard(
-          task: tasks[index],
-          onTap: () => context.push('/task/${tasks[index].id}'),
-        ),
+        itemBuilder: (context, index) {
+          final pTask = patientTasks[index];
+          final mappedTask = _mapPatientTaskToEntity(pTask);
+          
+          return TaskCard(
+            task: mappedTask,
+            onTap: mappedTask.isCompleted ? null : () async {
+              final type = (pTask.taskType.isNotEmpty ? pTask.taskType : (pTask.phaseTask?.taskType ?? '')).toUpperCase();
+              
+              if (type == 'QUESTIONNAIRE') {
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (ctx) => const Center(child: CircularProgressIndicator()),
+                );
+                
+                // Yield the frame to ensure the dialog is fully pushed before popping
+                await Future.delayed(const Duration(milliseconds: 100));
+                
+                try {
+                  final response = await ref.read(apiClientProvider).getTaskById(pTask.id);
+                  if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+                  
+                  if (response.success && response.data != null) {
+                    final qId = response.data!.phaseTask?.questionnaireId;
+                    if (qId != null && qId.isNotEmpty) {
+                      if (context.mounted) context.push('/questionnaire/$qId/${pTask.id}');
+                    } else {
+                      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Questionnaire ID not found for this task')),
+                      );
+                    }
+                  } else {
+                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text(response.message ?? 'Failed to fetch task details')),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    Navigator.of(context, rootNavigator: true).pop();
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Error fetching task: $e')),
+                    );
+                  }
+                }
+              } else if (type == 'APPOINTMENT') {
+                context.push('/connecting-session');
+              } else {
+                context.push('/task/${pTask.id}');
+              }
+            },
+          );
+        },
       ),
     );
   }

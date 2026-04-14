@@ -71,7 +71,7 @@ class _ConfirmBookingScreenState extends ConsumerState<ConfirmBookingScreen> {
         );
       }
     } catch (e) {
-      print('Exception: $e');
+      // print('Exception: $e');
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('An error occurred: $e')),

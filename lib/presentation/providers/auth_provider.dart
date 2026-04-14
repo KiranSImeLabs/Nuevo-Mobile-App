@@ -10,6 +10,16 @@ import '../../domain/usecases/usecase.dart';
 import '../../domain/repositories/auth_repository.dart';
 import 'auth_state.dart';
 import 'core_providers.dart';
+import 'user_provider.dart';
+import 'home_provider.dart';
+import 'diet_plan_provider.dart';
+import 'specialist_provider.dart';
+import 'appointment_provider.dart';
+import 'health_provider.dart';
+import 'lab_reports_provider.dart';
+import 'preferences_provider.dart';
+import 'goal_provider.dart';
+import 'phase_provider.dart';
 
 /// Auth Notifier
 /// Manages global authentication state
@@ -156,7 +166,33 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final result = await _logoutUseCase(const NoParams());
     result.fold(
       (failure) => state = AuthState.error(failure.message),
-      (_) => state = AuthState.unauthenticated(),
+      (_) {
+        state = AuthState.unauthenticated();
+        
+        // Clear all cached provider data on logout.
+        // We use Future.microtask to allow the Riverpod AuthState dependency graph to 
+        // safely update completely before we start explicitly invalidating watched providers.
+        Future.microtask(() {
+          _ref.invalidate(userProvider);
+          _ref.invalidate(homeDashboardProvider);
+          _ref.invalidate(dietPlanProvider);
+          _ref.invalidate(specialistListProvider);
+          _ref.invalidate(userAppointmentsProvider);
+          _ref.invalidate(labReportsProvider);
+          _ref.invalidate(todayExerciseProvider);
+          _ref.invalidate(weeklyScheduleProvider);
+          _ref.invalidate(patientHabitHistoryListProvider);
+          _ref.invalidate(goalListProvider);
+          _ref.invalidate(preferencesProvider);
+          
+          // Clear Phase Providers
+          _ref.invalidate(activePhaseProvider);
+          _ref.invalidate(phaseListProvider);
+          _ref.invalidate(weeklyViewProvider);
+          _ref.invalidate(phaseProgressProvider);
+          _ref.invalidate(activePhaseTaskProvider);
+        });
+      },
     );
   }
 

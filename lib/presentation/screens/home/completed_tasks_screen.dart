@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../providers/home_provider.dart';
+import '../../providers/phase_provider.dart';
+import '../../providers/core_providers.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/home/task_card.dart';
 import '../../widgets/common/app_error_widget.dart';
+import '../../../domain/entities/task.dart' as entities;
+import '../../../data/models/phase_model.dart';
 
 class CompletedTasksScreen extends ConsumerWidget {
   /// When [showCompleted] is true, shows tasks where isCompleted == true.
@@ -13,9 +16,39 @@ class CompletedTasksScreen extends ConsumerWidget {
 
   const CompletedTasksScreen({super.key, this.showCompleted = true});
 
+  entities.Task _mapPatientTaskToEntity(PatientTaskModel pTask) {
+    entities.TaskType type;
+    final String actualType = (pTask.taskType.isNotEmpty ? pTask.taskType : (pTask.phaseTask?.taskType ?? '')).toUpperCase();
+    
+    switch (actualType) {
+      case 'QUESTIONNAIRE':
+        type = entities.TaskType.questionnaire;
+        break;
+      case 'APPOINTMENT':
+        type = entities.TaskType.appointment;
+        break;
+      case 'EXERCISE':
+        type = entities.TaskType.exercise;
+        break;
+      case 'NUTRITION':
+        type = entities.TaskType.nutrition;
+        break;
+      default:
+        type = entities.TaskType.general;
+    }
+    return entities.Task(
+      id: pTask.id,
+      title: pTask.taskName.isNotEmpty ? pTask.taskName : (pTask.phaseTask?.title ?? 'Task'),
+      description: pTask.phaseTask?.description ?? '',
+      durationMinutes: pTask.phaseTask?.points ?? 5,
+      isCompleted: pTask.legacyStatus == 'COMPLETED' || pTask.status == 'COMPLETED',
+      type: type,
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final dashboardState = ref.watch(homeDashboardProvider);
+    final activePhaseState = ref.watch(activePhaseProvider);
 
     final String title = showCompleted ? 'Completed Tasks' : 'Action Required';
     final String emptyMessage =
@@ -41,11 +74,14 @@ class CompletedTasksScreen extends ConsumerWidget {
           onPressed: () => context.pop(),
         ),
       ),
-      body: dashboardState.when(
-        data: (dashboard) {
-          final tasks = dashboard.tasksCompleted
-              .where((t) => t.isCompleted == showCompleted)
-              .toList();
+      body: activePhaseState.when(
+        data: (activePhase) {
+          final patientTasks = activePhase.tasks.where((t) {
+            final isTCompleted = t.legacyStatus == 'COMPLETED' || t.status == 'COMPLETED';
+            return isTCompleted == showCompleted;
+          }).toList();
+
+          final tasks = patientTasks.map(_mapPatientTaskToEntity).toList();
 
           if (tasks.isEmpty) {
             return Center(
@@ -80,13 +116,61 @@ class CompletedTasksScreen extends ConsumerWidget {
               return TaskCard(
                 task: tasks[index],
                 width: double.infinity,
-                onTap: () => context.push('/task/${tasks[index].id}'),
+                onTap: tasks[index].isCompleted ? null : () async {
+                  final pTask = patientTasks[index];
+                  final type = (pTask.taskType.isNotEmpty ? pTask.taskType : (pTask.phaseTask?.taskType ?? '')).toUpperCase();
+                  
+                  if (type == 'QUESTIONNAIRE') {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (ctx) => const Center(child: CircularProgressIndicator()),
+                    );
+                    
+                    // Yield the frame to ensure the dialog is fully pushed before popping
+                    await Future.delayed(const Duration(milliseconds: 100));
+                    
+                    try {
+                      final response = await ref.read(apiClientProvider).getTaskById(pTask.id);
+                      if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+                      
+                      if (response.success && response.data != null) {
+                        final qId = response.data!.phaseTask?.questionnaireId;
+                        if (qId != null && qId.isNotEmpty) {
+                          if (context.mounted) context.push('/questionnaire/$qId/${pTask.id}');
+                        } else {
+                          if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Questionnaire ID not found for this task')),
+                          );
+                        }
+                      } else {
+                        if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(response.message ?? 'Failed to fetch task details')),
+                        );
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        Navigator.of(context, rootNavigator: true).pop();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Error fetching task: $e')),
+                        );
+                      }
+                    }
+                  } else if (type == 'APPOINTMENT') {
+                    context.push('/connecting-session');
+                  } else {
+                    context.push('/task/${pTask.id}');
+                  }
+                },
               );
             },
           );
         },
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => AppErrorWidget(message: err.toString()),
+        error: (err, _) => AppErrorWidget(
+          message: err.toString(),
+          onRetry: () => ref.read(activePhaseProvider.notifier).fetchActivePhase(),
+        ),
       ),
     );
   }

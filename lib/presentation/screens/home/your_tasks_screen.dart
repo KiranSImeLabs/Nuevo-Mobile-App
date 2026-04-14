@@ -384,6 +384,10 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
   Widget _buildPendingTaskCard(BuildContext context, PatientTaskModel task) {
     return GestureDetector(
       onTap: () async {
+        if (task.visualIndicator == 'toggle' && task.statusOptions.isNotEmpty) {
+           return; // Do nothing, let user tap the options directly
+        }
+
         if (task.taskType == 'QUESTIONNAIRE') {
            showDialog(
              context: context,
@@ -429,7 +433,7 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
            }
         } 
         else if (task.taskType == 'APPOINTMENT') {
-          context.push('/connecting-session');
+         // context.push('/connecting-session');
         } else {
            context.push('/task/${task.id}');
         }
@@ -499,20 +503,58 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
           Row(
             children: task.statusOptions.map((opt) {
               final isSelected = opt == task.statusValue;
-              return Container(
-                margin: const EdgeInsets.only(right: 8),
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color: isSelected ? const Color(0xFF6B3528) : Colors.white,
-                  border: Border.all(color: isSelected ? const Color(0xFF6B3528) : const Color(0xFFDFDFDF)),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  opt,
-                  style: TextStyle(
-                    color: isSelected ? Colors.white : const Color(0xFF735B4D),
-                    fontSize: ResponsiveUtils.fontSize(context, base: 14),
-                    fontWeight: FontWeight.w500,
+              return GestureDetector(
+                onTap: isSelected ? null : () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    useRootNavigator: true,
+                    builder: (ctx) => const Center(child: CircularProgressIndicator()),
+                  );
+                  
+                  await Future.delayed(const Duration(milliseconds: 100));
+                  
+                  try {
+                    final success = await ref.read(activePhaseTaskProvider.notifier).updateStatus(task.id, opt);
+                    if (context.mounted) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                      if (success) {
+                        final currentWeek = ref.read(weeklyViewProvider).value?.currentWeekGlobal;
+                        if (currentWeek != null) {
+                          ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(currentWeek);
+                        } else {
+                          ref.read(weeklyViewProvider.notifier).fetchCurrentWeek();
+                        }
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Failed to update task status')),
+                        );
+                      }
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      Navigator.of(context, rootNavigator: true).pop();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error: $e')),
+                      );
+                    }
+                  }
+                },
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? const Color(0xFF6B3528) : Colors.white,
+                    border: Border.all(color: isSelected ? const Color(0xFF6B3528) : const Color(0xFFDFDFDF)),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    opt,
+                    style: TextStyle(
+                      color: isSelected ? Colors.white : const Color(0xFF735B4D),
+                      fontSize: ResponsiveUtils.fontSize(context, base: 14),
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
               );

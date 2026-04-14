@@ -942,6 +942,7 @@ class _StepMediaWidget extends StatefulWidget {
 class _StepMediaWidgetState extends State<_StepMediaWidget> {
   VideoPlayerController? _videoController;
   bool _isInitialized = false;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -971,6 +972,7 @@ class _StepMediaWidgetState extends State<_StepMediaWidget> {
           if (mounted) {
             setState(() {
               _isInitialized = true;
+              _hasError = false;
             });
             
             // If we have an initial saved position, seek to it immediately
@@ -986,6 +988,11 @@ class _StepMediaWidgetState extends State<_StepMediaWidget> {
           }
         }).catchError((error) {
           debugPrint('Video Player error: $error URL: ${widget.url}');
+          if (mounted) {
+            setState(() {
+              _hasError = true;
+            });
+          }
         });
       _videoController?.setLooping(true);
     }
@@ -998,6 +1005,7 @@ class _StepMediaWidgetState extends State<_StepMediaWidget> {
       _videoController?.dispose();
       _videoController = null;
       _isInitialized = false;
+      _hasError = false;
       _initMedia();
     } else {
       if (oldWidget.replayCount != widget.replayCount && _videoController != null) {
@@ -1040,6 +1048,25 @@ class _StepMediaWidgetState extends State<_StepMediaWidget> {
           color: Colors.grey[300],
           child: const Center(
             child: Icon(Icons.error_outline, color: Colors.grey),
+          ),
+        ),
+      );
+    }
+
+    if (_hasError) {
+      return Container(
+        color: Colors.black,
+        child: const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.broken_image, color: Colors.white54, size: 48),
+              SizedBox(height: 8),
+              Text(
+                'Video unavailable',
+                style: TextStyle(color: Colors.white54, fontSize: 14),
+              ),
+            ],
           ),
         ),
       );

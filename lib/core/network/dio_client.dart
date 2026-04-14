@@ -1,4 +1,7 @@
+import 'dart:io';
+import 'dart:convert';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import '../constants/app_constants.dart';
 import '../errors/exceptions.dart';
 
@@ -45,6 +48,7 @@ class DioClient {
           return handler.next(options);
         },
         onResponse: (response, handler) {
+          _printApiResponse(response);
           // _logger.d(
           //   'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
           // );
@@ -64,21 +68,70 @@ class DioClient {
         },
       ),
     );
+
     /*
-    // Add LogInterceptor to print ALL API requests and responses
+    // Add Professional Interceptor to print cleanly (without response data payloads)
     _dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: true,
-        responseBody: true,
-        error: true,
-        logPrint: (obj) => print(obj), // Using print instead of developer.log so it shows up cleanly in standard debug console
+      InterceptorsWrapper(
+        onRequest: (options, handler) {
+          print('-----------------------------------------------------------');
+          print('--> REQUEST: [${options.method}] ${options.uri}');
+          if (options.headers.isNotEmpty) {
+            print('--> HEADERS:');
+            options.headers.forEach((k, v) => print('    $k: $v'));
+          }
+          // Request data printing is commented out per user request
+          // if (options.data != null) { ... }
+          print('-----------------------------------------------------------');
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          print('-----------------------------------------------------------');
+          print('<-- RESPONSE: [${response.statusCode}] ${response.requestOptions.uri}');
+          // Response data printing is commented out per user request
+          // if (response.data != null) { ... }
+          print('-----------------------------------------------------------');
+          return handler.next(response);
+        },
+        onError: (error, handler) {
+          print('-----------------------------------------------------------');
+          print('<-- ERROR: [${error.response?.statusCode}] ${error.requestOptions.uri}');
+          print('    MESSAGE: ${error.message}');
+          // Error data printing is commented out per user request
+          // if (error.response?.data != null) { ... }
+          print('-----------------------------------------------------------');
+          return handler.next(error);
+        },
       ),
-    );*/
+    );
+    */
+
+    // Android/Release Mode Hotfix: bypass SSL issues on Dev/Staging environments
+    _dio.httpClientAdapter = IOHttpClientAdapter(
+      createHttpClient: () {
+        final client = HttpClient();
+        client.badCertificateCallback = 
+            (X509Certificate cert, String host, int port) => true;
+        return client;
+      },
+    );
   }
   
+  /// Common function to print all API responses.
+  /// You can comment out the print statements inside or the method call above to disable this.
+  void _printApiResponse(Response response) {
+    // print('=== API RESPONSE [${response.statusCode}] ===');
+    // print('URL: ${response.requestOptions.uri}');
+    // try {
+    //   final encoder = const JsonEncoder.withIndent('  ');
+    //   final prettyString = encoder.convert(response.data);
+    //   prettyString.split('\n').forEach((element) => print(element));
+    // } catch (e) {
+    //   print('DATA: ${response.data}');
+    // }
+    // print('=============================================');
+  }
+
   /// Expose Dio instance for Retrofit
   Dio get dio => _dio;
 

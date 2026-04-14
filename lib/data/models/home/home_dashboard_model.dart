@@ -19,25 +19,39 @@ class HomeDashboardModel extends HomeDashboard {
   });
 
   factory HomeDashboardModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>;
+    final data = json['data'] as Map<String, dynamic>? ?? {};
 
     return HomeDashboardModel(
-      welcome: WelcomeDataModel.fromJson(data['welcome']),
-      wellnessProgress: WellnessProgressModelResponse.fromJson(data['wellnessProgress']),
-      quickStats: QuickStatsModel.fromJson(data['quickStats']),
+      welcome: data['welcome'] is Map<String, dynamic>
+          ? WelcomeDataModel.fromJson(data['welcome'] as Map<String, dynamic>)
+          : const WelcomeDataModel(firstName: 'User', lastName: '', greeting: 'Welcome'),
+      wellnessProgress: data['wellnessProgress'] is Map<String, dynamic>
+          ? WellnessProgressModelResponse.fromJson(data['wellnessProgress'] as Map<String, dynamic>)
+          : const WellnessProgressModelResponse(
+              phaseName: 'Wellness Phase',
+              subtitle: "Let's get started",
+              progressPercent: 0,
+              currentStep: '',
+            ),
+      quickStats: data['quickStats'] is Map<String, dynamic>
+          ? QuickStatsModel.fromJson(data['quickStats'] as Map<String, dynamic>)
+          : const QuickStatsModel(),
       actionRequired: (data['actionRequired'] as List<dynamic>?)
-              ?.map((e) => _parseTask(e))
+              ?.where((e) => e is Map<String, dynamic>)
+              .map((e) => _parseTask(e as Map<String, dynamic>))
               .toList() ??
           [],
       tasksCompleted: (data['tasksCompleted'] as List<dynamic>?)
-              ?.map((e) => _parseTask(e))
+              ?.where((e) => e is Map<String, dynamic>)
+              .map((e) => _parseTask(e as Map<String, dynamic>))
               .toList() ??
           [],
-      yourProgram: data['yourProgram'] != null
-          ? WellnessProgramModel.fromJson(data['yourProgram']).toEntity()
+      yourProgram: data['yourProgram'] is Map<String, dynamic>
+          ? WellnessProgramModel.fromJson(data['yourProgram'] as Map<String, dynamic>).toEntity()
           : null,
       quickAccess: (data['quickAccess'] as List<dynamic>?)
-              ?.map((e) => HomeQuickAccessItemModel.fromJson(e))
+              ?.where((e) => e is Map<String, dynamic>)
+              .map((e) => HomeQuickAccessItemModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
     );

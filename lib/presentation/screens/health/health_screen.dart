@@ -26,11 +26,13 @@ class HealthScreen extends ConsumerStatefulWidget {
 class _HealthScreenState extends ConsumerState<HealthScreen> {
   late int _selectedTabIndex;
   final List<String> _tabs = [AppStrings.tabExercise, AppStrings.tabDiet, AppStrings.tabResults, AppStrings.tabInsights];
+  final Set<int> _visitedTabs = {};
 
   @override
   void initState() {
     super.initState();
     _selectedTabIndex = widget.initialTabIndex;
+    _visitedTabs.add(_selectedTabIndex);
     
     // Fetch specialists when the screen initializes
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -43,6 +45,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
     super.didUpdateWidget(oldWidget);
     if (widget.initialTabIndex != oldWidget.initialTabIndex) {
       _selectedTabIndex = widget.initialTabIndex;
+      _visitedTabs.add(_selectedTabIndex);
     }
   }
 
@@ -103,6 +106,7 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
                         onTap: () {
                           setState(() {
                             _selectedTabIndex = index;
+                            _visitedTabs.add(index);
                           });
                         },
                         child: Container(
@@ -141,11 +145,11 @@ class _HealthScreenState extends ConsumerState<HealthScreen> {
               // Content based on selection (Refactored using clean architecture & IndexedStack for zero-hang performance)
               IndexedStack(
                 index: _selectedTabIndex,
-                children: const [
-                  ExerciseTabContent(),
-                  DietTabContent(),
-                  HealthResultsTab(),
-                  InsightsTabContent(),
+                children: [
+                  _visitedTabs.contains(0) ? const ExerciseTabContent() : const SizedBox.shrink(),
+                  _visitedTabs.contains(1) ? const DietTabContent() : const SizedBox.shrink(),
+                  _visitedTabs.contains(2) ? const HealthResultsTab() : const SizedBox.shrink(),
+                  _visitedTabs.contains(3) ? const InsightsTabContent() : const SizedBox.shrink(),
                 ],
               ),
             ],

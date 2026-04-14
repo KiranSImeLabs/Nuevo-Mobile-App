@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../../utils/responsive_utils.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/session.dart';
@@ -142,9 +143,8 @@ class AppointmentCard extends StatelessWidget {
          return '${session.professionalName} • ${session.durationMinutes} min';
       }
       if (type == AppointmentCardType.past) {
-        // Format: Dr. Name • Date
-         // Using a simple date formatter or static string for mock
-         return '${session.professionalName} • Dec 20, 2024'; 
+         final dateStr = DateFormat('MMM d, yyyy').format(session.scheduledTime);
+         return '${session.professionalName} • $dateStr'; 
       }
       return session.professionalName!;
     }
@@ -152,16 +152,31 @@ class AppointmentCard extends StatelessWidget {
   }
 
   Widget _buildTimeInfo(BuildContext context) {
-      // "Today   2:30PM   Virtual Visit"
+      final now = DateTime.now();
+      final today = DateTime(now.year, now.month, now.day);
+      final tomorrow = DateTime(now.year, now.month, now.day + 1);
+      final scheduledDate = DateTime(session.scheduledTime.year, session.scheduledTime.month, session.scheduledTime.day);
+      
+      String dateStr;
+      if (scheduledDate == today) {
+        dateStr = 'Today';
+      } else if (scheduledDate == tomorrow) {
+        dateStr = 'Tomorrow';
+      } else {
+        dateStr = DateFormat('MMM d, yyyy').format(session.scheduledTime);
+      }
+      
+      final timeStr = DateFormat.jm().format(session.scheduledTime);
+
       return Row(
           children: [
               Icon(Icons.calendar_today_outlined, size: 14, color: AppColors.textSecondary),
               const SizedBox(width: 4),
-              Text('Today', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              Text(dateStr, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
               const SizedBox(width: 12),
               Icon(Icons.access_time, size: 14, color: AppColors.textSecondary),
               const SizedBox(width: 4),
-              Text('2:30PM', style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
+              Text(timeStr, style: TextStyle(fontSize: 12, color: AppColors.textSecondary)),
               // Add Virtual/Location if needed
           ],
       );
