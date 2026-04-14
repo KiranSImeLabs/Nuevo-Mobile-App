@@ -617,8 +617,8 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
           if (task.statusOptions.isNotEmpty && task.taskType == 'APPOINTMENT') ...[
              SizedBox(height: ResponsiveUtils.spacing(context, base: 16)),
              Row(
-                children: task.statusOptions.map((opt) {
-                   final isSelected = opt == task.statusValue;
+                children: task.statusOptions.where((opt) => opt == task.statusValue).map((opt) {
+                   final isSelected = true; // since we pre-filtered, it is true
                    return Container(
                       margin: const EdgeInsets.only(right: 8),
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),

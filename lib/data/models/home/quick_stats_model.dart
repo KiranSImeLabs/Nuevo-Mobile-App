@@ -27,7 +27,7 @@ class QuickStatsModel extends QuickStats {
   factory QuickStatsModel.fromJson(Map<String, dynamic> json) {
     return QuickStatsModel(
       nuevoAge: json['nuevoAge']?.toString(),
-      nextSession: json['nextSession'] != null
+      nextSession: json['nextSession'] is Map<String, dynamic>
           ? SessionInfoModel.fromJson(json['nextSession'] as Map<String, dynamic>)
           : null,
     );

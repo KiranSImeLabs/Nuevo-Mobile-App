@@ -50,7 +50,7 @@ class Session extends Equatable {
     // or vice versa in a way that's hard to manage here. 
     // But since this is the entity, we'll assume it's passed correctly.
     final DateTime scheduled = detail.consultationDateTime != null 
-        ? DateTime.parse(detail.consultationDateTime!).toLocal()
+        ? DateTime.parse(detail.consultationDateTime!).toUtc().add(const Duration(hours: 10))
         : DateTime.now();
 
     return Session(

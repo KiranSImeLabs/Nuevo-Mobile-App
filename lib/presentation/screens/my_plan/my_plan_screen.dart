@@ -187,6 +187,8 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
       error: (error, _) => Text('Error loading active phase: $error'),
       data: (activePhaseData) {
         final activeOrderIndex = activePhaseData.phase.phase?.orderIndex ?? 0;
+        final allTasksCompleted = activePhaseData.tasks.isNotEmpty &&
+            activePhaseData.tasks.every((t) => t.status == 'COMPLETED' || t.legacyStatus == 'COMPLETED');
 
         return phaseState.when(
           loading: () => const Center(child: CircularProgressIndicator()),
@@ -200,27 +202,32 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
                 final isFirst = index == 0;
                 final isLast = index == phases.length - 1;
 
-                final isCompleted = phase.orderIndex < activeOrderIndex;
-                final isActive = phase.orderIndex == activeOrderIndex;
+                final isCompleted = phase.orderIndex < activeOrderIndex || 
+                                    (phase.orderIndex == activeOrderIndex && allTasksCompleted);
+                final isActiveVisually = (phase.orderIndex == activeOrderIndex && !allTasksCompleted) || 
+                                         (phase.orderIndex == activeOrderIndex + 1 && allTasksCompleted);
+                
+                final isSelectable = phase.orderIndex <= activeOrderIndex || 
+                                     (phase.orderIndex == activeOrderIndex + 1 && allTasksCompleted);
 
                 final program = ref.read(homeDashboardProvider).valueOrNull?.yourProgram;
                 return _buildTimelineItem(
                   phase.name,
-                  isActive: isActive,
+                  isActive: isActiveVisually,
                   isCompleted: isCompleted,
                   isFirst: isFirst,
                   isLast: isLast,
-                  onTap: () {
+                  onTap: isSelectable ? () {
                     context.push(
                       '/your-tasks',
                       extra: {
                         'programName': program?.name ?? 'Insight Program',
                         'programDescription': program?.description ?? 'Personalised, clinician-guided care',
                         'phaseId': phase.id,
-                        'isActive': isActive,
+                        'isActive': phase.orderIndex == activeOrderIndex,
                       },
                     );
-                  },
+                  } : null,
                 );
               }).toList(),
             );
@@ -246,14 +253,16 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
             width: 32,
             child: Column(
               children: [
-                  if (!isFirst)
-                  Container(
-                    width: 2,
-                    height: 12,
-                    color: isCompleted || isActive 
-                        ? const Color(0xFF8D5B4C) 
-                        : const Color(0xFF8D5B4C).withOpacity(0.3),
-                  ),
+                  if (isFirst)
+                    const SizedBox(height: 14)
+                  else
+                    Container(
+                      width: 2,
+                      height: 14,
+                      color: isCompleted || isActive 
+                          ? const Color(0xFF8D5B4C) 
+                          : const Color(0xFF8D5B4C).withOpacity(0.5),
+                    ),
                 Container(
                   width: 24,
                   height: 24,

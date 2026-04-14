@@ -140,34 +140,26 @@ class HomeScreen extends ConsumerWidget {
                                     height: ResponsiveUtils.spacing(context, base: 24),
                                   ),
                                 ],
-                                
-                                // 4. Action Required
-                                _buildSectionHeader(
-                                  context,
-                                  'Action required',
-                                  onActionTap: () => context.push(
-                                    '/completed-tasks',
-                                    extra: {'showCompleted': false},
-                                  ),
-                                  actionLabel: 'Complete Now',
-                                  showArrow: true,
-                                ),
-                                SizedBox(
-                                  height: ResponsiveUtils.spacing(context, base: 16),
-                                ),
-                                if (pendingPhaseTasks.isNotEmpty)
-                                  _buildTasksList(context, ref, activePhaseTasks.where((t) => t.legacyStatus != 'COMPLETED' && t.status != 'COMPLETED').toList())
-                                else
-                                  Padding(
-                                    padding: EdgeInsets.only(bottom: ResponsiveUtils.spacing(context, base: 8)),
-                                    child: Text(
-                                      'No pending actions.',
-                                      style: TextStyle(color: Colors.grey[600]),
+                                if (pendingPhaseTasks.isNotEmpty) ...[
+                                  // 4. Action Required
+                                  _buildSectionHeader(
+                                    context,
+                                    'Action required',
+                                    onActionTap: () => context.push(
+                                      '/completed-tasks',
+                                      extra: {'showCompleted': false},
                                     ),
+                                    actionLabel: 'Complete Now',
+                                    showArrow: true,
                                   ),
-                                SizedBox(
-                                  height: ResponsiveUtils.spacing(context, base: 24),
-                                ),
+                                  SizedBox(
+                                    height: ResponsiveUtils.spacing(context, base: 16),
+                                  ),
+                                  _buildTasksList(context, ref, activePhaseTasks.where((t) => t.legacyStatus != 'COMPLETED' && t.status != 'COMPLETED').toList()),
+                                  SizedBox(
+                                    height: ResponsiveUtils.spacing(context, base: 24),
+                                  ),
+                                ],
                               ],
                             );
                           },
@@ -502,6 +494,91 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
+  void _showAppointmentStatusDialog(BuildContext context, WidgetRef ref, PatientTaskModel pTask, List<String> options) {
+    final title = pTask.taskName.isNotEmpty ? pTask.taskName : (pTask.phaseTask?.title ?? 'Update Status');
+    String selectedOption = options.first;
+
+    showDialog(
+      context: context,
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              backgroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                title,
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Color(0xFF3E160D)),
+                textAlign: TextAlign.center,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Please confirm your selection before submitting.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                  const SizedBox(height: 24),
+                  ...options.map((opt) => RadioListTile<String>(
+                        title: Text(opt.toUpperCase(), style: const TextStyle(fontWeight: FontWeight.w500)),
+                        value: opt,
+                        groupValue: selectedOption,
+                        activeColor: const Color(0xFF964A38),
+                        onChanged: (val) {
+                          if (val != null) setState(() => selectedOption = val);
+                        },
+                      )),
+                ],
+              ),
+              contentPadding: const EdgeInsets.fromLTRB(16, 24, 16, 8),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text('Cancel', style: TextStyle(color: Colors.grey)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF964A38),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  onPressed: () async {
+                    // Capture navigator and messenger securely before async gap
+                    final rootNavigator = Navigator.of(ctx, rootNavigator: true);
+                    final messenger = ScaffoldMessenger.of(ctx);
+                    
+                    Navigator.of(ctx).pop(); // dismiss dialog
+                    
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (_) => const PopScope(
+                        canPop: false,
+                        child: Center(child: CircularProgressIndicator()),
+                      ),
+                    );
+                    
+                    final success = await ref.read(activePhaseTaskProvider.notifier).updateStatus(pTask.id, selectedOption);
+                    
+                    rootNavigator.pop(); // securely dismiss loader
+                    
+                    if (success) {
+                      ref.read(activePhaseProvider.notifier).fetchActivePhase();
+                      messenger.showSnackBar(const SnackBar(content: Text('Status updated successfully')));
+                    } else {
+                      messenger.showSnackBar(const SnackBar(content: Text('Failed to update status')));
+                    }
+                  },
+                  child: const Text('Confirm', style: TextStyle(color: Colors.white)),
+                ),
+              ],
+            );
+          }
+        );
+      },
+    );
+  }
+
   Widget _buildTasksList(BuildContext context, WidgetRef ref, List<PatientTaskModel> patientTasks) {
     return SizedBox(
       height: ResponsiveUtils.spacing(context, base: 110),
@@ -520,10 +597,16 @@ class HomeScreen extends ConsumerWidget {
               final type = (pTask.taskType.isNotEmpty ? pTask.taskType : (pTask.phaseTask?.taskType ?? '')).toUpperCase();
               
               if (type == 'QUESTIONNAIRE') {
+                final rootNavigator = Navigator.of(context, rootNavigator: true);
+                final messenger = ScaffoldMessenger.of(context);
+                
                 showDialog(
                   context: context,
                   barrierDismissible: false,
-                  builder: (ctx) => const Center(child: CircularProgressIndicator()),
+                  builder: (ctx) => const PopScope(
+                    canPop: false,
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
                 );
                 
                 // Yield the frame to ensure the dialog is fully pushed before popping
@@ -531,32 +614,35 @@ class HomeScreen extends ConsumerWidget {
                 
                 try {
                   final response = await ref.read(apiClientProvider).getTaskById(pTask.id);
-                  if (context.mounted) Navigator.of(context, rootNavigator: true).pop();
+                  rootNavigator.pop(); // dismiss loader
                   
                   if (response.success && response.data != null) {
                     final qId = response.data!.phaseTask?.questionnaireId;
                     if (qId != null && qId.isNotEmpty) {
                       if (context.mounted) context.push('/questionnaire/$qId/${pTask.id}');
                     } else {
-                      if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                      messenger.showSnackBar(
                         const SnackBar(content: Text('Questionnaire ID not found for this task')),
                       );
                     }
                   } else {
-                    if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
+                    messenger.showSnackBar(
                       SnackBar(content: Text(response.message ?? 'Failed to fetch task details')),
                     );
                   }
                 } catch (e) {
-                  if (context.mounted) {
-                    Navigator.of(context, rootNavigator: true).pop();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Error fetching task: $e')),
-                    );
-                  }
+                  rootNavigator.pop(); // dismiss loader on exception
+                  messenger.showSnackBar(
+                    SnackBar(content: Text('Error fetching task: $e')),
+                  );
                 }
               } else if (type == 'APPOINTMENT') {
-                context.push('/connecting-session');
+                final options = pTask.statusOptions.isNotEmpty ? pTask.statusOptions : (pTask.phaseTask?.statusOptions ?? []);
+                if (options.isNotEmpty) {
+                  _showAppointmentStatusDialog(context, ref, pTask, options);
+                } else {
+                  context.push('/connecting-session');
+                }
               } else {
                 context.push('/task/${pTask.id}');
               }

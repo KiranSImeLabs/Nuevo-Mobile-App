@@ -19,7 +19,9 @@ class HomeDashboardModel extends HomeDashboard {
   });
 
   factory HomeDashboardModel.fromJson(Map<String, dynamic> json) {
-    final data = json['data'] as Map<String, dynamic>? ?? {};
+    final data = json['data'] is Map<String, dynamic> 
+        ? json['data'] as Map<String, dynamic> 
+        : <String, dynamic>{};
 
     return HomeDashboardModel(
       welcome: data['welcome'] is Map<String, dynamic>

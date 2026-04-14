@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 // ==========================================
 // Time Slot Models
 // ==========================================
@@ -16,10 +18,18 @@ class TimeSlot {
   });
 
   factory TimeSlot.fromJson(Map<String, dynamic> json) {
+    String dTime = json['displayTime'] as String? ?? '';
+    final startTimeStr = json['startTime'] as String?;
+    if (startTimeStr != null && startTimeStr.isNotEmpty) {
+      try {
+        final dt = DateTime.parse(startTimeStr).toUtc().add(const Duration(hours: 10));
+        dTime = DateFormat.jm().format(dt);
+      } catch (_) {}
+    }
     return TimeSlot(
       startTime: json['startTime'] as String? ?? '',
       endTime: json['endTime'] as String? ?? '',
-      displayTime: json['displayTime'] as String? ?? '',
+      displayTime: dTime,
       available: json['available'] as bool? ?? false,
     );
   }
@@ -178,10 +188,18 @@ class AppointmentDetail {
   });
 
   factory AppointmentDetail.fromJson(Map<String, dynamic> json) {
+    String? dTime = json['displayTime'] as String?;
+    final consultTimeStr = json['consultationDateTime'] as String?;
+    if (consultTimeStr != null && consultTimeStr.isNotEmpty) {
+       try {
+         final dt = DateTime.parse(consultTimeStr).toUtc().add(const Duration(hours: 10));
+         dTime = DateFormat.jm().format(dt);
+       } catch (_) {}
+    }
     return AppointmentDetail(
       id: json['id'] as String? ?? '',
       displayDate: json['displayDate'] as String?,
-      displayTime: json['displayTime'] as String?,
+      displayTime: dTime,
       duration: json['duration']?.toString(),
       notes: json['notes'] as String?,
       status: json['status'] as String? ?? '',

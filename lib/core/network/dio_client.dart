@@ -122,13 +122,13 @@ class DioClient {
   void _printApiResponse(Response response) {
     // print('=== API RESPONSE [${response.statusCode}] ===');
     // print('URL: ${response.requestOptions.uri}');
-    // try {
-    //   final encoder = const JsonEncoder.withIndent('  ');
-    //   final prettyString = encoder.convert(response.data);
-    //   prettyString.split('\n').forEach((element) => print(element));
-    // } catch (e) {
-    //   print('DATA: ${response.data}');
-    // }
+    try {
+      final encoder = const JsonEncoder.withIndent('  ');
+      final prettyString = encoder.convert(response.data);
+      // prettyString.split('\n').forEach((element) => print(element));
+    } catch (e) {
+      // print('DATA: ${response.data}');
+    }
     // print('=============================================');
   }
 
