@@ -23,106 +23,89 @@ class WellnessCard extends StatelessWidget {
         color: const Color(0xFF6B3528),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: Row(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Left Side: Content (Icon+Text, Bars)
-          Expanded(
-            child: Align(
-              alignment: Alignment.topLeft,
-              child: IntrinsicWidth(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    // Top Row: Icon Box + Text
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // Icon Box
-                        Container(
-                          width: 48,
-                          height: 48,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Image.asset(
-                              'assets/images/wellness_icon.png',
-                              fit: BoxFit.contain,
-                              errorBuilder: (context, error, stackTrace) => const Icon(
-                                Icons.spa,
-                                color: Color(0xFF6B3528),
-                              ),
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        // Text Column
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              wellnessProgress.phaseName,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.white,
-                                height: 1.2,
-                                fontFamily: 'Inter',
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              wellnessProgress.subtitle,
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white.withOpacity(0.9),
-                                height: 1.2,
-                                fontFamily: 'Inter',
-                              ),
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
-                      ],
+          // Top Row: Content (Icon+Text)
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon Box
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Image.asset(
+                    'assets/images/wellness_icon.png',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.spa,
+                      color: Color(0xFF6B3528),
                     ),
-                    
-                    // Bottom: Progress Bars (Matches Row Width due to stretch)
-                    _buildProgressBars(context, percentage),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Text Column
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      wellnessProgress.phaseName,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.white,
+                        height: 1.2,
+                        fontFamily: 'Inter',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      wellnessProgress.subtitle,
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                        color: Colors.white.withOpacity(0.9),
+                        height: 1.2,
+                        fontFamily: 'Inter',
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ],
                 ),
               ),
-            ),
+            ],
           ),
           
-          const SizedBox(width: 16),
-          
-          // Right Side: Percentage (Aligned to bottom)
-          SizedBox(
-            width: 61,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Text(
-                  '$percentage%',
-                  style: const TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w400,
-                    color: Colors.white,
-                    height: 1.0,
-                    fontFamily: 'Outfit',
-                  ),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Expanded(
+                child: _buildProgressBars(context, percentage),
+              ),
+              const SizedBox(width: 70),
+              Text(
+                '$percentage%',
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.white,
+                  height: 1.0,
+                  fontFamily: 'Outfit',
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ],
       ),

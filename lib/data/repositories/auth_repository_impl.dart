@@ -218,21 +218,15 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<Either<Failure, void>> logout() async {
     try {
-      // API doesn't have explicit logout in the provided Postman subset for token invalidation unless it's blacklist.
-      // But typically we just clear local storage.
-      // If there IS a logout endpoint, I'd call it.
-      // Postman subset didn't show logout. ApiConstants had placeholder.
-      // I'll just clear local data for now as per "Client-side logout".
-      
-      // If server logout exists: await _restClient.logout();
-      
       // Clear local data
       await _localDataSource.clearSecureData();
+      await _localDataSource.clearPreferences();
       
       return const Right(null);
     } catch (e) {
       // Even if API call fails, clear local data
       await _localDataSource.clearSecureData();
+      await _localDataSource.clearPreferences();
       return Left(UnknownFailure(message: e.toString()));
     }
   }

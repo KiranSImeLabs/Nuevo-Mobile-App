@@ -36,10 +36,19 @@ class DioClient {
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
-          final token = await getAccessToken();
-          if (token != null && token.isNotEmpty) {
-            options.headers['Authorization'] = 'Bearer $token'; // The Postman collection doesn't always use Bearer but most do.
-            // Postman collection uses {{authToken}} in Bearer.
+          // Identify public routes that don't need authentication natively
+          final isPublicRoute = 
+              options.path.contains('/auth/register') ||
+              options.path.contains('/auth/login') ||
+              options.path.contains('/auth/generate-otp') ||
+              options.path.contains('/auth/login-otp') ||
+              options.path.contains('/auth/forgot-password');
+
+          if (!isPublicRoute) {
+            final token = await getAccessToken();
+            if (token != null && token.isNotEmpty) {
+              options.headers['Authorization'] = 'Bearer $token';
+            }
           }
           
           // HIPAA/GDPR Compliance: Do NOT log request data containing PII
@@ -49,18 +58,19 @@ class DioClient {
         },
         onResponse: (response, handler) {
           _printApiResponse(response);
-          // _logger.d(
-          //   'RESPONSE[${response.statusCode}] => PATH: ${response.requestOptions.path}',
-          // );
           return handler.next(response);
         },
         onError: (error, handler) {
-          // _logger.e(
-          //   'ERROR[${error.response?.statusCode}] => PATH: ${error.requestOptions.path}',
-          // );
-          
-          if (error.response?.statusCode == 401) {
-            // _logger.w('401 Unauthorized detected - triggering onUnauthorized callback');
+          final isPublicRoute = 
+              error.requestOptions.path.contains('/auth/register') ||
+              error.requestOptions.path.contains('/auth/login') ||
+              error.requestOptions.path.contains('/auth/generate-otp') ||
+              error.requestOptions.path.contains('/auth/login-otp') ||
+              error.requestOptions.path.contains('/auth/forgot-password');
+              
+          // Only trigger global session expiration on 401s for PROTECTED routes.
+          // A 401 on a public route usually implies Bad Credentials, not a session timeout.
+          if (error.response?.statusCode == 401 && !isPublicRoute) {
             onUnauthorized?.call();
           }
           
@@ -190,11 +200,17 @@ class DioClient {
           );
         } else {
           // Try to extract error message from response
-          final message = error.response?.data?['message'] ?? 
-                         error.response?.data?['error'] ?? 
-                         ErrorMessages.somethingWentWrong;
+          String message = ErrorMessages.somethingWentWrong;
+          if (error.response?.data is Map) {
+            message = (error.response?.data['message'] ?? 
+                      error.response?.data['error'] ?? 
+                      ErrorMessages.somethingWentWrong).toString();
+          } else if (error.response?.data is String) {
+            message = error.response?.data as String;
+          }
+          
           return ServerException(
-            message: message.toString(),
+            message: message,
             code: statusCode,
           );
         }

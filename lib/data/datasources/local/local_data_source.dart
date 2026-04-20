@@ -206,10 +206,10 @@ class LocalDataSource {
   /// If so, clear secure storage to prevent stale tokens from persisting (iOS Keychain issue)
   Future<void> handleFirstLaunch() async {
     if (isFirstLaunch()) {
-
-      await clearSecureData();
+      // DISABLED FOR DEVELOPMENT: This aggressive cache clearing prevents stale iOS tokens 
+      // on fresh production installs, but causes 'flutter run' to aggressively log developers out.
+      // await clearSecureData();
       await setFirstLaunchComplete();
-
     }
   }
 

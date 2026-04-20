@@ -77,7 +77,8 @@ class HealthResultsTab extends ConsumerWidget {
             ),
           ),
           error: (error, stack) {
-            debugPrint('Error loading lab reports: $error');
+            debugPrint('$error');
+            //Error loading lab reports: 
             return const Center(child: Text(AppStrings.unableToLoadLabReports));
           },
         ),

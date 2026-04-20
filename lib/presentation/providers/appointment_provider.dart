@@ -3,6 +3,8 @@ import '../../domain/repositories/appointment_repository.dart';
 import '../../data/repositories/appointment_repository_impl.dart';
 import '../../data/models/appointment_model.dart';
 import 'core_providers.dart';
+import 'auth_provider.dart';
+import 'auth_state.dart';
 
 final appointmentRepositoryProvider = Provider<AppointmentRepository>((ref) {
   final apiClient = ref.watch(apiClientProvider);
@@ -14,6 +16,11 @@ typedef TimeSlotsKey = ({String memberId, String date});
 
 final timeSlotsProvider =
     FutureProvider.family<TimeSlotResponse, TimeSlotsKey>((ref, key) async {
+  ref.listen<AuthState>(authProvider, (previous, next) {
+    if (next.status == AuthStatus.unauthenticated) {
+      ref.invalidateSelf();
+    }
+  });
   final repository = ref.watch(appointmentRepositoryProvider);
   final response =
       await repository.getTimeSlots(memberId: key.memberId, date: key.date);
@@ -27,6 +34,11 @@ final timeSlotsProvider =
 final appointmentDetailProvider =
     FutureProvider.family<AppointmentResponseData, String>(
         (ref, appointmentId) async {
+  ref.listen<AuthState>(authProvider, (previous, next) {
+    if (next.status == AuthStatus.unauthenticated) {
+      ref.invalidateSelf();
+    }
+  });
   final repository = ref.watch(appointmentRepositoryProvider);
   final response = await repository.getAppointmentById(appointmentId);
   if (response.success && response.data != null) {
@@ -38,6 +50,11 @@ final appointmentDetailProvider =
 /// Fetch all user appointments
 final userAppointmentsProvider =
     FutureProvider<UserAppointmentsResponse>((ref) async {
+  ref.listen<AuthState>(authProvider, (previous, next) {
+    if (next.status == AuthStatus.unauthenticated) {
+      ref.invalidateSelf();
+    }
+  });
   final repository = ref.watch(appointmentRepositoryProvider);
   final response = await repository.getUserAppointments();
   if (response.success && response.data != null) {

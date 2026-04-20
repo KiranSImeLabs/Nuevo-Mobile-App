@@ -61,6 +61,8 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(next.error!), backgroundColor: AppColors.error),
         );
+      } else if (next.status == AuthStatus.authenticated && previous?.status != AuthStatus.authenticated) {
+        context.go('/home');
       }
     });
 

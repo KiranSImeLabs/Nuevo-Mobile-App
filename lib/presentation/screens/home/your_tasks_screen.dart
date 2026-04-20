@@ -407,7 +407,15 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
                
                if (qId != null && qId.isNotEmpty) {
                  if (context.mounted) {
-                   context.push('/questionnaire/$qId/${task.id}');
+                   await context.push('/questionnaire/$qId/${task.id}');
+                   if (context.mounted) {
+                     final currentWeek = ref.read(weeklyViewProvider).value?.currentWeekGlobal;
+                     if (currentWeek != null) {
+                       ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(currentWeek);
+                     } else {
+                       ref.read(weeklyViewProvider.notifier).fetchCurrentWeek();
+                     }
+                   }
                  }
                } else {
                  if (context.mounted) {
@@ -435,7 +443,15 @@ class _YourTasksScreenState extends ConsumerState<YourTasksScreen> {
         else if (task.taskType == 'APPOINTMENT') {
          // context.push('/connecting-session');
         } else {
-           context.push('/task/${task.id}');
+           await context.push('/task/${task.id}');
+           if (context.mounted) {
+             final currentWeek = ref.read(weeklyViewProvider).value?.currentWeekGlobal;
+             if (currentWeek != null) {
+               ref.read(weeklyViewProvider.notifier).fetchWeekByNumber(currentWeek);
+             } else {
+               ref.read(weeklyViewProvider.notifier).fetchCurrentWeek();
+             }
+           }
         }
       },
       child: Container(

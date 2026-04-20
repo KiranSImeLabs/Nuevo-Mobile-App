@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../providers/phase_provider.dart';
 import '../../providers/core_providers.dart';
+import '../../providers/home_provider.dart';
 import '../../utils/responsive_utils.dart';
 import '../../widgets/home/task_card.dart';
 import '../../widgets/common/app_error_widget.dart';
@@ -137,7 +138,13 @@ class CompletedTasksScreen extends ConsumerWidget {
                       if (response.success && response.data != null) {
                         final qId = response.data!.phaseTask?.questionnaireId;
                         if (qId != null && qId.isNotEmpty) {
-                          if (context.mounted) context.push('/questionnaire/$qId/${pTask.id}');
+                          if (context.mounted) {
+                            await context.push('/questionnaire/$qId/${pTask.id}');
+                            if (context.mounted) {
+                              ref.read(activePhaseProvider.notifier).fetchActivePhase();
+                              ref.refresh(homeDashboardProvider.future);
+                            }
+                          }
                         } else {
                           if (context.mounted) ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Questionnaire ID not found for this task')),
@@ -159,7 +166,11 @@ class CompletedTasksScreen extends ConsumerWidget {
                   } else if (type == 'APPOINTMENT') {
                     context.push('/connecting-session');
                   } else {
-                    context.push('/task/${pTask.id}');
+                    await context.push('/task/${pTask.id}');
+                    if (context.mounted) {
+                      ref.read(activePhaseProvider.notifier).fetchActivePhase();
+                      ref.refresh(homeDashboardProvider.future);
+                    }
                   }
                 },
               );

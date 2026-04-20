@@ -184,7 +184,8 @@ class _MyPlanScreenState extends ConsumerState<MyPlanScreen> {
 
     return activePhaseState.when(
       loading: () => const Center(child: CircularProgressIndicator()),
-      error: (error, _) => Text('Error loading active phase: $error'),
+      error: (error, _) => Text('$error'),
+      //Error loading active phase: 
       data: (activePhaseData) {
         final activeOrderIndex = activePhaseData.phase.phase?.orderIndex ?? 0;
         final allTasksCompleted = activePhaseData.tasks.isNotEmpty &&

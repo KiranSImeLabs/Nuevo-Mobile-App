@@ -619,7 +619,13 @@ class HomeScreen extends ConsumerWidget {
                   if (response.success && response.data != null) {
                     final qId = response.data!.phaseTask?.questionnaireId;
                     if (qId != null && qId.isNotEmpty) {
-                      if (context.mounted) context.push('/questionnaire/$qId/${pTask.id}');
+                      if (context.mounted) {
+                        await context.push('/questionnaire/$qId/${pTask.id}');
+                        if (context.mounted) {
+                          ref.read(activePhaseProvider.notifier).fetchActivePhase();
+                          ref.refresh(homeDashboardProvider.future);
+                        }
+                      }
                     } else {
                       messenger.showSnackBar(
                         const SnackBar(content: Text('Questionnaire ID not found for this task')),
@@ -644,7 +650,11 @@ class HomeScreen extends ConsumerWidget {
                   context.push('/connecting-session');
                 }
               } else {
-                context.push('/task/${pTask.id}');
+                await context.push('/task/${pTask.id}');
+                if (context.mounted) {
+                  ref.read(activePhaseProvider.notifier).fetchActivePhase();
+                  ref.refresh(homeDashboardProvider.future);
+                }
               }
             },
           );

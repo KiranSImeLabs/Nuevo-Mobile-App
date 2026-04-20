@@ -1,3 +1,4 @@
+
 import 'package:dartz/dartz.dart';
 import '../../core/errors/failures.dart';
 import '../../data/models/daily_exercise_model.dart';

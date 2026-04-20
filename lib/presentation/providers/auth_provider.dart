@@ -8,6 +8,7 @@ import '../../domain/usecases/user/get_user_profile_usecase.dart';
 import '../../domain/usecases/auth/forgot_password_usecase.dart';
 import '../../domain/usecases/usecase.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/entities/user.dart';
 import 'auth_state.dart';
 import 'core_providers.dart';
 import 'user_provider.dart';
@@ -20,6 +21,8 @@ import 'lab_reports_provider.dart';
 import 'preferences_provider.dart';
 import 'goal_provider.dart';
 import 'phase_provider.dart';
+import 'subscription_provider.dart';
+import 'questionnaire_provider.dart';
 
 /// Auth Notifier
 /// Manages global authentication state
@@ -60,8 +63,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     // We use this event system to break circular dependency with DioClient
     _ref.listen<int>(logoutEventProvider, (previous, next) {
       if (next > (previous ?? 0)) {
-
-        logout();
+        logout('401 Unauthorized globally intercepted by DioClient');
       }
     });
   }
@@ -81,8 +83,20 @@ class AuthNotifier extends StateNotifier<AuthState> {
         
         profileResult.fold(
           (failure) async {
-
-            await logout(); // This handles state update and storage cleanup
+            // Only force a hard logout if it's explicitly an authorization/session-expired error.
+            // This prevents unexpected logouts on Hot Reload, network drops, or missing backend profile endpoints.
+            final msg = failure.message.toLowerCase();
+            final isAuthError = msg.contains('unauthorized') || 
+                                msg.contains('expired') || 
+                                msg.contains('token');
+            if (isAuthError) {
+              await logout('isAuthError in checkLoginStatus ($msg)');
+            } else {
+              // Proceed as authenticated with a placeholder user. 
+              // The valid token is still in secure storage and will attach to future requests.
+              state = AuthState.authenticated(
+                  User(id: 'local_fallback', email: '', name: 'Loading...'));
+            }
           },
           (user) {
 
@@ -104,7 +118,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final result = await _loginUseCase(LoginParams(email: email, password: password));
     result.fold(
       (failure) => state = AuthState.error(failure.message),
-      (user) => state = AuthState.authenticated(user),
+      (user) {
+        _clearUserCache();
+        state = AuthState.authenticated(user);
+      },
     );
   }
 
@@ -127,17 +144,28 @@ class AuthNotifier extends StateNotifier<AuthState> {
   /// Verify OTP
   Future<bool> verifyOtp(String email, String otp) async {
     state = AuthState.loading();
-    final result = await _verifyOtpUseCase(email: email, otp: otp);
-    return result.fold(
-      (failure) {
-        state = AuthState.error(failure.message);
-        return false;
-      },
-      (user) {
-        state = AuthState.authenticated(user);
-        return true;
-      },
-    );
+    try {
+      final result = await _verifyOtpUseCase(email: email, otp: otp);
+      return result.fold(
+        (failure) {
+          state = AuthState.error(failure.message);
+          return false;
+        },
+        (user) {
+          try {
+            _clearUserCache();
+          } catch (e) {
+            // If cache clearing fails, we still want to log the user in to avoid freezing
+            print('Non-fatal error clearing cache: $e');
+          }
+          state = AuthState.authenticated(user);
+          return true;
+        },
+      );
+    } catch (e) {
+      state = AuthState.error("Unexpected error: ${e.toString()}");
+      return false;
+    }
   }
 
   /// Signup
@@ -156,44 +184,74 @@ class AuthNotifier extends StateNotifier<AuthState> {
     ));
     result.fold(
       (failure) => state = AuthState.error(failure.message),
-      (user) => state = AuthState.authenticated(user),
+      (user) {
+        _clearUserCache();
+        state = AuthState.authenticated(user);
+      },
     );
   }
 
   /// Logout
-  Future<void> logout() async {
+  Future<void> logout([String? reason]) async {
     state = AuthState.loading();
-    final result = await _logoutUseCase(const NoParams());
-    result.fold(
-      (failure) => state = AuthState.error(failure.message),
-      (_) {
-        state = AuthState.unauthenticated();
-        
-        // Clear all cached provider data on logout.
-        // We use Future.microtask to allow the Riverpod AuthState dependency graph to 
-        // safely update completely before we start explicitly invalidating watched providers.
-        Future.microtask(() {
-          _ref.invalidate(userProvider);
-          _ref.invalidate(homeDashboardProvider);
-          _ref.invalidate(dietPlanProvider);
-          _ref.invalidate(specialistListProvider);
-          _ref.invalidate(userAppointmentsProvider);
-          _ref.invalidate(labReportsProvider);
-          _ref.invalidate(todayExerciseProvider);
-          _ref.invalidate(weeklyScheduleProvider);
-          _ref.invalidate(patientHabitHistoryListProvider);
-          _ref.invalidate(goalListProvider);
-          _ref.invalidate(preferencesProvider);
-          
-          // Clear Phase Providers
-          _ref.invalidate(activePhaseProvider);
-          _ref.invalidate(phaseListProvider);
-          _ref.invalidate(weeklyViewProvider);
-          _ref.invalidate(phaseProgressProvider);
-          _ref.invalidate(activePhaseTaskProvider);
-        });
-      },
-    );
+    try {
+      print('>>> AUTO LOGOUT TRIGGERED. Reason: ${reason ?? "Manual"}');
+      await _logoutUseCase(const NoParams());
+      state = AuthState.unauthenticated();
+      // Defer explicit provider invalidation to avoid Riverpod CircularDependencyError 
+      // (e.g. from userProvider which actively watches authProvider)
+      Future.microtask(() => _clearUserCache());
+    } catch (e) {
+      state = AuthState.unauthenticated();
+      Future.microtask(() => _clearUserCache());
+    }
+  }
+
+  /// Safely clears all user-specific data from providers 
+  /// before a new user logs in or when logging out to prevent data leaks.
+  void _clearUserCache() {
+    // Clear all cached provider data on logout or pre-login.
+    // _ref.invalidate(userProvider); // Removed to prevent CircularDependencyError (since it watches authProvider contextually)
+    _ref.invalidate(homeDashboardProvider);
+    _ref.invalidate(dietPlanProvider);
+    _ref.invalidate(specialistListProvider);
+      
+      // Clear Appointment Providers
+      _ref.invalidate(userAppointmentsProvider);
+      _ref.invalidate(timeSlotsProvider);
+      _ref.invalidate(appointmentDetailProvider);
+      
+      _ref.invalidate(labReportsProvider);
+      _ref.invalidate(todayExerciseProvider);
+      _ref.invalidate(weeklyScheduleProvider);
+      _ref.invalidate(patientHabitHistoryListProvider);
+      _ref.invalidate(goalListProvider);
+      _ref.invalidate(preferencesProvider);
+      
+      // Clear Phase Providers
+      _ref.invalidate(activePhaseProvider);
+      _ref.invalidate(phaseListProvider);
+      _ref.invalidate(weeklyViewProvider);
+      _ref.invalidate(phaseProgressProvider);
+      _ref.invalidate(activePhaseTaskProvider);
+      
+      // Clear Subscription Providers
+      _ref.invalidate(subscriptionProvider);
+      _ref.invalidate(featureAccessProvider);
+      
+      // Clear Questionnaire Providers
+      _ref.invalidate(fetchQuestionnaireProvider);
+      _ref.invalidate(questionnaireNotifierProvider);
+
+      // Clear remaining Health/Session Providers
+    _ref.invalidate(sessionDetailsProvider);
+    _ref.invalidate(startSessionProvider);
+    _ref.invalidate(completeSessionProvider);
+    _ref.invalidate(syncSessionProgressProvider);
+    _ref.invalidate(activeProgressProvider);
+    _ref.invalidate(labReportDetailsProvider);
+    _ref.invalidate(createLabRequestProvider);
+    _ref.invalidate(patientHabitHistoryProvider);
   }
 
   /// Sign in with Google
@@ -203,7 +261,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final result = await _authRepository.signInWithGoogle();
     result.fold(
       (failure) => state = AuthState.error(failure.message),
-      (user) => state = AuthState.authenticated(user),
+      (user) {
+        _clearUserCache();
+        state = AuthState.authenticated(user);
+      },
     );
   }
 
@@ -213,7 +274,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final result = await _authRepository.signInWithApple();
     result.fold(
       (failure) => state = AuthState.error(failure.message),
-      (user) => state = AuthState.authenticated(user),
+      (user) {
+        _clearUserCache();
+        state = AuthState.authenticated(user);
+      },
     );
   }
 
