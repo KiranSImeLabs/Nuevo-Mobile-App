@@ -184,13 +184,13 @@ class AppStrings {
   static const String tabInsights = 'Insights';
   static const String contentComingSoon = 'Content for %s coming soon';
   static const String weeklyPreview = 'Weekly Preview';
-  static const String noScheduleAvailable = 'No schedule available';
+  static const String noScheduleAvailable = 'No schedule available right now.';
   static const String todaysExercise = "Today's Exercise";
   static const String exercisePreview = 'Exercise Preview';
-  static const String noExerciseToday = 'No exercise scheduled for today.';
-  static const String noExerciseThisDate = 'No exercise scheduled for this date.';
-  static const String yourWeeklyScheduleWillAppear = 'Your weekly schedule will appear here once it is available';
-  static const String unableToLoadExercise = 'Unable to load the exercise. Please try again.';
+ static const String noExerciseToday = 'You’re all set for today! No exercises scheduled.';
+ static const String noExerciseThisDate = 'No exercises planned for this day. Feel free to pick another date.';
+ static const String yourWeeklyScheduleWillAppear = 'Your weekly schedule will show up here once it’s ready.';
+ static const String unableToLoadExercise = 'Unable to load the exercise. Please try again.';
   static const String planOverview = 'Plan Overview';
   static const String program = 'PROGRAM';
   static const String weekOf = 'Week %s of %s'; // e.g. Week 3 of 12
@@ -199,12 +199,12 @@ class AppStrings {
   static const String mobilityAndFlex = 'Mobility & Flex'; // Example
   static const String activeSession = 'Active';
   static const String plusSessions = '+%s sessions'; // e.g. +2 sessions
-  static const String noCareTeamAssigned = 'No care team has been assigned yet.';
+  static const String noCareTeamAssigned = 'You don’t have a care team assigned yet.';
   static const String exerciseSession = 'Exercise Session';
   static const String mins = 'mins';
   static const String startSession = 'Start Session';
-  static const String noNutritionPlan = 'No nutrition plan assigned.';
-  static const String unableToLoadDietPlan = 'Unable to load diet plan';
+  static const String noNutritionPlan = 'You don’t have a nutrition plan assigned yet.';
+static const String unableToLoadDietPlan = 'Unable to load your diet plan. Please try again.';
   static const String todaysNutrition = "Today's Nutrition";
   static const String calories = 'Calories';
   static const String protein = 'Protein';
@@ -217,8 +217,8 @@ class AppStrings {
   static const String tapForDetails = 'Tap for details';
   
   // Results
-  static const String noLabReportsFound = 'No lab reports found.';
-  static const String unableToLoadLabReports = 'Unable to load lab reports';
+  static const String noLabReportsFound = 'You don’t have any lab reports yet.';
+static const String unableToLoadLabReports = 'Unable to load your lab reports. Please try again.';
   static const String unknownDate = 'Unknown Date';
   static const String labReport = 'Lab Report';
   static const String bookNewTest = 'Book a New Test';
@@ -230,15 +230,15 @@ class AppStrings {
   static const String biologicalAgeDiff = '5 years younger than your biological age';
   static const String recentInsights = 'Recent Insights';
   static const String sleepQualityImproved = 'Sleep Quality Improved';
-  static const String sleepQualityDesc = 'Your average sleep time increased by 45 minutes this week';
+  static const String sleepQualityDesc = 'Your average sleep time increased this week.';
   static const String activityGoalMet = 'Activity Goal Met';
-  static const String activityGoalDesc = "You've hit your daily step goal 5 days in a row!";
+  static const String activityGoalDesc = 'You’re on a great streak—keep hitting your daily step goal!';
   static const String stressLevels = 'Stress Levels';
   static const String stressLevelsDesc = 'Consider adding relaxation techniques to your routine';
 
   // Session Overview
   static const String sessionOverview = 'Session Overview';
-  static const String failedToLoadSession = 'Failed to load session details: ';
+  static const String failedToLoadSession = 'Unable to load session details. Please try again.';
   static const String sessionNotFound = 'Session not found';
   static const String guidedSession = 'Guided Session';
   static const String stepPrefix = 'Step ';
@@ -252,12 +252,12 @@ class AppStrings {
 
   // Guided Session
   static const String exerciseStep = 'Exercise Step';
-  static const String failedToLoadActiveProgress = 'Failed to load active progress: ';
-  static const String sessionStartedBackend = 'Session started successfully on backend';
-  static const String failedToStartBackend = 'Failed to start session on backend: ';
+  static const String failedToLoadActiveProgress = 'Having trouble loading your progress. Please try again in a moment.';
+  static const String sessionStartedBackend = 'Your session has started successfully.';
+  static const String failedToStartBackend = 'Unable to start the session. Please try again.';
   static const String progressSyncedSuccessfully = 'Progress synced successfully for step ';
-  static const String failedToCompleteSession = 'Failed to complete session: ';
-  static const String noSessionSteps = 'No session steps available.';
+  static const String failedToCompleteSession = 'Unable to complete the session. Please try again.';
+  static const String noSessionSteps = 'No steps are available for this session.';
   static const String timeRemaining = 'TIME REMAINING';
   static const String endSession = 'End Session';
 
@@ -268,7 +268,7 @@ class AppStrings {
   // Result Details
   static const String resultDetails = 'Result Details';
   static const String greatProgress = 'Great Progress!';
-  static const String healthScoreImprovementDesc = 'Your overall health score improved by 12% compared to last month. 3 key markers are trending positively.';
+  static const String healthScoreImprovementDesc = 'Your overall health score improved by %s compared to last month, with %s key markers trending positively.';
   static const String keyImprovements = 'Key Improvements';
   static const String totalCholesterol = 'Total Cholesterol';
   static const String ngMl = 'ng/mL';

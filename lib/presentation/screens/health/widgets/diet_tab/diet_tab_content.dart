@@ -33,7 +33,8 @@ class DietTabContent extends ConsumerWidget {
         ),
       ),
       error: (error, stack) {
-        debugPrint('Error loading diet plan: $error');
+        debugPrint('$error');
+        //Error loading diet plan: 
         return const Center(child: Text(AppStrings.unableToLoadDietPlan));
       },
     );

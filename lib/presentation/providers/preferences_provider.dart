@@ -71,6 +71,8 @@ class PreferencesNotifier extends StateNotifier<PreferencesState> {
 
     final result = await _getPreferencesUseCase(const NoParams());
 
+    if (!mounted) return;
+
     result.fold(
       (failure) => state = state.copyWith(
         isLoading: false,
@@ -128,6 +130,8 @@ class PreferencesNotifier extends StateNotifier<PreferencesState> {
     state = state.copyWith(isLoading: true, error: null);
 
     final result = await _updatePreferencesUseCase(newPreferences);
+
+    if (!mounted) return;
 
     result.fold(
       (failure) {

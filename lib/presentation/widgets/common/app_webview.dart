@@ -63,18 +63,22 @@ class _AppWebViewState extends State<AppWebView> {
             }
           },
           onWebResourceError: (WebResourceError error) {
-             debugPrint('WebResourceError: ${error.description}');
+            // debugPrint('WebResourceError: ${error.description}');
           },
           onNavigationRequest: (NavigationRequest request) {
-            // Disable inter-link navigations.
-            // Allow only the exact URL or if it's loading the page itself.
-            // Using startsWith allows for query parameters or anchors if any.
-            if (request.url.startsWith(widget.url)) {
+            final url = request.url;
+
+           // debugPrint("Navigating to: $url");
+
+            if (url.startsWith("http") || url.startsWith("https")) {
               return NavigationDecision.navigate;
             }
-            
-            // Block all other navigations
+
+            // Handle external schemes
             return NavigationDecision.prevent;
+          },
+          onUrlChange: (UrlChange change) {
+            //debugPrint('WebView URL Changed: ${change.url}');
           },
         ),
       )

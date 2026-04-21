@@ -66,7 +66,8 @@ class ClinicianProfileScreen extends ConsumerWidget {
                   ],
                 ),
                 loading: () => const Center(child: CircularProgressIndicator()),
-                error: (err, stack) => Center(child: Text('Error loading details: $err')),
+                error: (err, stack) => Center(child: Text('$err')),
+                //Error loading details:
               ),
               
               const SizedBox(height: 32),

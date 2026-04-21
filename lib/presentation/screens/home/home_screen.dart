@@ -425,12 +425,31 @@ class HomeScreen extends ConsumerWidget {
           ),
           SizedBox(width: ResponsiveUtils.spacing(context, base: 8)),
           Expanded(
-            child: DietitianSessionCard(
-              sessionInfo: stats.nextSession,
-              onTap: () {
-                // Handle tap, e.g., navigate to session details
-              },
-            ),
+            child: (stats.nextSession != null && stats.nextSession!.label == 'Doctor Session')
+                ? DietitianSessionCard(
+                    sessionInfo: stats.nextSession,
+                    onTap: () {
+                      // Handle tap, e.g., navigate to session details
+                    },
+                  )
+                : Container(
+                    height: ResponsiveUtils.spacing(context, base: 68),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFF6ECE9),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '--',
+                        style: TextStyle(
+                          fontSize: ResponsiveUtils.fontSize(context, base: 24),
+                          fontWeight: FontWeight.w500,
+                          color: Colors.green,
+                          height: 1.0,
+                        ),
+                      ),
+                    ),
+                  ),
           ),
         ],
       ),

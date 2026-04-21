@@ -4,6 +4,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'core/theme/app_theme.dart';
 import 'presentation/navigation/router.dart';
 import 'presentation/providers/core_providers.dart';
+import 'presentation/providers/auth_listener.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -26,6 +27,7 @@ class NuevoApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    ref.watch(authStateListenerProvider);
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
