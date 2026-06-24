@@ -79,7 +79,7 @@ class DioClient {
       ),
     );
 
-    /*
+    
     // Add Professional Interceptor to print cleanly (without response data payloads)
     _dio.interceptors.add(
       InterceptorsWrapper(
@@ -99,8 +99,9 @@ class DioClient {
           print('-----------------------------------------------------------');
           print('<-- RESPONSE: [${response.statusCode}] ${response.requestOptions.uri}');
           // Response data printing is commented out per user request
-          // if (response.data != null) { ... }
+          if (response.data != null) { print('--> RESPONSE DATA: ${response.data}'); }
           print('-----------------------------------------------------------');
+          
           return handler.next(response);
         },
         onError: (error, handler) {
@@ -114,7 +115,7 @@ class DioClient {
         },
       ),
     );
-    */
+    
 
     // Android/Release Mode Hotfix: bypass SSL issues on Dev/Staging environments
     _dio.httpClientAdapter = IOHttpClientAdapter(
